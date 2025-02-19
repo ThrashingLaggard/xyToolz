@@ -2,7 +2,7 @@
 using System.Diagnostics;
 
 
-using con_Logger.Loggers;
+
 
 namespace xyToolz
 {
@@ -191,7 +191,7 @@ namespace xyToolz
       }
       catch(Exception e)
       {
-            sLog.ExLog(e);
+            xyLog.ExLog(e);
       }
       }
 

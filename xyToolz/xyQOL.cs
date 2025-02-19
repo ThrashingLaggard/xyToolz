@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using con_Logger.Loggers;
 
 namespace xyToolz
 {
@@ -32,7 +31,7 @@ namespace xyToolz
             }
             public static void Print(string what_to_print)
             {
-                  sLog.Log(what_to_print);
+                  xyLog.Log(what_to_print);
             }
 
 

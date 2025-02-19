@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using con_Logger.Loggers;
 
 namespace xyToolz
 {
@@ -50,7 +49,7 @@ namespace xyToolz
                   foreach (object value in values) 
                   {
                         output += value + ", ";
-                        sLog.Log(value+"");
+                        xyLog.Log(value+"");
                   }
                   return output;
             }

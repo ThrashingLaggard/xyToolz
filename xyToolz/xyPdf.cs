@@ -2,7 +2,7 @@
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using con_Logger.Loggers;
+
 
 namespace xyToolz
 {
@@ -32,7 +32,7 @@ namespace xyToolz
                   }
                   catch (Exception e) 
                   {
-                        sLog.ExLog(e);
+                        xyLog.ExLog(e);
                   }
                   return new_File;
             }
@@ -55,7 +55,7 @@ namespace xyToolz
                   }
                   catch(Exception e)
                   {
-                        sLog.ExLog(e);
+                        xyLog.ExLog(e);
                         return false;
                   }
             }
