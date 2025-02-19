@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using con_Logger.Loggers;
+
+namespace xyToolz
+{
+      public class xyListen
+      {
+            public static IEnumerable<int> FillTheList(int limit) 
+            {
+                  var list = new List<int>();
+
+                  for (int i = 0; i < limit; i++)
+                  {
+                        list.Add(i);
+                  }
+                  return list;
+            }
+
+            public static IEnumerable<int> FillEvenList(int limit) 
+            {
+                  var lst_EvenNumbers = new List<int>();
+
+                  for (int i = 2; i < limit; i +=2)
+                  {
+                        lst_EvenNumbers.Add(i);
+                  }
+                  return lst_EvenNumbers;
+            }
+
+            public static IEnumerable<int> FillOddList(int limit) 
+            {
+                  var lst_OddNumbers = new List<int>();
+
+                  for (int i = 1; i < limit; i+=2)
+                  {
+                        lst_OddNumbers.Add(i);
+                  }
+                  return lst_OddNumbers;
+            }
+
+            public static string ListToString(IEnumerable values)
+            {
+                  string output = string.Empty;
+                  foreach (object value in values) 
+                  {
+                        output += value + ", ";
+                        sLog.Log(value+"");
+                  }
+                  return output;
+            }
+
+            /// <summary>
+            /// Returns a list filled with all the quarters of an hour in the day
+            /// </summary>
+            /// <returns></returns>
+            private static IEnumerable<string> GetQuarterHours()
+            {
+                  var presets = new List<string>();
+                  for (int i = 0; i < 24; i++)
+                  {
+                        for (int j = 0; j < 4; j++)
+                        {
+                              // Wert in der Schleife aktualisieren!
+                              int minutes = 15 * (j + 1);
+                              int hour = i;
+
+                              // Stunden inkrementieren
+                              if (minutes == 60)
+                              {
+                                    minutes = 0;
+                                    hour = (i + 1) % 24;
+                              }
+
+                              // Mit führenden Nullen formatieren
+                              string str_Time = $"{hour:D2}:{minutes:D2}";
+
+                              // Zur Liste hinzufügen und dann verwerfen
+                              presets.Add(str_Time);
+                              str_Time = string.Empty;
+                        }
+                  }
+                  return presets;
+            }
+
+      }
+}

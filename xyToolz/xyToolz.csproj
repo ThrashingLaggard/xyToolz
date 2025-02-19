@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <SignAssembly>False</SignAssembly>
+    <Title>xyToolZ</Title>
+    <Company></Company>
+    <Authors>Hansi Bremstein</Authors>
+    <Description>Little toolz to save some precious seconds with my doggo.
+
+-PDF:
+  -create
+  -convert
+  -combine
+  -
+
+-Files</Description>
+    <Copyright>Do with this, as you please. Go home to your dog   </Copyright>
+    <PackageTags>tools,pdf,qol,files,small,stuff,</PackageTags>
+    <PackAsTool>True</PackAsTool>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PDFsharp" Version="6.1.1" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
+    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="con_Logger">
+      <HintPath>..\..\..\..\con_Logger\con_Logger\bin\Debug\net8.0\con_Logger.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
