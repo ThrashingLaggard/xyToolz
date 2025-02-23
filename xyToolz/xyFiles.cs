@@ -211,7 +211,6 @@ namespace xyToolz
                 {
                     Directory.CreateDirectory(dir);
                     DirectoryInfo info = new(dir);
-                    info.Attributes = FileAttributes.None;
                     info.Attributes = FileAttributes.Directory;
                 }
                 
@@ -225,6 +224,9 @@ namespace xyToolz
                 return("#############################XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX#############################");
             }            
         }
+
+
+
         public static string Copy_Overwrite(string full_path, string target_path)
         {
             try
@@ -235,7 +237,6 @@ namespace xyToolz
                 {
                     Directory.CreateDirectory(dir);
                     DirectoryInfo info = new(dir);
-                    info.Attributes = FileAttributes.None;
                     info.Attributes = FileAttributes.Directory;
                 }
 
@@ -269,7 +270,7 @@ namespace xyToolz
                 string folderPath = xyFolder.EnsureSubfolderExists(basePath, subfolder);
                 string filePath = Path.Combine(folderPath, fileName);
 
-                await File.WriteAllTextAsync(filePath, content);
+             //   await File.WriteAllTextAsync(filePath, content);
                 return true;
             }
             catch (Exception ex)
@@ -292,8 +293,8 @@ namespace xyToolz
 
                 if (!File.Exists(filePath))
                     return null;
-
-                return await File.ReadAllTextAsync(filePath);
+                return File.ReadAllText(filePath);
+              //  return await File.ReadAllTextAsync(filePath);
             }
             catch (Exception ex)
             {
