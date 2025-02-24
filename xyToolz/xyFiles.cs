@@ -5,9 +5,6 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 
 using xyToolz.Helper;
-using PdfSharp.Quality;
-
-
 
 
 
@@ -41,8 +38,9 @@ namespace xyToolz
                         File.Move(completePath, newPath);
                         return newPath;
                   }
-                  catch
+                  catch (Exception e)
                   {
+                        xyLog.ExLog(e);
                         return "Error renaming file";
                   }
             }
