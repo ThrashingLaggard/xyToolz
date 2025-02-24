@@ -48,11 +48,14 @@
   </PropertyGroup>
 
 	<PropertyGroup>
+		<!-- Verhindert, dass der Runtime Identifier an den Output-Pfad angehängt wird -->
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<!-- Versuche, die AAR-Erzeugung zu deaktivieren (falls unterstützt) -->
+		<AndroidGenerateLibraryPackage>false</AndroidGenerateLibraryPackage>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net8.0-android</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -64,6 +67,11 @@
   </ItemGroup>
 
 
+	<Target Name="CopyDllToRidFolder" AfterTargets="Build" Condition="'$(TargetFramework)'=='net8.0'">
+		<MakeDir Directories="$(OutputPath)android-x64" Condition="!Exists('$(OutputPath)android-x64')" />
+		<Copy SourceFiles="$(OutputPath)xyToolz.dll" DestinationFolder="$(OutputPath)android-x64" SkipUnchangedFiles="true" />
+	</Target>
+	
 	<Target Name="CopyDllToRidFolder" AfterTargets="Build" Condition="'$(TargetFramework)'=='net8.0-android'">
 		<MakeDir Directories="$(OutputPath)android-x64" Condition="!Exists('$(OutputPath)android-x64')" />
 		<Copy SourceFiles="$(OutputPath)xyToolz.dll" DestinationFolder="$(OutputPath)android-x64" SkipUnchangedFiles="true" />
