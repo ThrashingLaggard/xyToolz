@@ -21,19 +21,11 @@
 		</Description>
 		<Copyright>Do with this, as you please. Go home to your dog   </Copyright>
 		<PackageTags>tools,pdf,qol,files,small,stuff,</PackageTags>
-		<PackAsTool>True</PackAsTool>
+		<PackAsTool>False</PackAsTool>
 		<NeutralLanguage>en-GB</NeutralLanguage>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<OutputType>Library</OutputType>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<Optimize>False</Optimize>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<Optimize>False</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup>

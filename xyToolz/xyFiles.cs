@@ -10,8 +10,16 @@ using xyToolz.Helper;
 
 namespace xyToolz
 {
+      /// <summary>
+      /// xyFile eine Klasse zum Dateihandling
+      /// </summary>
       public class xyFiles
       {
+            /// <summary>
+            /// Überprüft ob alle angegebenen Verzeichnisse existieren
+            /// </summary>
+            /// <param name="directories"></param>
+            /// <returns></returns>
             public static bool CheckForDirectories(params string[] directories)
             {
                   return directories.All(dir => Directory.Exists(xyPathHelper.EnsureDirectory(dir)));
