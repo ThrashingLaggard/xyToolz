@@ -1,72 +1,261 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Cryptography;
 
 namespace xyToolz.Helper
 {
-      public static class xyHashHelper
-      {
-            public static string Pepper { get; set; }
-            private const int SaltLength = 16;  // 128 Bit
-            private const int KeyLenth = 32;    // 256 Bit
-            private const int Iterations = 1000;
+    /// <summary>
+    /// Hash and check passwords based on [Rfc2898DeriveBytes]
+    /// </summary>
+    public static class xyHashHelper
+    {
+        #region "Member"
+        /// <summary>
+        /// Populate with environment variable when using, default is "Ahuhu"...
+        /// </summary>
+        public static String? Pepper { get; private set; }
 
-            public static string HashPassword(string password)
+        /// <summary>
+        ///  The size for standard salt     =>     128 Bytes
+        /// </summary>
+        private const Int32 SaltLength = 16;
+
+        /// <summary>
+        /// SHA256  =  32 Bytes   
+        /// </summary>
+        private const Int16 KeyLength256 = 32;
+
+        /// <summary>
+        /// SHA512  =  64 Bytes    -->   Base64 => 86 characters (88 with padding)
+        /// </summary>
+        private const Int16 KeyLength512 = 64;   
+
+        /// <summary>
+        /// Number of iterations for the generator to choose the key from
+        /// </summary>
+        public static Int32 Iterations { get; private set; } = 100000;
+
+        private static HashAlgorithmName Sha256 = HashAlgorithmName.SHA256;
+        private static HashAlgorithmName Sha512 = HashAlgorithmName.SHA512;
+        #endregion
+
+        #region "Hashing"
+
+        /// <summary>
+        /// Hashes the given pasword in the specified algorithm
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <returns>hashed password as base64 string</returns>
+        public static String HashPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
+        {
+            String hashedPasswordString = "";
+            int length = SetKeySize(hashAlgorithm); 
+            String pepperedPassword = PepperPassword(password);
+            Byte[] hash = new Byte[length];
+
+            return HashToString(hashAlgorithm, password, salt);
+        }
+
+        /// <summary>
+        /// Hash the given password in  the specified algorithm, without creating local variables 
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <returns>
+        /// Byte[] hashedPassword
+        /// </returns>
+        public static byte[] HashToBytes(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
+        => (new Rfc2898DeriveBytes(PepperPassword(password), salt, Iterations, Sha256)).GetBytes(SetKeySize(hashAlgorithm));
+        
+        /// <summary>
+        /// Hash the given password in  the specified algorithm, without creating local variables
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <returns> base64 string     password</returns>
+        public static String HashToString(HashAlgorithmName hashAlgorithm, String password, Byte[] salt) 
+        => Convert.ToBase64String((new Rfc2898DeriveBytes(PepperPassword(password), salt, Iterations, Sha256)).GetBytes(SetKeySize(hashAlgorithm)));
+        
+        /// <summary>
+        /// Hashes the given pasword in the specified algorithm and returns hash and salt as base64 string
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <returns>salt:hash</returns>
+        public static String HashPasswordGetSaltAndHash(HashAlgorithmName hashAlgorithm,string password)
+        {
+            string saltNhash = "";
+            int length = SetKeySize(hashAlgorithm);
+            String pepperedPassword = PepperPassword(password);
+            Byte[] salt = GetSalt();
+            Byte[] hash = new Byte[length];
+
+            using (var pbkdf2 = new Rfc2898DeriveBytes(pepperedPassword, salt, Iterations, hashAlgorithm))
             {
-                  string hashedPassword = "";
-                  byte [ ] salt = RandomNumberGenerator.GetBytes (SaltLength);
-
-
-
-
-                  return hashedPassword;
+                hash = pbkdf2.GetBytes(length);
+                saltNhash = $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
+                return saltNhash;
             }
+        }
+
+        #endregion
+
+        #region "Verification"
+
+        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, Byte[] password, Byte[] salt) => CryptographicOperations.FixedTimeEquals(password, HashToBytes(hashAlgorithm, Convert.ToBase64String(password), salt));
+        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt) => CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), HashToBytes(hashAlgorithm, password, salt));
+        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, String saltNhash, string? useless = "This is the same function as the others but working step by step and using local variables")
+        {
+            String[] input = saltNhash.Split(':');
+            if (input.Length != 2) return false;
+            
+            Byte[] salt = Convert.FromBase64String(input[0]);
+            Byte[] hash = Convert.FromBase64String(input[1]);
+            Byte[] hashToCheck = HashToBytes(hashAlgorithm, password,salt) ;
+            
+            return CryptographicOperations.FixedTimeEquals(hash, hashToCheck);
+        }
+        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, String saltNhash)
+        =>CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(saltNhash.Split(':').First()), HashToBytes(hashAlgorithm, password, Convert.FromBase64String(saltNhash.Split(':').Last())));
+        
+        #endregion
+
+        #region "Misc"
+        /// <summary>
+        /// Create an array of cryptographically strong random values
+        /// </summary>
+        /// <returns></returns>
+        public static Byte[] GetSalt() => RandomNumberGenerator.GetBytes(SaltLength);
+
+        /// <summary>
+        /// Checks the given algorithm and returns the according length in Bytes
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <returns></returns>
+        private static Int32 SetKeySize(HashAlgorithmName hashAlgorithm)
+        {
+            if (hashAlgorithm == HashAlgorithmName.SHA256)
+            {
+                return KeyLength256;
+            }
+            if (hashAlgorithm == HashAlgorithmName.SHA512)
+            {
+                return KeyLength512;
+            }
+            else
+            {
+                xyLog.Log("No specific algorithm detected, default to secure alternative.");
+                return 128;
+            }
+        }
+        #endregion
+
+        #region "Pepper"
+        /// <summary>
+        /// Get the value for a specific environment variable 
+        /// </summary>
+        /// <param name="namePepperEnvVar"></param>
+        /// <returns>The value of the EnvVar</returns>
+        private static String? GetValueByFromEnviromentVariable(string namePepperEnvVar)
+        {
+            string? environmentVariable = "";
+            try
+            {
+                environmentVariable = Environment.GetEnvironmentVariable(namePepperEnvVar);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+            }
+            return environmentVariable;
+        }
+
+        /// <summary>
+        /// Pepper the password with the value retrieved from the environment variable
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="namePepperEnvVar"></param>
+        /// <returns></returns>
+        private static String PepperPasswordWithEnvVar(string password, string namePepperEnvVar) => password + GetValueByFromEnviromentVariable(namePepperEnvVar);
+
+        /// <summary>
+        /// Set member "pepper" to the value of the targeted environment variable or if thats not availlable, the given string in parameter
+        /// </summary>
+        /// <param name="pepperVarName"></param>
+        /// <param name="alternativeValueForMember"></param>
+        private static void SetPepper(string pepperVarName, string alternativeValueForMember = "Ahuhu") => Pepper = GetValueByFromEnviromentVariable(pepperVarName) ?? alternativeValueForMember;
+
+        /// <summary>
+        /// Concat password and "Pepper" - member
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        private static String PepperPassword(string password) => password + Pepper;
+        #endregion
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        #region "Obsolet"
+        /// <summary>
+        /// Hashes the entered password based on [Rfc2898DeriveBytes(SHA512)]  
+        /// working with its own local variables, if needed for debugging
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns>hash</returns>
+        public static String HashPassword512(String password)
+        {
+            Byte[] salt = RandomNumberGenerator.GetBytes(SaltLength);
+            Byte[] hash = new Byte[KeyLength512];
+            String pepperedPassword = PepperPassword(password);
+            String hashedPassword = "";
+
+            using (Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(pepperedPassword, salt, Iterations, Sha512))
+            {
+                hash = pbkdf2.GetBytes(KeyLength512);
+                hashedPassword = Convert.ToBase64String(hash);
+                return hashedPassword;
+            }
+        }
+
+        /// <summary>
+        /// Hashes the entered password based on [Rfc2898DeriveBytes(SHA256)]  
+        /// working with its own local variables, if needed for debugging
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns>hash</returns>
+        public static String HashPassword256(String password)
+        {
+
+            Byte[] salt = RandomNumberGenerator.GetBytes(SaltLength);
+            Byte[] hash = new Byte[KeyLength256];
+            String pepperedPassword = PepperPassword(password);
+            String hashedPassword = "";
+
+            using (Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(pepperedPassword, salt, Iterations, Sha256))
+            {
+                hash = pbkdf2.GetBytes(KeyLength256);
+                hashedPassword = Convert.ToBase64String(hash);
+                return hashedPassword;
+            }
+        }
+
+        /// <summary>
+        /// Hashes the given pasword in the specified algorithm and returns hash and salt as base64 string without declaring additional variables
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <returns>salt:hash</returns>
+        public static String HashPwGetSaltHash(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
+        => $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(new Rfc2898DeriveBytes(PepperPassword(password), GetSalt(), Iterations, hashAlgorithm).GetBytes(SetKeySize(hashAlgorithm)))}";
+
+        /// <summary>
+        /// Returns either the value of the target env_var      or      the value of the member "Pepper"
+        /// </summary>
+        /// <param name="pepperName"></param>
+        /// <returns></returns>
+        private static String GetPepper(string pepperName) => GetValueByFromEnviromentVariable(pepperName) ?? Pepper;
+
+
+
+        #endregion
 
     }
-}
+}        
 
-//public class Passwords
-//{
-//      private const int SaltSize = 16; // 128-bit
-//      private const int KeySize = 32;  // 256-bit
-//      private const int Iterations = 10000;
-
-//      /// <summary>
-//      /// 
-//      /// </summary>
-//      /// <param name="password"></param>
-//      /// <returns></returns>
-//      public static string HashPassword ( string password )
-//      {
-//            byte [ ] salt = RandomNumberGenerator.GetBytes (SaltSize);
-
-//            using var pbkdf2 = new Rfc2898DeriveBytes (password, salt, Iterations, HashAlgorithmName.SHA256);
-//            byte [ ] hash = pbkdf2.GetBytes (KeySize);
-//            return Convert.ToBase64String (salt) + ":" + Convert.ToBase64String (hash);
-//      }
-
-//      /// <summary>
-//      /// 
-//      /// </summary>
-//      /// <param name="password"></param>
-//      /// <param name="hashedPassword"></param>
-//      /// <returns></returns>
-//      public static bool VerifyPassword ( string password, string hashedPassword )
-//      {
-//            string [ ] parts = hashedPassword.Split (':');
-//            if (parts.Length != 2)
-//            {
-//                  return false;
-//            }
-
-//            byte [ ] salt = Convert.FromBase64String (parts [ 0 ]);
-//            byte [ ] hash = Convert.FromBase64String (parts [ 1 ]);
-
-//            using var pbkdf2 = new Rfc2898DeriveBytes (password, salt, Iterations, HashAlgorithmName.SHA256);
-//            byte [ ] hashToCheck = pbkdf2.GetBytes (KeySize);
-//            return CryptographicOperations.FixedTimeEquals (hash, hashToCheck);
-//      }
-//}
