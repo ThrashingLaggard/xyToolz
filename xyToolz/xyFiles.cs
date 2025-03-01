@@ -15,16 +15,25 @@ namespace xyToolz
       /// </summary>
       public class xyFiles
       {
+            private static readonly JsonSerializerOptions DefaultJsonOptions = new()
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+
             /// <summary>
-            /// Überprüft ob alle angegebenen Verzeichnisse existieren
+            /// Stellt sicher alle angegebenen Verzeichnisse existieren
             /// </summary>
             /// <param name="directories"></param>
             /// <returns></returns>
-            public static bool CheckForDirectories(params string[] directories)
-            {
-                  return directories.All(dir => Directory.Exists(xyPathHelper.EnsureDirectory(dir)));
-            }
+            public static bool CheckForDirectories( string[] directories) => directories.All(dir => Directory.Exists(xyPathHelper.EnsureDirectory(dir)));
 
+
+            /// <summary>
+            /// Return a list filled with the filnames in the target directory
+            /// </summary>
+            /// <param name="path"></param>
+            /// <returns></returns>
             public static List<string> Inventory(string path)
             {
                   List<string> lstfullNames = new();
@@ -79,11 +88,7 @@ namespace xyToolz
                   }
             }
 
-            private static readonly JsonSerializerOptions DefaultJsonOptions = new()
-            {
-                  WriteIndented = true,
-                  DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
+           
 
             public static async Task<bool> SaveFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
             {

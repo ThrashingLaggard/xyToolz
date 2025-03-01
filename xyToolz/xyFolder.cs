@@ -315,7 +315,7 @@ namespace xyToolz
 
                 // Erstelle den Zielordner, falls er nicht existiert.
                 Directory.CreateDirectory(extractFolder);
-#if! NETSTANDARD2_0
+                #if! NETSTANDARD2_0
                 // Extrahiere den Inhalt der ZIP-Datei
                 ZipFile.ExtractToDirectory(zipFilePath, extractFolder, overwriteFiles: true);
                 #endif
