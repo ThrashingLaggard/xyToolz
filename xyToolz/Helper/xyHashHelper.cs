@@ -100,22 +100,33 @@ namespace xyToolz.Helper
         #endregion
 
         #region "Verification"
-
-        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, Byte[] password, Byte[] salt) => CryptographicOperations.FixedTimeEquals(password, HashToBytes(hashAlgorithm, Convert.ToBase64String(password), salt));
+        /// <summary>
+        /// Verify the password
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <param name="salt"></param>
+        /// <returns></returns>
         public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt) => CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), HashToBytes(hashAlgorithm, password, salt));
-        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, String saltNhash, string? useless = "This is the same function as the others but working step by step and using local variables")
+        
+        /// <summary>
+        /// This is the same function as the others but working step by step and using local variables
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <param name="saltNhash"></param>
+        /// <returns></returns>
+        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, String saltNhash)
         {
             String[] input = saltNhash.Split(':');
             if (input.Length != 2) return false;
-            
+
             Byte[] salt = Convert.FromBase64String(input[0]);
             Byte[] hash = Convert.FromBase64String(input[1]);
-            Byte[] hashToCheck = HashToBytes(hashAlgorithm, password,salt) ;
-            
+            Byte[] hashToCheck = HashToBytes(hashAlgorithm, password, salt);
+
             return CryptographicOperations.FixedTimeEquals(hash, hashToCheck);
         }
-        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, String saltNhash)
-        =>CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(saltNhash.Split(':').First()), HashToBytes(hashAlgorithm, password, Convert.FromBase64String(saltNhash.Split(':').Last())));
         
         #endregion
 
@@ -192,7 +203,7 @@ namespace xyToolz.Helper
         private static String PepperPassword(string password) => password + Pepper;
         #endregion
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        #region "Obsolet"
+        #region "Not in Use"
         /// <summary>
         /// Hashes the entered password based on [Rfc2898DeriveBytes(SHA512)]  
         /// working with its own local variables, if needed for debugging
@@ -252,7 +263,25 @@ namespace xyToolz.Helper
         /// <returns></returns>
         private static String GetPepper(string pepperName) => GetValueByFromEnviromentVariable(pepperName) ?? Pepper;
 
+        /// <summary>
+        /// Verifiy the password
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <param name="salt"></param>
+        /// <returns></returns>
+        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, Byte[] password, Byte[] salt) => CryptographicOperations.FixedTimeEquals(password, HashToBytes(hashAlgorithm, Convert.ToBase64String(password), salt));
 
+        /// <summary>
+        /// Verify the password
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <param name="saltNhash"></param>
+        /// <param name="useless"></param>
+        /// <returns></returns>
+        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, String saltNhash, string? useless = "")
+        => CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(saltNhash.Split(':').First()), HashToBytes(hashAlgorithm, password, Convert.FromBase64String(saltNhash.Split(':').Last())));
 
         #endregion
 
