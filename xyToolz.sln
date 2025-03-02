@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xyAndroid", "xyAndroid\xyAndroid.csproj", "{74C4ADC6-EACD-E6BE-6F73-958AE95DA444}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xyAvalonia", "xyAvalonia\xyAvalonia.csproj", "{0DD3F516-4B74-4E8C-9C1B-1A5397266795}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{74C4ADC6-EACD-E6BE-6F73-958AE95DA444}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74C4ADC6-EACD-E6BE-6F73-958AE95DA444}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74C4ADC6-EACD-E6BE-6F73-958AE95DA444}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DD3F516-4B74-4E8C-9C1B-1A5397266795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DD3F516-4B74-4E8C-9C1B-1A5397266795}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DD3F516-4B74-4E8C-9C1B-1A5397266795}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DD3F516-4B74-4E8C-9C1B-1A5397266795}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
