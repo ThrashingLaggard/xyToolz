@@ -37,6 +37,17 @@ public partial class DebugConsole : Window
         }
     }
 
+    public void InputIntoConsole()
+    {
+        while (true)
+        {
+            string input = Console.ReadLine();
+            if (input == "exit") break; // Beenden der Eingabe
+            AppendText(input); // Text an die DebugConsole anhängen
+        }
+    }
+
+
     private void BtnClear_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         ConsoleOutput.Text = string.Empty; 

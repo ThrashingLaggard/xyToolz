@@ -15,8 +15,6 @@
 				Name="ConsoleOutput" 
 				IsReadOnly="True" 
 				AcceptsReturn="True" 
-				VerticalScrollBarVisibility="Hidden" 
-				
 			/>
 		</ScrollViewer>
 		<Button 
