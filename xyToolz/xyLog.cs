@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Logging;
 
 using xyToolz.Helper;
@@ -13,29 +12,35 @@ namespace xyToolz
 {
     public static class xyLog
      {
-            private static readonly string _logFilePath = "logs/app.log"; // Standard logs
-            private static readonly string _exLogFilePath= "logs/exceptions.log"; // Exceptional logs
-            private static readonly long _maxLogFileSize = 10485760; // 10 MB lol
-            private static readonly ushort _bufferSizeForFileStream = 4096;
-            private static readonly object _threadSafetyLock = new object();
-            private static readonly LogLevel _minLogLevel = LogLevel.Information;
+        /// <summary>
+        /// Event für die DebugingConsole
+        /// </summary>
+        public static event Action<string>? LogMessageReceived;
+
+        private static readonly string _logFilePath = "logs/app.log"; // Standard logs
+        private static readonly string _exLogFilePath= "logs/exceptions.log"; // Exceptional logs
+        private static readonly long _maxLogFileSize = 10485760; // 10 MB lol
+        private static readonly ushort _bufferSizeForFileStream = 4096;
+        private static readonly object _threadSafetyLock = new object();
+        private static readonly LogLevel _minLogLevel = LogLevel.Information;
+        private static xyLogArchiver _archiver = new(_maxLogFileSize);
+
+   
+        #region Logging
+        /// <summary>
+        /// Writes a log-Message into console and returns the message as string
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="level"></param>
+        public static string Log(string message, [CallerMemberName] string? callerName = null)
+        {
+            string formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
+            Console.WriteLine(formattedMsg);
+            Console.Out.Flush();
             
-            private static xyLogArchiver _archiver = new(_maxLogFileSize);
-
-
-            #region Logging
-            /// <summary>
-            /// Writes a log-Message into console and returns the message as string
-            /// </summary>
-            /// <param name="message"></param>
-            /// <param name="level"></param>
-            public static string Log(string message, [CallerMemberName] string? callerName = null)
-            {
-                  string formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
-                  Console.WriteLine(formattedMsg);
-                  Console.Out.Flush();
-                  return formattedMsg;
-            }
+            LogMessageReceived?.Invoke(formattedMsg);
+            return formattedMsg;
+        }
 
             /// <summary>
             /// Writes details for the given exception to into console

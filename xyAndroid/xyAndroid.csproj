@@ -26,6 +26,7 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\xyAvalonia\xyAvalonia.csproj" />
     <ProjectReference Include="..\xyToolz\xyToolz.csproj" />
   </ItemGroup>
   <ItemGroup>

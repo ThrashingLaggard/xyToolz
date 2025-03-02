@@ -34,7 +34,11 @@ namespace xyToolz
                   xyLog.Log(what_to_print);
             }
 
-
+        public static void Piep()
+        {
+            Console.Beep();
+            xyLog.Log("Beep!");
+        }
             public static void EDITOR()
             {
                   Process.Start("notepad.exe");
@@ -44,10 +48,10 @@ namespace xyToolz
                   Process.Start("notepad.exe", filepath);
             }
 
-            public static string crash(int high_number)
+            public static string crash(UInt128 high_number)
             {
-                  int a = 0;
-                  int b = 0;
+                  UInt128 a = 0;
+                  UInt128 b = 0;
                   string lol = "";
 
                   if (high_number == 0)
