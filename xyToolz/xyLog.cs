@@ -20,7 +20,6 @@ namespace xyToolz
             private static readonly object _threadSafetyLock = new object();
             private static readonly LogLevel _minLogLevel = LogLevel.Information;
             
-            private static xyLogFormatter _formatter = new();
             private static xyLogArchiver _archiver = new(_maxLogFileSize);
 
 
@@ -178,14 +177,14 @@ namespace xyToolz
 
             public static string FormatMsg(string message, string? callerName = null, LogLevel? level = null)
             {
-                  return _formatter.FormatMessageForLogging(message, callerName, level);
+                  return xyLogFormatter.FormatMessageForLogging(message, callerName, level);
             }
             /// <summary>
             /// Formats the Exception´s details for consistent logging.
             /// </summary>
             private static string FormatEx(Exception ex, LogLevel level, string? callerName = null)
             {
-                  return _formatter.FormatExceptionDetails(ex, level, callerName);
+                  return xyLogFormatter.FormatExceptionDetails(ex, level, callerName);
             }
 
             #endregion

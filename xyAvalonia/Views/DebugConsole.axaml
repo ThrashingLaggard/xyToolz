@@ -5,5 +5,23 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="xyAvalonia.DebugConsole"
         Title="DebugConsole">
-  Welcome to Avalonia!
+	<StackPanel>
+		<ScrollViewer 
+			Name="ScrollViewer"
+			VerticalScrollBarVisibility="Auto" 
+			Height="350" 
+		>
+			<TextBox 
+				Name="ConsoleOutput" 
+				IsReadOnly="True" 
+				AcceptsReturn="True" 
+				VerticalScrollBarVisibility="Hidden" 
+				
+			/>
+		</ScrollViewer>
+		<Button 
+			Content="Clear" 
+			Click="BtnClear_Click" 
+		/>
+	</StackPanel>
 </Window>

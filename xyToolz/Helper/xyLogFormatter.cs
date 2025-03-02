@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace xyToolz.Helper
 {
-    internal class xyLogFormatter
+    public static class xyLogFormatter
     {
-            public string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null)
+            public static string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null)
             {
                   StringBuilder sb = new StringBuilder();
                   sb.AppendLine($"{DateTime.Now} [{callerName ?? ""}] [{level}] Exception Details:");
@@ -43,7 +43,7 @@ namespace xyToolz.Helper
                   return sb.ToString();
             }
 
-            public string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)
+            public static string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)
             {
                   {
                         // Setze das aktuelle Datum und die Uhrzeit
@@ -63,7 +63,7 @@ namespace xyToolz.Helper
             }
 
 
-            public string FormatMailDetails(MailMessage mailMessage)
+            public static string FormatMailDetails(MailMessage mailMessage)
             {
                   var logDetails = new StringBuilder();
                   logDetails.AppendLine("Timestamp:  " + DateTime.Now);
@@ -78,7 +78,7 @@ namespace xyToolz.Helper
                   return logDetails.ToString();
             }
 
-            public string LogPerformance(string operationName, TimeSpan duration)
+            public static string LogPerformance(string operationName, TimeSpan duration)
             {
                   var logDetails = new StringBuilder();
                   logDetails.AppendLine("Timestamp:  " + DateTime.Now);
