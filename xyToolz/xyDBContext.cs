@@ -12,7 +12,7 @@ namespace xyToolz
     {
         public String Description { get; set; } = "Generic DBcontext for easier interactions via EF-Core";
 
-        public DbSet<object>Entities  { get; set; }
+        public DbSet<object> Entities { get; set; }
 
         public String pathForDB { get; set; }
 
@@ -20,21 +20,19 @@ namespace xyToolz
         {
         }
 
-        public String GetPathForDB()
+        public String GetPathForLocalDbFromWithinApplicationFolder(String pathDB = @"\DB\xyLagerverwaltung.mdf")
         {
-                String db = @"\DB\xyLagerverwaltung.mdf";
-                String path = Directory.GetCurrentDirectory();
             try
             {
-                pathForDB = Path.Join(path, db);
+                String appFolder = xyFolder.GetInnerApplicationFolder();
+                xyLog.Log(pathForDB = Path.Join(appFolder, pathDB));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 xyLog.ExLog(ex);
             }
-
-            return path;
+            return pathForDB;
         }
-
     }
 }
+
