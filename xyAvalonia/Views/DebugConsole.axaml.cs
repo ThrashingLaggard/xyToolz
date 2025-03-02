@@ -71,7 +71,8 @@ public partial class DebugConsole : Window
     /// <param name="e"></param>
     private void BtnClear_Click(object sender, RoutedEventArgs e)
     {
-        ConsoleOutput.Text = string.Empty; 
+        ConsoleOutput.Text = string.Empty;
+        //xyQOL.Crash(9999);
     }
 
     private void BtnExport_Click(object sender, RoutedEventArgs e)

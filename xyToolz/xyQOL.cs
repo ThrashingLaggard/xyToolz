@@ -48,7 +48,12 @@ namespace xyToolz
                   Process.Start("notepad.exe", filepath);
             }
 
-            public static string crash(UInt128 high_number)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="high_number"></param>
+            /// <returns></returns>
+            public static string Crash(UInt128 high_number)
             {
                   UInt128 a = 0;
                   UInt128 b = 0;
@@ -61,12 +66,12 @@ namespace xyToolz
                   }
                   else
                   {
-                        high_number -= 8;
+                        high_number -= 88;
                         Console.WriteLine(high_number);
-                        if (high_number < 88)
+                        if (high_number < 8888)
                               goto lol;
 
-                        return crash(high_number);
+                        return Crash(high_number);
 
                   lol:
                         {
@@ -74,6 +79,7 @@ namespace xyToolz
                               a++;
                               if (b > (high_number / 2))
                               {
+                                    Piep();
                                     Console.WriteLine(a);
                               }
                               goto rofl;
@@ -84,6 +90,7 @@ namespace xyToolz
                               Console.WriteLine("Ho");
                               if (a > (high_number / 2))
                               {
+                                    Piep();
                                     Console.WriteLine(b);
                               }
                               ++b;

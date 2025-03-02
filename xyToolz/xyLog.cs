@@ -49,10 +49,11 @@ namespace xyToolz
             /// <param name="level"></param>
             public static void ExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
             {
-                  string exMessage = FormatEx(ex, level, callerName);
-                  Console.WriteLine(exMessage);
-                  Console.Out.Flush();
-            }
+                    string exMessage = FormatEx(ex, level, callerName);
+                    Console.WriteLine(exMessage);
+                    Console.Out.Flush();
+                    LogMessageReceived?.Invoke(exMessage);
+        }
 
             /// <summary>
             /// Synchronous: Writes a log message into file and console
@@ -71,7 +72,8 @@ namespace xyToolz
                               File.AppendAllText(_logFilePath, formattedMessage);
                               Console.WriteLine(formattedMessage);
                               Console.Out.Flush();
-                              return true;
+                                LogMessageReceived?.Invoke(formattedMessage);
+                                return true;
                         }
                         catch (Exception ex)
                         {
@@ -97,8 +99,8 @@ namespace xyToolz
                               File.AppendAllText(_exLogFilePath, exceptionDetails);
                               Console.WriteLine(exceptionDetails);
                               Console.Out.Flush();
-
-                              return true;
+                                LogMessageReceived?.Invoke(exceptionDetails);
+                                return true;
                         }
                         catch (Exception innerEx)
                         {
