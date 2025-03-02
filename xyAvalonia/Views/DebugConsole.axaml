@@ -9,7 +9,7 @@
 		<ScrollViewer 
 			Name="ScrollViewer"
 			VerticalScrollBarVisibility="Auto" 
-			Height="700" 
+			Height="900" 
 		>
 			<TextBox 
 				Name="ConsoleOutput" 
@@ -17,24 +17,28 @@
 				AcceptsReturn="True" 
 			/>
 		</ScrollViewer>
-		<StackPanel HorizontalAlignment="Center">
-			<TextBox
-            Name="InputTextBox"
-            Width="400"
-            Text ="Please enter your billing info here..."
-			 GotFocus="InputTextBox_GotFocus" 
-			 LostFocus="InputTextBox_LostFocus" 
-			/>
-			<Button
-            Content="Hinzufügen"
-            Click="AddButton_Click"
-			/>	
-		</StackPanel>
-	
-       
+		
 		<Button 
+			HorizontalAlignment="Right"
 			Content="Clear" 
 			Click="BtnClear_Click" 
 		/>
+		
+		<TextBox
+        Name="InputTextBox"
+        Width="400"
+        Text ="Please enter your billing info here..."
+			GotFocus="InputTextBox_GotFocus" 
+			LostFocus="InputTextBox_LostFocus" 
+		/>
+		<Button
+		HorizontalAlignment="Center"
+        Content="Hinzufügen"
+        Click="AddButton_Click"
+		/>	
+		
+	
+       
+		
 	</StackPanel>
 </Window>
