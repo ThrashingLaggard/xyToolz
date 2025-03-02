@@ -9,6 +9,31 @@ namespace xyToolz
 {
     public static class xyFolder
     {
+
+        /// <summary>
+        /// Get the full path of the directory containing 
+        /// </summary>
+        /// <returns></returns>
+        public static string GetInnerApplicationFolder()
+        {
+            string net8_0 = Environment.CurrentDirectory; xyLog.Log(net8_0);
+
+            string debug = Directory.GetParent(net8_0).FullName; xyLog.Log(debug);
+
+            string bin = Directory.GetParent(debug).FullName; xyLog.Log(bin);
+
+            string appFolder = Directory.GetParent(bin).FullName; xyLog.Log(appFolder);
+
+            return appFolder;
+        }
+
+        /// <summary>
+        /// Get the full path of the directory containing this programs     .sln    file
+        /// </summary>
+        /// <returns></returns>
+        public static String GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolder()).FullName;
+
+
         /// <summary>
         /// Stellt sicher, dass der Unterordner existiert. Existiert er nicht, wird er erstellt.
         /// </summary>
