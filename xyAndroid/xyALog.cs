@@ -8,7 +8,7 @@ using Android.Util;
 
 namespace xyAndroid
 {
-    public static class xyLog
+    public static class xyALog
     {
             private const string Tag = "LogcatLibrary";
 

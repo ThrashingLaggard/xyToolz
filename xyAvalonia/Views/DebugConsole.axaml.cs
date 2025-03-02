@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using System;
@@ -46,9 +47,35 @@ public partial class DebugConsole : Window
             AppendText(input); // Text an die DebugConsole anhängen
         }
     }
+    private void AddButton_Click(object sender, RoutedEventArgs e)
+    {
+        string input = InputTextBox.Text;
+        if (!string.IsNullOrWhiteSpace(input))
+        {
+            var formatted = xyLogFormatter.FormatMessageForLogging(input);
+            AppendText(formatted);
+            InputTextBox.Text = string.Empty; // Eingabefeld leeren
+        }
+    }
+
+    private void InputTextBox_GotFocus(object sender, RoutedEventArgs e)
+    {   
+        if (InputTextBox.Text == "Please enter your billing info here...")
+        {
+            InputTextBox.Text = string.Empty; 
+        }
+    }
+
+    private void InputTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(InputTextBox.Text))
+        {
+            InputTextBox.Text = "Please enter your billing info here...";
+        }
+    }
 
 
-    private void BtnClear_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void BtnClear_Click(object sender, RoutedEventArgs e)
     {
         ConsoleOutput.Text = string.Empty; 
     }
