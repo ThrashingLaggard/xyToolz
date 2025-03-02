@@ -55,7 +55,7 @@ public partial class DebugConsole : Window
     /// <param name="e"></param>
     private void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        string input = InputTextBox.Text;
+        string input = InputTextBox.Text!;
         if (!string.IsNullOrWhiteSpace(input))
         {
             var formatted = xyLogFormatter.FormatMessageForLogging(input);
