@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,21 +11,30 @@ using xyToolz.Helper;
 
 namespace xyToolz
 {
-    public static class xyLog
-     {
-        /// <summary>
-        /// Event für die DebugingConsole
-        /// </summary>
-        public static event Action<string>? LogMessageReceived;
+      public static class xyLog
+      {
+            /// <summary>
+            /// Event für die DebugingConsole
+            /// </summary>
+            public static event Action<string>? LogMessageReceived;
 
-        private static readonly string _logFilePath = "logs/app.log"; // Standard logs
-        private static readonly string _exLogFilePath= "logs/exceptions.log"; // Exceptional logs
-        private static readonly long _maxLogFileSize = 10485760; // 10 MB lol
-        private static readonly ushort _bufferSizeForFileStream = 4096;
-        private static readonly object _threadSafetyLock = new object();
-        private static readonly LogLevel _minLogLevel = LogLevel.Information;
-        private static xyLogArchiver _archiver = new(_maxLogFileSize);
+            private static readonly string _logFilePath = "logs/app.log"; // Standard logs
+            private static readonly string _exLogFilePath = "logs/exceptions.log"; // Exceptional logs
+            private static readonly long _maxLogFileSize = 10485760; // 10 MB lol
+            private static readonly UInt16 _bufferSizeForFileStream = 4096;
+            private static readonly Object _threadSafetyLock = new object ( );
+            private static readonly LogLevel _minLogLevel = LogLevel.Information;
+            private static xyLogArchiver _archiver = new (_maxLogFileSize);
 
+            private static Boolean IsLoggingToSystemConsole = true;
+
+            public static String SetLogTarget ( Boolean isTargetSystem)
+            {
+                  String logTarget = ( isTargetSystem ) ? "System" : "Custom";
+                  return logTarget;
+            }
+             
+          
    
         #region Logging
         /// <summary>
