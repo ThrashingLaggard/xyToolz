@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace xyToolz
 {
-    public class xyDBContext
+    public class xyDBContext : DbContext
     {
         public String Description { get; set; } = "Generic DBcontext for easier interactions via EF-Core";
 
