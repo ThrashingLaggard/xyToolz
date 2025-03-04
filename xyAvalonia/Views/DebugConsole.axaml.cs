@@ -3,19 +3,24 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+
 using xyToolz;
-using xyToolz.Helper;
+using xyToolz.Helper.Logging;
 
 namespace xyAvalonia;
 
 public partial class DebugConsole : Window
 {
+
+    
     public DebugConsole()
     {
+           
         InitializeComponent();
     }
 

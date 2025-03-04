@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using xyToolz;
 
 using Microsoft.Extensions.Logging;
 
-namespace xyToolz.Helper
+namespace xyToolz.Helper.Logging
 {
     internal class xyLogArchiver
     {

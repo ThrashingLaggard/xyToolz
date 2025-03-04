@@ -7,10 +7,24 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
-namespace xyToolz.Helper
+namespace xyToolz.Helper.Logging
 {
+      /// <summary>
+      /// Format text for logging:
+      /// -Exceptions
+      /// -Messages
+      /// -Mails
+      /// -Performance
+      /// </summary>
     public static class xyLogFormatter
     {
+            /// <summary>
+            /// Get a detailed view for the caught exceptions
+            /// </summary>
+            /// <param name="ex"></param>
+            /// <param name="level"></param>
+            /// <param name="callerName"></param>
+            /// <returns></returns>
             public static string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null)
             {
                   StringBuilder sb = new StringBuilder();
@@ -43,6 +57,13 @@ namespace xyToolz.Helper
                   return sb.ToString();
             }
 
+            /// <summary>
+            /// Format a normal string for a detailed output
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="callerName"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
             public static string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)
             {
                   {
@@ -62,7 +83,11 @@ namespace xyToolz.Helper
                   }
             }
 
-
+            /// <summary>
+            /// Format captured mails
+            /// </summary>
+            /// <param name="mailMessage"></param>
+            /// <returns></returns>
             public static string FormatMailDetails(MailMessage mailMessage)
             {
                   var logDetails = new StringBuilder();
@@ -78,7 +103,13 @@ namespace xyToolz.Helper
                   return logDetails.ToString();
             }
 
-            public static string LogPerformance(string operationName, TimeSpan duration)
+            /// <summary>
+            /// Format the performance log
+            /// </summary>
+            /// <param name="operationName"></param>
+            /// <param name="duration"></param>
+            /// <returns></returns>
+            public static string FormatPerformanceLog(string operationName, TimeSpan duration)
             {
                   var logDetails = new StringBuilder();
                   logDetails.AppendLine("Timestamp:  " + DateTime.Now);

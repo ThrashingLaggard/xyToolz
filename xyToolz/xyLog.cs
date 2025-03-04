@@ -5,9 +5,10 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
 
-using xyToolz.Helper;
+using xyToolz.Helper.Logging;
 
 namespace xyToolz
 {
@@ -21,22 +22,29 @@ namespace xyToolz
             private static readonly string _logFilePath = "logs/app.log"; // Standard logs
             private static readonly string _exLogFilePath = "logs/exceptions.log"; // Exceptional logs
             private static readonly long _maxLogFileSize = 10485760; // 10 MB lol
-            private static readonly UInt16 _bufferSizeForFileStream = 4096;
             private static readonly Object _threadSafetyLock = new object ( );
-            private static readonly LogLevel _minLogLevel = LogLevel.Information;
             private static xyLogArchiver _archiver = new (_maxLogFileSize);
-
             private static Boolean IsLoggingToSystemConsole = true;
+            private static IEnumerable<xyLogTargets> _eTargets = new List<xyLogTargets>();      // 0 - System     |||   1 - OwnDebug
+            
 
-            public static String SetLogTarget ( Boolean isTargetSystem)
+           
+
+            internal static IEnumerable<xyLogTargets> SetLogTargets ( UInt16 [ ] logTargets)
             {
-                  String logTarget = ( isTargetSystem ) ? "System" : "Custom";
-                  return logTarget;
+                  if (logTargets.Length < 1) return new xyLogTargets [ ] {0}; 
+                  xyLogTargets[] targets = new xyLogTargets[logTargets.Length ];
+
+                  for (int i = 0 ; i < logTargets.Length ; i++)
+                  {
+                        targets [ i ] = ( xyLogTargets )logTargets [ i ] ;
+                  }
+                  return targets;
             }
              
           
    
-        #region Logging
+            #region Logging
         /// <summary>
         /// Writes a log-Message into console and returns the message as string
         /// </summary>
