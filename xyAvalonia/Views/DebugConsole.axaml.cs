@@ -17,16 +17,16 @@ namespace xyAvalonia;
 
 public partial class DebugConsole : Window
 {
-      public event EventHandler<Action<String>> LogMessageReceived;
+      public event Action<String> LogMessageReceived;
 
-      public void OnMessageReceived (String message, [CallerMemberName] String? callerName = null)
+      public void OnMessageReceived ( String message , [CallerMemberName] String? callerName = null )
       {
-            LogMessageReceived?.Invoke (callerName,(message) => AppendText(message));
+            LogMessageReceived?.Invoke (( message ));
       }
       public DebugConsole ( )
       {
-            
-            //LogMessageReceived += LogMessageCaught;
+            xyLog.LogMessageSent +=  LogMessageReceived ;
+          
             InitializeComponent ( );
       }
 
