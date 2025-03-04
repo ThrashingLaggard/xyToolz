@@ -17,7 +17,13 @@ namespace xyToolz
             /// <summary>
             /// Event für die DebugingConsole
             /// </summary>
-            public static event Action<string>? LogMessageReceived;
+            public static event Action<string>? LogMessageSent;
+
+            public static void OnMessageSent(string message )
+            {
+                  LogMessageSent?.Invoke (message);
+            }
+
 
             private static readonly string _logFilePath = "logs/app.log"; // Standard logs
             private static readonly string _exLogFilePath = "logs/exceptions.log"; // Exceptional logs
@@ -56,7 +62,7 @@ namespace xyToolz
             Console.WriteLine(formattedMsg);
             Console.Out.Flush();
             
-            LogMessageReceived?.Invoke(formattedMsg);
+            LogMessageSent?.Invoke(formattedMsg);
             return formattedMsg;
         }
 
@@ -70,7 +76,7 @@ namespace xyToolz
                     string exMessage = FormatEx(ex, level, callerName);
                     Console.WriteLine(exMessage);
                     Console.Out.Flush();
-                    LogMessageReceived?.Invoke(exMessage);
+                    LogMessageSent?.Invoke(exMessage);
         }
 
             /// <summary>
@@ -90,7 +96,7 @@ namespace xyToolz
                               File.AppendAllText(_logFilePath, formattedMessage);
                               Console.WriteLine(formattedMessage);
                               Console.Out.Flush();
-                                LogMessageReceived?.Invoke(formattedMessage);
+                                LogMessageSent?.Invoke(formattedMessage);
                                 return true;
                         }
                         catch (Exception ex)
@@ -117,7 +123,7 @@ namespace xyToolz
                               File.AppendAllText(_exLogFilePath, exceptionDetails);
                               Console.WriteLine(exceptionDetails);
                               Console.Out.Flush();
-                                LogMessageReceived?.Invoke(exceptionDetails);
+                                LogMessageSent?.Invoke(exceptionDetails);
                                 return true;
                         }
                         catch (Exception innerEx)
