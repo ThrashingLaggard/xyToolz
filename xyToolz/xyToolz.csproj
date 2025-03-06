@@ -11,13 +11,6 @@
 		<Description>
 			Little toolz to save some precious seconds with my doggo.
 
-			-PDF:
-			-create
-			-convert
-			-combine
-			-
-
-			-Files
 		</Description>
 		<Copyright>Do with this, as you please. Go home to your dog   </Copyright>
 		<PackageTags>tools,pdf,qol,files,small,stuff,</PackageTags>
@@ -34,6 +27,12 @@
 		<PackageReference Include="System.Drawing.Common" Version="8.0.8" />
 		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
 		<PackageReference Include="System.Text.Json" Version="9.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="xyToolz">
+	    <HintPath>bin\Debug\net8.0\xyToolz.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 
