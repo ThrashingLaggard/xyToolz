@@ -6,6 +6,11 @@ using System.Text.Json;
 
 using xyToolz.Helper;
 
+#if ANDROID
+using Android.Content;
+using Android.App;
+using System.IO;
+#endif
 
 
 namespace xyToolz
@@ -26,8 +31,18 @@ namespace xyToolz
             /// </summary>
             /// <param name="directories"></param>
             /// <returns></returns>
-            public static bool CheckForDirectories( string[] directories) => directories.All(dir => Directory.Exists(xyPathHelper.EnsureDirectory(dir)));
-
+            public static bool CheckForDirectories( string[] directories) => directories.All(dir => Directory.Exists(EnsureDirectory(dir)));
+            private static string EnsureDirectory( string dir )
+            {
+#if ANDROID
+                  string path = Path.Combine(Android.App.Application.Context.FilesDir(null)!.AbsolutePath, dir);
+                  if(String.IsNullOrEmpty(path))
+                  path = Path.Combine(Android.App.Application.Context.GetExternalFilesDir(null)!.AbsolutePath, dir);
+#else
+                  string path = xyPathHelper.EnsureDirectory(dir);
+      #endif
+                  return path;
+            }
 
             /// <summary>
             /// Return a list filled with the filnames in the target directory
@@ -51,7 +66,7 @@ namespace xyToolz
                   try
                   {
                         string dirPath = Path.GetDirectoryName(completePath);
-                        string newPath = xyPathHelper.Combine(dirPath, newName);
+                        string newPath = Path.Combine(dirPath, newName);
                         File.Move(completePath, newPath);
                         return newPath;
                   }
@@ -82,8 +97,9 @@ namespace xyToolz
                         File.Copy(fullPath, targetPath, overwrite);
                         return new FileInfo(targetPath).FullName;
                   }
-                  catch
+                  catch(Exception ex)
                   {
+                        xyLog.ExLog(ex);
                         return "Error copying file";
                   }
             }
@@ -94,6 +110,7 @@ namespace xyToolz
             {
                   try
                   {
+                        EnsureDirectory(subfolder);
                         string filePath = xyPathHelper.Combine(subfolder, fileName);
                         await File.WriteAllTextAsync(filePath, content);
                         return true;

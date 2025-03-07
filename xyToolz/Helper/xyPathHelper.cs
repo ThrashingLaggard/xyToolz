@@ -8,9 +8,20 @@ namespace xyToolz.Helper
 {
       public static class xyPathHelper
       {
-            public static string BasePath { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
-
-            public static string Combine(params string[] paths) => Path.Combine(paths.Prepend(BasePath).ToArray());
+            #if ANDROID
+                  public static string BasePath { get; } = Android.App.Application.Context.FilesDir.AbsolutePath;
+            #else
+            public static string BasePath { get; } = AppContext.BaseDirectory;
+            #endif
+            public static string Combine( params string [ ] paths ) 
+            {
+            #if ANDROID
+                  return Path.Combine(BasePath, Path.Combine(paths));
+            #else
+                  return Path.Combine(paths.Prepend(BasePath).ToArray( ));
+            #endif
+            }
+           
 
             public static string EnsureDirectory(params string[] subPaths)
             {
