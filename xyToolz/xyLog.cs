@@ -47,16 +47,17 @@ namespace xyToolz
                   }
                   return targets;
             }
-             
-          
-   
+
+
+
             #region Logging
-        /// <summary>
-        /// Writes a log-Message into console and returns the message as string
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="level"></param>
-        public static string Log(string message, [CallerMemberName] string? callerName = null)
+            /// <summary>
+            /// Writes a log-Message into console and returns the message as string
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="callerName"></param>
+          
+            public static string Log(string message, [CallerMemberName] string? callerName = null)
         {
             string formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
             Console.WriteLine(formattedMsg);
@@ -71,6 +72,7 @@ namespace xyToolz
             /// </summary>
             /// <param name="ex"></param>
             /// <param name="level"></param>
+            /// <param name="callerName"></param>
             public static void ExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
             {
                     string exMessage = FormatEx(ex, level, callerName);
@@ -85,7 +87,7 @@ namespace xyToolz
             /// <param name="message"></param>
             /// <param name="callerName"></param>
             /// <returns></returns>
-            public static bool WriteLog(string message, [CallerMemberName] string callerName = null)
+            public static bool WriteLog(string message, [CallerMemberName] string? callerName = null)
             {
                   lock (_threadSafetyLock)
                   {
@@ -111,7 +113,7 @@ namespace xyToolz
             /// <summary>
             /// Synchronous: Writes details for the given exception to into console and file
             /// </summary>
-            public static bool WriteExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string callerName = null)
+            public static bool WriteExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
             {
                   lock (_threadSafetyLock)
                   {
@@ -128,7 +130,7 @@ namespace xyToolz
                         }
                         catch (Exception innerEx)
                         {
-                              ExLog(ex, LogLevel.Warning, callerName);
+                              ExLog(innerEx, LogLevel.Warning, callerName);
                         }
                         return false;
                   }
@@ -140,10 +142,10 @@ namespace xyToolz
             /// <summary>
             /// Führt eine Aktion aus und protokolliert deren Start, Erfolg oder Fehler, einschließlich spezifischer Behandlungen von Ausnahmen.
             /// </summary>
-            /// <typeparam name="T">Der Rückgabetyp der Aktion, die ausgeführt wird.</typeparam>
-            /// <param name="actionName">Der Name der Aktion, der in den Logmeldungen verwendet wird.</param>
-            /// <param name="action">Eine Methode oder Funktion (als Delegate `Func<T>`), die ausgeführt werden soll.</param>
-            /// <param name="logOnError">Eine optionale Aktion (Delegate `Action<Exception>`), die bei Auftreten eines Fehlers ausgeführt wird. Kann null sein.</param>
+            /// <typeparam name="T">Der Rückgabetyp der Aktion, die ausgeführt wird.      </typeparam>
+            /// <param name="actionName">Der Name der Aktion, der in den Logmeldungen verwendet wird. </param>
+            /// <param name="action">Eine Methode oder Funktion (als Delegate `Func<T>`), die ausgeführt werden soll.   </param>
+            /// <param name="logOnError">Eine optionale Aktion (Delegate `Action<Exception>`), die bei Auftreten eines Fehlers ausgeführt wird. Kann null sein. </param>
             /// <returns>
             /// Das Ergebnis der ausgeführten Aktion vom Typ `T`. Wenn ein Fehler auftritt, wird der Standardwert von `T` zurückgegeben (`default(T)`).
             /// </returns>
@@ -153,7 +155,7 @@ namespace xyToolz
             /// 
             /// 
             /// </example>
-            public static T ExecuteWithLogging<T>(string actionName, Func<T> action, Action<Exception> logOnError = null)
+            public static T ExecuteWithLogging<T>(string actionName, Func<T> action, Action<Exception>? logOnError = null)
             {
                   try
                   {
@@ -184,7 +186,7 @@ namespace xyToolz
                         ExLog(ex, LogLevel.Critical, actionName);  // Wenn die Exception nicht anders definiert ist, als die des Delegaten, kommt ggf zweimal die gleiche Nachricht, mit unterschiedlichen Callern
                   }
 
-                  return default;
+                  return default!;
             }
 
             /// <summary>
@@ -206,6 +208,13 @@ namespace xyToolz
                   }
             }
 
+            /// <summary>
+            /// Format the given message for a detailed overview
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="callerName"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
             public static string FormatMsg(string message, string? callerName = null, LogLevel? level = null)
             {
                   return xyLogFormatter.FormatMessageForLogging(message, callerName, level);

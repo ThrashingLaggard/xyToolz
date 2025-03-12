@@ -11,7 +11,7 @@ namespace xyToolz
     {
 
         /// <summary>
-        /// Get the full path of the directory containing 
+        /// While debugging in C# use this to get the app directory
         /// </summary>
         /// <returns></returns>
         public static string GetInnerApplicationFolder()
@@ -27,11 +27,17 @@ namespace xyToolz
             return appFolder;
         }
 
-        /// <summary>
-        /// Get the full path of the directory containing this programs     .sln    file
-        /// </summary>
-        /// <returns></returns>
-        public static String GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolder()).FullName;
+            /// <summary>
+            /// Get the directory containing the application
+            /// </summary>
+            /// <returns></returns>
+            public static string GetApplicationFolder() => Environment.CurrentDirectory;
+
+            /// <summary>
+            /// Get the full path of the directory containing this programs     .sln    file
+            /// </summary>
+            /// <returns></returns>
+            public static String GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolder()).FullName;
 
 
         /// <summary>
