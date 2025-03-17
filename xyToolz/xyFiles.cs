@@ -20,11 +20,7 @@ namespace xyToolz
       /// </summary>
       public class xyFiles
       {
-            private static readonly JsonSerializerOptions DefaultJsonOptions = new()
-            {
-                WriteIndented = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
+            private static readonly JsonSerializerOptions DefaultJsonOptions = xyJson.defaultJsonOptions;
 
             /// <summary>
             /// Stellt sicher alle angegebenen Verzeichnisse existieren
@@ -42,6 +38,31 @@ namespace xyToolz
                   string path = xyPathHelper.EnsureDirectory(dir);
       #endif
                   return path;
+            }
+
+            internal static bool EnsurePathExists( string filePath )
+            {
+                  try
+                  {
+                        // Prüfen, ob die Datei existiert
+                        if (!File.Exists(filePath))
+                        {
+                              // Wenn nicht, eine neue Datei erstellen
+                            
+                              File.Create(filePath);
+                              xyLog.Log($"{filePath} was created");
+                        }
+                        else
+                        {
+                              xyLog.Log($"{filePath} already exists");
+                        }
+                  }
+                  catch (Exception ex)
+                  {
+                        xyLog.ExLog(ex);
+                        return false;
+                  }
+                  return true;
             }
 
             /// <summary>
