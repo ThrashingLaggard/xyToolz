@@ -4,12 +4,29 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 
 namespace xyToolz
 {
       public static class xyQOL
       {
+
+            //public static async  object TryCatch(Func<object,object>dangerousMethod, object param)
+            //{
+            //      try
+            //      {
+            //            return dangerousMethod(param);
+            //      }
+            //      catch(Exception ex)
+            //      {
+            //            xyLog.ExLog(ex);
+            //      }
+            //}
+
+
+
+
             public static string Repeat(string what_to_repeat, ushort quantity)
             {
                   StringBuilder stringBuilder = new();
