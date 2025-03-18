@@ -71,7 +71,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="message"></param>
         /// <param name="callerName"></param>
-        public static async Task<string> AxxLog(string message, [CallerMemberName] string? callerName = null)
+        public static async Task<string> AsxLog(string message, [CallerMemberName] string? callerName = null)
         {
             string formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
 
