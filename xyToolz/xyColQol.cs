@@ -3,7 +3,7 @@
 
 namespace xyToolz
 {
-      public static class xyCollections
+      public static class xyColQol
       {
             public static IEnumerable<int> FillTheList(int limit) 
             {
@@ -38,7 +38,12 @@ namespace xyToolz
                   return lst_OddNumbers;
             }
 
-            public static string SpillDown(IEnumerable values)
+        /// <summary>
+        /// Print the targets intestines on your favourite console with CARRIAGE RETURNS after every value
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public static string SpillDown(IEnumerable values)
             {
                   string output = string.Empty;
                   foreach (object value in values) 
@@ -49,6 +54,11 @@ namespace xyToolz
                   return output;
             }
 
+            /// <summary>
+            /// Print the targets intestines on your favourite console
+            /// </summary>
+            /// <param name="values"></param>
+            /// <returns></returns>
             public static string Spill( IEnumerable values )
             {
                   string output = string.Empty;
