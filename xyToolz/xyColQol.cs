@@ -3,6 +3,19 @@
 
 namespace xyToolz
 {
+    /// <summary>
+    /// Helpers for Enumerables:
+    /// 
+    /// Fill with integer
+    ///             -> with even
+    ///             -> with odd
+    ///             
+    /// Print whole thingy
+    ///         --> also with Carriage return
+    /// 
+    /// Fill with a time for every quarter hour of the day 
+    ///     
+    /// </summary>
       public static class xyColQol
       {
             public static IEnumerable<int> FillTheList(int limit) 
@@ -38,22 +51,6 @@ namespace xyToolz
                   return lst_OddNumbers;
             }
 
-        /// <summary>
-        /// Print the targets intestines on your favourite console with CARRIAGE RETURNS after every value
-        /// </summary>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        public static string SpillDown(IEnumerable values)
-            {
-                  string output = string.Empty;
-                  foreach (object value in values) 
-                  {
-                        output += value + ", ";
-                        xyLog.Log(value+"");
-                  }
-                  return output;
-            }
-
             /// <summary>
             /// Print the targets intestines on your favourite console
             /// </summary>
@@ -67,6 +64,22 @@ namespace xyToolz
                         output += value + ", ";
                   }
                         xyLog.Log(output);
+                  return output;
+            }
+
+        /// <summary>
+        /// Print the targets intestines on your favourite console with CARRIAGE RETURNS after every value
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public static string SpillDown(IEnumerable values)
+            {
+                  string output = string.Empty;
+                  foreach (object value in values) 
+                  {
+                        output += value + ", ";
+                        xyLog.Log(value+"");
+                  }
                   return output;
             }
 
