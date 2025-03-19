@@ -147,7 +147,7 @@ namespace xyToolz
             {
                   try
                   {
-                        String appFolder = xyFolder.GetInnerApplicationFolder();
+                        String appFolder = xyDirUtils.GetInnerApplicationFolder();
                         xyLog.Log(PathForDB = Path.Join(appFolder, pathDB));
                   }
                   catch (Exception ex)

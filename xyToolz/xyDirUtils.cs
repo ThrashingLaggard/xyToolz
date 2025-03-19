@@ -7,8 +7,22 @@ using System.Threading.Tasks;
 
 namespace xyToolz
 {
-    public static class xyFolder
+    /// <summary>
+    /// Directory helpers
+    /// </summary>
+    public static class xyDirUtils
     {
+        /// <summary>
+        /// Get the full path of the directory containing this programs     .sln    file
+        /// </summary>
+        /// <returns></returns>
+        public static String GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolder())!.FullName;
+
+        /// <summary>
+        /// Get the directory containing the application
+        /// </summary>
+        /// <returns></returns>
+        public static string GetApplicationFolder() => Environment.CurrentDirectory;
 
         /// <summary>
         /// While debugging in C# use this to get the app directory
@@ -26,19 +40,6 @@ namespace xyToolz
 
             return appFolder;
         }
-
-            /// <summary>
-            /// Get the directory containing the application
-            /// </summary>
-            /// <returns></returns>
-            public static string GetApplicationFolder() => Environment.CurrentDirectory;
-
-            /// <summary>
-            /// Get the full path of the directory containing this programs     .sln    file
-            /// </summary>
-            /// <returns></returns>
-            public static String GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolder()).FullName;
-
 
         /// <summary>
         /// Stellt sicher, dass der Unterordner existiert. Existiert er nicht, wird er erstellt.
@@ -402,5 +403,8 @@ namespace xyToolz
                 return null;
             }
         }
+    
+    
+    
     }
 }

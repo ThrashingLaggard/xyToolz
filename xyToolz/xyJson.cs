@@ -14,12 +14,32 @@ using Microsoft.Win32.SafeHandles;
 
 namespace xyToolz
 {
+    /// <summary>
+    /// JsonUtils:
+    /// 
+    /// New Entry in json file
+    ///     
+    /// Update Entry 
+    /// 
+    /// new or  update for rsa key
+    /// 
+    /// Read all contents from the given json file
+    ///         --> read value from target key
+    /// 
+    /// new json file?!
+    /// </summary>
       public class xyJson
       {
-            internal static readonly JsonSerializerOptions defaultJsonOptions = new()
-            {
-                  WriteIndented = true ,
-                  DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        /// <summary>
+        /// Provide default options for the serializer, so he shutteth the fucketh up
+        /// </summary>
+        internal static readonly JsonSerializerOptions defaultJsonOptions = new()
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            AllowOutOfOrderMetadataProperties = true,
+            DefaultBufferSize = 4096,
+            
             };
 
 
@@ -29,7 +49,7 @@ namespace xyToolz
             /// </summary>
             /// <param name="filePath">Der Pfad zur JSON-Datei.</param>
             /// <param name="key">Der Schlüssel, der hinzugefügt oder aktualisiert werden soll.</param>
-            /// <param name="value_">Der Wert, der dem Schlüssel zugeordnet werden soll.</param>
+            /// <param name="value">Der Wert, der dem Schlüssel zugeordnet werden soll.</param>
             public static async Task AddOrUpdateEntry( string filePath , string key , object value )
             {
                   Dictionary<string , object>? keyValuePairsFromJsonFile = null;
@@ -66,13 +86,14 @@ namespace xyToolz
                         xyLog.ExLog(ex);
                   }
             }
-            /// <summary>
-            /// Fügt einen neuen Schlüssel hinzu oder aktualisiert einen bestehenden Schlüssel in der JSON-Datei.
-            /// </summary>
-            /// <param name="filePath">Der Pfad zur JSON-Datei.</param>
-            /// <param name="key">Der Schlüssel, der hinzugefügt oder aktualisiert werden soll.</param>
-            /// <param name="value">Der Wert, der dem Schlüssel zugeordnet werden soll.</param>
-            public static async Task AddOrUpdateRSAEntry( string filePath , string key , byte[] value , bool overwrite )
+        /// <summary>
+        /// Fügt einen neuen Schlüssel hinzu oder aktualisiert einen bestehenden Schlüssel in der JSON-Datei.
+        /// </summary>
+        /// <param name="filePath">Der Pfad zur JSON-Datei.</param>
+        /// <param name="key">Der Schlüssel, der hinzugefügt oder aktualisiert werden soll.</param>
+        /// <param name="value">Der Wert, der dem Schlüssel zugeordnet werden soll.</param>
+        /// <param name="overwrite"></param>
+        public static async Task AddOrUpdateRSAEntry( string filePath , string key , byte[] value , bool overwrite )
             {
                   try
                   {
@@ -94,7 +115,13 @@ namespace xyToolz
             }
 
 
-
+            /// <summary>
+            /// New RsaKey Entry in target file
+            /// </summary>
+            /// <param name="filePath"></param>
+            /// <param name="key"></param>
+            /// <param name="value"></param>
+            /// <returns></returns>
             public static async Task AddRsaEntry( string filePath , string key , byte[] value )
             {
                   (Dictionary<string , object>?, byte[]?) dictionary_SecretKeyBytes = await PrepareDictionaryAndKey(filePath , key , value);
@@ -105,10 +132,17 @@ namespace xyToolz
                   }
                   else
                   {
-                        await WriteRsaKeyIntoJson(filePath , updatedDictionary);
+                        await SerializeDictionary(filePath , updatedDictionary);
                   }
             }
 
+            /// <summary>
+            /// Update rsa key entry in json file
+            /// </summary>
+            /// <param name="filePath"></param>
+            /// <param name="key"></param>
+            /// <param name="value"></param>
+            /// <returns></returns>
             public static async Task UpdateRsaEntry( string filePath , string key , byte[] value )
             {
                   (Dictionary<string , object>?, byte[]?) dictionary_SecretKeyBytes = await PrepareDictionaryAndKey(filePath , key , value);
@@ -119,15 +153,21 @@ namespace xyToolz
                   }
                   else
                   {
-                        await WriteRsaKeyIntoJson(filePath , updatedDictionary);
+                        await SerializeDictionary(filePath , updatedDictionary);
                   }
             }
 
 
 
 
-
-            private static async Task<(Dictionary<string , object>?, byte[]?)> PrepareDictionaryAndKey( string filePath , string key , byte[] value )
+        /// <summary>
+        ///                                                         ===v
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns>A Dictionary and the entered byte[]</returns>
+        private static async Task<(Dictionary<string , object>?, byte[]?)> PrepareDictionaryAndKey( string filePath , string key , byte[] value )
             {
                   string? updatedJsonContent = null;
                   Dictionary<string , object>? keyValuePairsFromJsonFile = await GetValuesFromJson(filePath);
@@ -199,7 +239,13 @@ namespace xyToolz
                   return null;
             }
 
-            private static async Task<bool> WriteRsaKeyIntoJson( string filePath , Dictionary<string , object> updatedDictionary )
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="filePath"></param>
+            /// <param name="updatedDictionary"></param>
+            /// <returns></returns>
+            private static async Task<bool> SerializeDictionary( string filePath , Dictionary<string , object> updatedDictionary )
             {
                   try
                   {
@@ -207,7 +253,7 @@ namespace xyToolz
                         {
                               string updatedJsonContent = JsonSerializer.Serialize(updatedDictionary , defaultJsonOptions);
                               await File.WriteAllTextAsync(filePath , updatedJsonContent);
-                              xyLog.Log($"{updatedDictionary.Count()} entrys are stored in {filePath}");
+                              await xyLog.AsxLog($"{updatedDictionary.Count()} entrys are stored in {filePath}");
                               return true;
                         }
                   }
