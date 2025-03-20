@@ -100,6 +100,24 @@ namespace xyToolz
             LogMessageSent?.Invoke(exMessage);
         }
 
+
+        /// <summary>
+        /// Writes details for the given exception to into console
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="level"></param>
+        /// <param name="callerName"></param>
+        public static async Task AsxExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
+        {
+            await Task.Run(() =>
+            {
+                string exMessage = FormatEx(ex, level, callerName);
+                Console.WriteLine(exMessage);
+                Console.Out.Flush();
+                LogMessageSent?.Invoke(exMessage);
+            });
+        }
+
         /// <summary>
         /// Synchronous: Writes a log message into file and console
         /// </summary>
@@ -207,6 +225,58 @@ namespace xyToolz
 
             return default!;
         }
+
+
+
+
+
+        /// <summary>
+        /// Execute "a function" with one main return value with logging BUT ASYNC
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="actionName"></param>
+        /// <param name="action"></param>
+        /// <param name="logOnError"></param>
+        /// <returns></returns>
+        public static async Task<T> ExecuteDebuggingAsync<T>(string actionName, Func<T> action, Action<Exception>? logOnError = null)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(actionName))
+                {
+                    await AsxExLog(new ArgumentException("ActionName invalid"), LogLevel.Error);
+                }
+                string go = $"Start: {actionName}";
+                string yes = $"Erfolgreich: {actionName} abgeschlossen.";
+                string no = $"Warnung: {actionName} hat keine Ergebnisse geliefert.";
+
+                await AsxLog(go);
+                var result = action();
+
+                if (result == null || (result is IEnumerable<object> enumerable && !enumerable.Any()))
+                {
+                    await AsxLog(no);
+                }
+                else
+                {
+                    await AsxLog(yes);
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                logOnError?.Invoke(ex);// Den im Aufruf per Lambda-Ausdruck generierten Delegaten (in diesem Fall sogar mit Parameter) ansprechen, falls dieser != null 
+                await AsxExLog(ex, LogLevel.Critical, actionName);  // Wenn die Exception nicht anders definiert ist, als die des Delegaten, kommt ggf zweimal die gleiche Nachricht, mit unterschiedlichen Callern
+            }
+
+            return default;
+        }
+
+
+
+
+
+
 
         /// <summary>
         /// Checks the filesize for both logtypes and archives the logs if they get "too big"
