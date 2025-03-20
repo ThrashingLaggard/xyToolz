@@ -72,18 +72,28 @@ namespace xyToolz
         /// <param name="message"></param>
         /// <param name="callerName"></param>
         public static async Task<string> AsxLog(string message, [CallerMemberName] string? callerName = null)
-        {
-            string formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
-
-            await Task.Run( () =>
             {
-                Console.WriteLine(formattedMsg);
-                Console.Out.Flush();
+                  string formattedMsg ="";
+                  await Task.Run(() =>
+                  {           
+                        formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
+                  });
+                  if(formattedMsg.Length > 0)
+                  {
+                        await Task.Run( () =>
+                        {
+                            Console.WriteLine(formattedMsg);
+                            Console.Out.Flush();
 
-                LogMessageSent?.Invoke(formattedMsg);           // Fix???
-            } );
+                            LogMessageSent?.Invoke(formattedMsg);           // Fix???
+                        } );
+                  }
+                  else
+                  {
+                        return "What in the fucking hell happened here?";
+                  }
 
-            return formattedMsg;
+                        return formattedMsg;
         }
 
         /// <summary>
@@ -192,7 +202,7 @@ namespace xyToolz
         /// 
         /// 
         /// </example>
-        public static T ExecuteWithLogging<T>(string actionName, Func<T> action, Action<Exception>? logOnError = null)
+        public static T ExecuteDebugging<T>(string actionName, Func<T> action, Action<Exception>? logOnError = null)
         {
             try
             {
