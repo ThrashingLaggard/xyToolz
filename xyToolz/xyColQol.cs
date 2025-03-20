@@ -56,7 +56,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
-        public static string Spill(IEnumerable values)
+        public static string SplitSpill(IEnumerable values)
         {
             string output = string.Empty;
             foreach (object value in values)
@@ -67,13 +67,24 @@ namespace xyToolz
             return output;
         }
 
+            public static string Spill( IEnumerable values )
+            {
+                  string output = string.Empty;
+                  foreach (object value in values)
+                  {
+                        output += value ;
+                  }
+                  xyLog.Log(output);
+                  return output;
+            }
 
-        /// <summary>
-        /// Print the targets intestines on your favourite console BUT ASYNC
-        /// </summary>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        public static async Task<string> AsxSpill(IEnumerable values)
+
+            /// <summary>
+            /// Print the targets intestines on your favourite console BUT ASYNC
+            /// </summary>
+            /// <param name="values"></param>
+            /// <returns></returns>
+            public static async Task<string> AsxSpill(IEnumerable values)
         {
             string output = string.Empty;
             await Task.Run

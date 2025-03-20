@@ -56,13 +56,13 @@ namespace xyToolz
                         {
                               xyLog.Log($"{filePath} already exists");
                         }
+                        return true;
                   }
                   catch (Exception ex)
                   {
                         xyLog.ExLog(ex);
                         return false;
                   }
-                  return true;
             }
 
             /// <summary>

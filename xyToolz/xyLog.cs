@@ -78,7 +78,11 @@ namespace xyToolz
                   {           
                         formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
                   });
-                  if(formattedMsg.Length > 0)
+                  if(formattedMsg.Length == 0)
+                  {
+                        return "What in the fucking hell happened here?";
+                  }
+                  else
                   {
                         await Task.Run( () =>
                         {
@@ -88,12 +92,7 @@ namespace xyToolz
                             LogMessageSent?.Invoke(formattedMsg);           // Fix???
                         } );
                   }
-                  else
-                  {
-                        return "What in the fucking hell happened here?";
-                  }
-
-                        return formattedMsg;
+                  return formattedMsg;
         }
 
         /// <summary>
