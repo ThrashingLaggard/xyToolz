@@ -4,6 +4,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json.Linq;
+
 namespace xyToolz
 {
     /// <summary>
@@ -218,6 +220,18 @@ namespace xyToolz
                         return jsonDic[ key ];
                   }
             }
+            public static async Task<JObject?> GetJObjectFromFile( string filePath ) => xyFiles.EnsurePathExists(filePath) ? ( await File.ReadAllTextAsync(filePath) is string jsonFileContent ) ? JObject.Parse(jsonFileContent) : (await xyLog.AsxLog("Cant read file content into JObject"), new JObject[0].FirstOrDefault()).Item2 : null;
+        
+            public static async Task<object> DeserializeSubKey( string filePath , string key , string subkey ) =>  (await GetJObjectFromFile(filePath) is    JObject jsonObject )? ( jsonObject[ key ][ subkey ] is object value ) ? value : (async Task<object>() => { await xyLog.AsxLog("Cant read JObject into Object"); return null!; } ) :null; 
+                        
+            public static async Task<byte[]> DeserializeSubKeyToBytes( string filePath , string key , string subkey ) => ( await DeserializeSubKey(filePath , key , subkey) is byte[] value ) ? value : ( await xyLog.AsxLog("Cant read JObject into byte[]"), Array.Empty<byte>()).Item2; 
+
+               
+            
+
+                            
+
+                        
 
             #endregion
 
