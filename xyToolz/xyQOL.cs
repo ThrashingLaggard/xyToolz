@@ -14,14 +14,15 @@ namespace xyToolz
     /// Little helpers:
     /// 
     /// Repeat  or  reverse   strings
-    /// 
+    /// ---
     /// Open Editor 
     ///         -> also with file
+    ///         ---------------------------
     ///         
     /// "Useless" experiments:
     /// 
     /// Biep
-    /// 
+    /// ---
     /// Crash
     /// 
     /// </summary>
@@ -83,12 +84,24 @@ namespace xyToolz
             xyLog.Log(what_to_print);
         }
 
+            public static byte[] StringBytes( string target )
+            {
+                  try
+                  {
+                        return Encoding.UTF8.GetBytes(target);
+                  }
+                  catch (Exception ex)
+                  {
+                        xyLog.ExLog(ex);
+                        return null!;
+                  }
+            }
 
 
-        /// <summary>
-        /// Open Notepad.exe
-        /// </summary>
-        public static void EDITOR()
+            /// <summary>
+            /// Open Notepad.exe
+            /// </summary>
+            public static void EDITOR()
         {
             Process.Start("notepad.exe");
         }

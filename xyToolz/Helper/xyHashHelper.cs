@@ -30,17 +30,18 @@ namespace xyToolz.Helper
 
         private static HashAlgorithmName Sha256 = HashAlgorithmName.SHA256;
         private static HashAlgorithmName Sha512 = HashAlgorithmName.SHA512;
-        #endregion
+            #endregion
 
-        #region "Hashing"
+            #region "Hashing"
 
-        /// <summary>
-        /// Hashes the given pasword in the specified algorithm
-        /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <returns>hashed password as base64 string</returns>
-        public static String HashPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
+            /// <summary>
+            /// Hashes the given pasword in the specified algorithm
+            /// </summary>
+            /// <param name="hashAlgorithm"></param>
+            /// <param name="password"></param>
+            /// <param name="salt"></param>
+            /// <returns>hashed password as base64 string</returns>
+            public static String HashPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
         {
             String hashedPasswordString = "";
             int length = SetKeySize(hashAlgorithm); 
