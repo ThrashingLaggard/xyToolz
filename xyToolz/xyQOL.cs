@@ -84,6 +84,12 @@ namespace xyToolz
             xyLog.Log(what_to_print);
         }
 
+
+        /// <summary>
+        /// Get a byte array from  utf8 string
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns>byte[]</returns>
             public static byte[] StringBytes( string target )
             {
                   try
