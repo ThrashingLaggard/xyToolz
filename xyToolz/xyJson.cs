@@ -277,7 +277,7 @@ namespace xyToolz
 
         public static async Task<object?> DeserializeSubKey(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (jsonObject[key][subkey] is object value) ? value : (async Task<object> () => { await xyLog.AsxLog("Cant read JObject into Object"); return null!; }) : null;
 
-        public static async Task<byte[]?> DeserializeSubKeyToBytes(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (xyQOL.StringBytes(jsonObject[key][subkey].ToString()) is byte[] value) ? value : (await xyLog.AsxLog("Cant read JObject into byte[]"), Array.Empty<byte>()).Item2 : null;
+        public static async Task<byte[]?> DeserializeSubKeyToBytes(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (xyQOL.Byting(jsonObject[key][subkey].ToString()) is byte[] value) ? value : (await xyLog.AsxLog("Cant read JObject into byte[]"), Array.Empty<byte>()).Item2 : null;
 
         #endregion
 

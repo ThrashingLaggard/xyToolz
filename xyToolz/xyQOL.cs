@@ -26,7 +26,7 @@ namespace xyToolz
     /// Crash
     /// 
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs yet.")]
     public static class xyQOL
     {
 
@@ -53,7 +53,7 @@ namespace xyToolz
         public static string Repeat(string what_to_repeat, ushort quantity)
         {
             StringBuilder stringBuilder = new();
-            for (int i = 0; i < quantity; i++)
+            for (int i = 0; i < quantity -1; i++)
             {
                 stringBuilder.Append(what_to_repeat);
             }
@@ -90,7 +90,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="target"></param>
         /// <returns>byte[]</returns>
-            public static byte[] StringBytes( string target )
+            public static byte[] Byting( string target )
             {
                   try
                   {
@@ -120,7 +120,10 @@ namespace xyToolz
             Process.Start("notepad.exe", filepath);
         }
 
-        #region "Experiments an Research Chemicals"
+
+
+
+        #region "Experiments and Research Chemicals"
 
         /// <summary>
         /// Bei dir piepts wohl!
