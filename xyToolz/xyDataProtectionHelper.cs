@@ -58,5 +58,50 @@ namespace xyToolz
         }
 
 
+        public static async Task<byte[]> Encrypt(byte[] data, string password) 
+        { 
+            using(Aes aes = Aes.Create())
+            {
+                aes.KeySize = 256;
+                aes.GenerateKey();
+                aes.GenerateIV();
+
+                using(MemoryStream memoryStream = new MemoryStream())
+                {
+                    memoryStream.Write(aes.IV, 0, aes.IV.Length);
+                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, aes.CreateEncryptor(aes.Key, aes.IV), CryptoStreamMode.Write))
+                    {
+                        await cryptoStream.WriteAsync(data, 0, data.Length);
+                        await cryptoStream.FlushFinalBlockAsync();
+                    } 
+                    return memoryStream.ToArray();
+                }
+            }
+        }
+
+        public static async Task<byte[]> Decrypt(byte[] encryptedData, string password)
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.KeySize = 256;
+
+                int length = aes.IV.Length;
+                byte[] iv = new byte[length];
+                Array.Copy(encryptedData, iv, length);
+                aes.IV = iv;
+
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    memoryStream.Write(aes.IV, 0, aes.IV.Length);
+                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, aes.CreateEncryptor(aes.Key, aes.IV), CryptoStreamMode.Write))
+                    {
+                        await cryptoStream.WriteAsync(encryptedData,length, encryptedData.Length - length);
+                        await cryptoStream.FlushFinalBlockAsync();
+                    }
+                    return memoryStream.ToArray();
+                }
+            }
+        }
+        
     }
 }
