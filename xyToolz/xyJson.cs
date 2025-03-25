@@ -191,7 +191,7 @@ namespace xyToolz
         /// <param name="fileName"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static async Task<bool> SaveToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions? options = default)
+        public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions? options = default)
         {
 
             try
@@ -229,7 +229,7 @@ namespace xyToolz
         {
             try
             {
-                await SaveToJsonAsync(updatedDictionary, filePath);
+                await SaveDataToJsonAsync(updatedDictionary, filePath);
                 await xyLog.AsxLog($"{updatedDictionary.Count()} entrys are stored in the dictionary, it was now added to {filePath}");
                 return true;
             }
@@ -240,36 +240,37 @@ namespace xyToolz
             return false;
         }
 
-        public static async Task<Dictionary<string, object>?> DeserializeFromFile(string filePath) => await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(new MemoryStream(Encoding.ASCII.GetBytes(await File.ReadAllTextAsync(filePath))));
+        public static async Task<Dictionary<string, object>?> DeserializeFromFile(string filePath) => await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(await xyFiles.GetStreamFromFile(filePath));
 
-        public static object? DeserializeFromKey(string filePath, string key)
+ 
+
+        public static async Task<object?> DeserializeFromKey(string filePath, string key)
         {
-            string pathError = "No target file at the specified path: ";
+            string pathError = "Cant read data from the specified path: ";
             string serializingError = "Error in deserialization of the file ";
             string keyError = "No matching key for the given parameters!";
 
-            string? jsonContent = File.ReadAllText(filePath);
-            if (jsonContent is null)
+            if (await xyFiles.GetStreamFromFile(filePath) is MemoryStream memoryStream)
             {
-                xyLog.Log(pathError + filePath);
-                return null;
-            }
-
-            Dictionary<string, object>? jsonDic = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonContent);
-            if (jsonDic is null)
-            {
-                xyLog.Log(serializingError + filePath);
-                return null;
-            }
-            else
-            {
-                if (!jsonDic.ContainsKey(key))
+                Dictionary<string, object>? jsonDic = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(memoryStream, defaultJsonOptions);
+                
+                if (jsonDic is null)
                 {
-                    xyLog.Log(keyError);
+                    xyLog.Log(serializingError + filePath);
                     return null;
                 }
-                return jsonDic[key];
+                else
+                {
+                    if (!jsonDic.ContainsKey(key))
+                    {
+                        xyLog.Log(keyError);
+                        return null;
+                    }
+                    return jsonDic[key];
+                }
             }
+            xyLog.Log(pathError);
+            return null;
         }
 
         public static async Task<JObject?> GetJObjectFromFile(string filePath) => xyFiles.EnsurePathExists(filePath) ? (await File.ReadAllTextAsync(filePath) is string jsonFileContent) ? JObject.Parse(jsonFileContent) : (await xyLog.AsxLog("Cant read file content into JObject"), new JObject[0].FirstOrDefault()).Item2 : null;

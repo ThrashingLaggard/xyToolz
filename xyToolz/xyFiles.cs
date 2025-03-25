@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 
 using xyToolz.Helper;
+using System.Text;
 
 #if ANDROID
 using Android.Content;
@@ -98,21 +99,6 @@ namespace xyToolz
             }
             return lstfullNames;
         }
-        /// <summary>
-        /// Serialize data into a targetfile
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="subfolder"></param>
-        /// <param name="fileName"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static async Task<bool> SaveJsonAsync<T>(T data, string subfolder = "AppData", string fileName = "config.json", JsonSerializerOptions? options = default)
-        {
-            string jsonData = JsonSerializer.Serialize(data, options ?? DefaultJsonOptions);
-            return await SaveToFileAsync(jsonData, subfolder, fileName);
-        }
-
 
         /// <summary>
         ///  Rename a file
@@ -175,6 +161,31 @@ namespace xyToolz
         }
 
 
+        /// <summary>
+        /// Generate a memorystream from the specified filepath
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns>MemoryStream (as Stream?)</returns>
+        public static async Task<Stream> GetStreamFromFile(string filePath)
+        {
+            try
+            {
+                if (await File.ReadAllTextAsync(filePath) is string contentString)
+                {
+                    if (Encoding.UTF8.GetBytes(contentString) is byte[] buffer)
+                    {
+                        MemoryStream memoryStream = new(buffer);
+                        return memoryStream;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+            }
+            await xyLog.AsxLog($"Unable to get file content from {filePath}, please check it.");
+            return null!;
+        }
 
         /// <summary>
         /// Save a string into a file
@@ -198,7 +209,6 @@ namespace xyToolz
                 return false;
             }
         }
- 
 
         /// <summary>
         /// Read a file's content into an ienumerable
