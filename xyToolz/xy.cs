@@ -42,11 +42,35 @@ namespace xyToolz
                 return null!;
             }
         }
+        public static object TryCatch(Func<object[], object> dangerousMethod, object[] parameters)
+        {
+            try
+            {
+                return dangerousMethod(parameters);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
         public static async Task<object> TryCatch(Func<object, object, Task<object>>dangerousMethod, object param1, object param2)
         {
             try
             {
                 return await dangerousMethod(param1, param2);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
+        public static object TryCatch(Func<object, object, object> dangerousMethod, object param1, object param2)
+        {
+            try
+            {
+                return dangerousMethod(param1, param2);
             }
             catch (Exception ex)
             {
@@ -66,11 +90,35 @@ namespace xyToolz
                 return null!;
             }
         }
+        public static object TryCatch(Func<object, object> dangerousMethod, object param)
+        {
+            try
+            {
+                return dangerousMethod(param);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
         public static async Task<object> TryCatch(Func<Task<object>> dangerousMethod)
         {
             try
             {
                 return await dangerousMethod();
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
+        public static object TryCatch(Func<object> dangerousMethod)
+        {
+            try
+            {
+                return dangerousMethod();
             }
             catch (Exception ex)
             {
@@ -126,7 +174,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="target"></param>
         /// <returns>byte[]</returns>
-            public static byte[] Byting( string target )
+        public static byte[] StringBytes( string target )
             {
                   try
                   {
@@ -139,8 +187,26 @@ namespace xyToolz
                   }
             }
 
+        /// <summary>
+        /// Get an UTF8 string from a byte array
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        public static string ByteString(byte[] bytes)
+        {
+            try
+            {
+                return Encoding.UTF8.GetString(bytes);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+            }
+            return null!;
+        }
+
         #endregion
-       
+
         #region "Experiments and Research Chemicals"
 
         /// <summary>
