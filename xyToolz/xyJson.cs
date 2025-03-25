@@ -33,7 +33,7 @@ namespace xyToolz
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             AllowOutOfOrderMetadataProperties = true,
             DefaultBufferSize = 4096,
-
+            AllowTrailingCommas = false
         };
 
         #region "Helper"
@@ -182,7 +182,7 @@ namespace xyToolz
         #region "Serialization"
 
         /// <summary>
-        /// 
+        /// Write a dictionary into the target file OVERWRITING it completely
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="updatedDictionary"></param>
@@ -194,8 +194,15 @@ namespace xyToolz
                 if (xyFiles.EnsurePathExists(filePath))
                 {
                     string updatedJsonContent = JsonSerializer.Serialize(updatedDictionary, defaultJsonOptions);
-                    await File.WriteAllTextAsync(filePath, updatedJsonContent);
-                    await xyLog.AsxLog($"{updatedDictionary.Count()} entrys are stored in this dictionary, which is being added to {filePath}");
+                    if (File.ReadLines(filePath) is IEnumerable<string> lines)
+                    {
+                        await File.AppendAllTextAsync(filePath,updatedJsonContent);
+                    }
+                    else
+                    {
+                        await File.WriteAllTextAsync(filePath, updatedJsonContent);
+                    }
+                    await xyLog.AsxLog($"{updatedDictionary.Count()} entrys are stored in the dictionary, it was now added to {filePath}");
                     return true;
                 }
             }
@@ -243,13 +250,6 @@ namespace xyToolz
         public static async Task<object?> DeserializeSubKey(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (jsonObject[key][subkey] is object value) ? value : (async Task<object> () => { await xyLog.AsxLog("Cant read JObject into Object"); return null!; }) : null;
 
         public static async Task<byte[]?> DeserializeSubKeyToBytes(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (xyQOL.StringBytes(jsonObject[key][subkey].ToString()) is byte[] value) ? value : (await xyLog.AsxLog("Cant read JObject into byte[]"), Array.Empty<byte>()).Item2 : null;
-
-
-
-
-
-
-
 
         #endregion
 
