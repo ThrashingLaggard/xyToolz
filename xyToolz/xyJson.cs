@@ -181,6 +181,44 @@ namespace xyToolz
 
         #region "Serialization"
 
+
+        /// <summary>
+        /// Serialize data into a targetfile
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="subfolder"></param>
+        /// <param name="fileName"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static async Task<bool> SaveToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions? options = default)
+        {
+
+            try
+            {
+                if (xyFiles.EnsurePathExists(fileName))
+                {
+                    string jsonData = JsonSerializer.Serialize(data, options ?? defaultJsonOptions);
+
+                    if (File.ReadLines(fileName) is IEnumerable<string> lines)
+                    {
+                        await File.AppendAllTextAsync(fileName, jsonData);
+                    }
+                    else
+                    {
+                        await File.WriteAllTextAsync(fileName, jsonData);
+                    }
+                    await xyLog.AsxLog($"{jsonData} was now added to {fileName}");
+                    return true;
+                }
+            }
+            catch (JsonException jEx)
+            {
+                xyLog.ExLog(jEx);
+            }
+            return false;
+        }
+
         /// <summary>
         /// Write a dictionary into the target file OVERWRITING it completely
         /// </summary>
@@ -191,20 +229,9 @@ namespace xyToolz
         {
             try
             {
-                if (xyFiles.EnsurePathExists(filePath))
-                {
-                    string updatedJsonContent = JsonSerializer.Serialize(updatedDictionary, defaultJsonOptions);
-                    if (File.ReadLines(filePath) is IEnumerable<string> lines)
-                    {
-                        await File.AppendAllTextAsync(filePath,updatedJsonContent);
-                    }
-                    else
-                    {
-                        await File.WriteAllTextAsync(filePath, updatedJsonContent);
-                    }
-                    await xyLog.AsxLog($"{updatedDictionary.Count()} entrys are stored in the dictionary, it was now added to {filePath}");
-                    return true;
-                }
+                await SaveToJsonAsync(updatedDictionary, filePath);
+                await xyLog.AsxLog($"{updatedDictionary.Count()} entrys are stored in the dictionary, it was now added to {filePath}");
+                return true;
             }
             catch (JsonException jEx)
             {

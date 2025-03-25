@@ -98,7 +98,20 @@ namespace xyToolz
             }
             return lstfullNames;
         }
-
+        /// <summary>
+        /// Serialize data into a targetfile
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="subfolder"></param>
+        /// <param name="fileName"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static async Task<bool> SaveJsonAsync<T>(T data, string subfolder = "AppData", string fileName = "config.json", JsonSerializerOptions? options = default)
+        {
+            string jsonData = JsonSerializer.Serialize(data, options ?? DefaultJsonOptions);
+            return await SaveToFileAsync(jsonData, subfolder, fileName);
+        }
 
 
         /// <summary>
@@ -170,7 +183,7 @@ namespace xyToolz
         /// <param name="subfolder"></param>
         /// <param name="fileName"></param>
         /// <returns>true if successfull, false if not</returns>
-        public static async Task<bool> SaveFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
+        public static async Task<bool> SaveToFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
         {
             try
             {
@@ -185,20 +198,7 @@ namespace xyToolz
                 return false;
             }
         }
-        /// <summary>
-        /// Serialize data into a targetfile
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="subfolder"></param>
-        /// <param name="fileName"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static async Task<bool> SaveJsonAsync<T>(T data, string subfolder = "AppData", string fileName = "config.json", JsonSerializerOptions? options = default)
-        {
-            string jsonData = JsonSerializer.Serialize(data, options ?? DefaultJsonOptions);
-            return await SaveFileAsync(jsonData, subfolder, fileName);
-        }
+ 
 
         /// <summary>
         /// Read a file's content into an ienumerable
@@ -245,19 +245,6 @@ namespace xyToolz
                 return null;
             }
         }
-        /// <summary>
-        /// Not sure, needs testing....
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="subfolder"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public static async Task<T?> LoadJsonAsync<T>(string subfolder = "AppData", string fileName = "config.json")
-        {
-            string? jsonData = await LoadFileAsync(subfolder, fileName);
-            return jsonData != null ? JsonSerializer.Deserialize<T>(jsonData) : default;
-        }
-
 
         /// <summary>
         /// CAUTION! 
