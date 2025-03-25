@@ -27,23 +27,60 @@ namespace xyToolz
     /// 
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs yet.")]
-    public static class xyQOL
+    public static class xy
     {
+        #region "Try ... Catch!"
+        public static async Task<object> TryCatch(Func<object[], Task<object>> dangerousMethod, object[] parameters)
+        {
+            try
+            {
+                return await dangerousMethod(parameters);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
+        public static async Task<object> TryCatch(Func<object, object, Task<object>>dangerousMethod, object param1, object param2)
+        {
+            try
+            {
+                return await dangerousMethod(param1, param2);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
+        public static async Task<object >TryCatch(Func<object, Task<object>> dangerousMethod, object param)
+        {
+            try
+            {
+                return await dangerousMethod(param);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
+        public static async Task<object> TryCatch(Func<Task<object>> dangerousMethod)
+        {
+            try
+            {
+                return await dangerousMethod();
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
+        #endregion
 
-        //public static async  object TryCatch(Func<object,object>dangerousMethod, object param)
-        //{
-        //      try
-        //      {
-        //            return dangerousMethod(param);
-        //      }
-        //      catch(Exception ex)
-        //      {
-        //            xyLog.ExLog(ex);
-        //      }
-        //}
-
-
-
+        #region "QOL"
         /// <summary>
         /// Repeat the string the given number of times
         /// </summary>
@@ -84,7 +121,6 @@ namespace xyToolz
             xyLog.Log(what_to_print);
         }
 
-
         /// <summary>
         /// Get a byte array from  utf8 string
         /// </summary>
@@ -103,11 +139,14 @@ namespace xyToolz
                   }
             }
 
+        #endregion
+       
+        #region "Experiments and Research Chemicals"
 
-            /// <summary>
-            /// Open Notepad.exe
-            /// </summary>
-            public static void EDITOR()
+        /// <summary>
+        /// Open Notepad.exe
+        /// </summary>
+        public static void EDITOR()
         {
             Process.Start("notepad.exe");
         }
@@ -119,11 +158,6 @@ namespace xyToolz
         {
             Process.Start("notepad.exe", filepath);
         }
-
-
-
-
-        #region "Experiments and Research Chemicals"
 
         /// <summary>
         /// Bei dir piepts wohl!
