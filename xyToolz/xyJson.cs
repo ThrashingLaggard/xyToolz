@@ -85,6 +85,7 @@ namespace xyToolz
             await xyLog.AsxLog(fileHandlingError);
             return (null!, null!, null!);
         }
+
         /// <summary>
         /// Looks at the first char of the first and the last char from the last line and checks if they are curly braces {...}
         /// </summary>
@@ -99,6 +100,7 @@ namespace xyToolz
             string lastLine = firstLine_LastLine.Item2;
             return firstLine.StartsWith('{') && lastLine.EndsWith('}');
         }
+        
         /// <summary>
         /// Encapsulates a string wich curly braces
         /// </summary>
