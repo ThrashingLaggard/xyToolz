@@ -212,7 +212,7 @@ namespace xyToolz
         /// <summary>
         /// Open Notepad.exe
         /// </summary>
-        public static void EDITOR()
+        public static void Editor()
         {
             Process.Start("notepad.exe");
         }
@@ -220,7 +220,7 @@ namespace xyToolz
         /// <summary>
         /// Open Notepad.exe with the specified file
         /// </summary>
-        public static void EDITOR(string filepath)
+        public static void Editor(string filepath)
         {
             Process.Start("notepad.exe", filepath);
         }
