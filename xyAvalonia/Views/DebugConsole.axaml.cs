@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using xyAvalonia.Services;
 using xyAvalonia.Views;
@@ -37,12 +38,27 @@ public partial class DebugConsole : Window
         _consoleWriter = new ConsoleTextBoxWriter(ConsoleOutput);
         Console.SetOut(_consoleWriter);
         Console.SetError(_consoleWriter);
+
     }
+     
+    
+
+    private async void Btn_StartMonitoringClick(object sender, RoutedEventArgs e)
+    {
+        if(txt_ProgramPath.Text is  string programPath)
+        {
+            await ReadProgramOutput(programPath);
+        }
+        else
+        {
+            await _consoleWriter.WriteAsync("Please enter valid program path");
+        }
+
+    }
+
 
     public async Task ReadProgramOutput(string programPath)
     {
-        MainWindow mainWindow = (MainWindow)this.Owner;
-        mainWindow.Hide();
         
         Process process = new Process
         {
@@ -51,18 +67,28 @@ public partial class DebugConsole : Window
                 FileName = programPath,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                UseShellExecute = false,
+                UseShellExecute = true,
                 CreateNoWindow = true,
+                Verb = "runas"
             }
         };
 
-        process.OutputDataReceived += async (sender, e) => await xyLog.AsxLog(e.Data!);
-        process.ErrorDataReceived += async (sender, e) =>
+        if( (MainWindow)this.Owner is MainWindow mainWindow)
+        {
+            mainWindow.Hide();
+        }
+
+        process.OutputDataReceived += async (sender, e) => await _consoleWriter.WriteAsync(FormatMsgForLogs(e.Data!));
+        process.ErrorDataReceived += async (sender, e) => 
          {
              if (!string.IsNullOrEmpty(e.Data))
              {
                  Exception exception = new Exception(e.Data);
-                 await xyLog.AsxExLog(exception);
+                 if (FormatExMsgForLogs(exception) is   string exContent)
+                 {
+                    await _consoleWriter.WriteAsync(exContent);
+                     
+                 }
              }
          };
 
@@ -71,7 +97,8 @@ public partial class DebugConsole : Window
         process.BeginErrorReadLine();
 
         await process.WaitForExitAsync();
-        mainWindow.Show();
+        
+        //mainWindow.Show();
     }
 
 
@@ -167,7 +194,39 @@ public partial class DebugConsole : Window
     }
 
 
+    /// <summary>
+    /// Delete the placehoder when clicking on it
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void PathTextBox_GotFocus(Object sender, RoutedEventArgs e)
+    {
+        if (InputTextBox.Text == "Enter the path of the target program")
+        {
+            InputTextBox.Text = string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Put the placeholder back in...
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void PathTextBox_LostFocus(Object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(InputTextBox.Text))
+        {
+            InputTextBox.Text = "Enter the path of the target program";
+        }
+    }
+
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private static String FormatMsgForLogs(String message) => xyLogFormatter.FormatMessageForLogging(message);
+    private static String FormatExMsgForLogs(Exception exception) => xyLogFormatter.FormatExceptionDetails(exception, Microsoft.Extensions.Logging.LogLevel.Error);
+
+
 
     /// <summary>
     /// Text zur GUI hinzufügen

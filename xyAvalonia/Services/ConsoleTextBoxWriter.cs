@@ -28,20 +28,29 @@ namespace xyAvalonia.Services
                 () =>
                     {
                         _output.Text += value + Environment.NewLine;
-                        _output.CaretIndex = _output.Text.Length;
-                        _output.ScrollToLine(_output.CaretIndex);
+                        UpdateCaretAndScroll();
                     }
             );
         }
 
+        public override async Task WriteAsync(string value)
+        {
+            await Dispatcher.UIThread.InvokeAsync
+            (
+                () =>
+                {
+                    _output.Text += value + Environment.NewLine;
+                    UpdateCaretAndScroll();
+                }
+            );
+        }
 
-
-
-
-
-        private static String FormatMsgForLogs(String message) => xyLogFormatter.FormatMessageForLogging(message);
-        private static String FormatExMsgForLogs(Exception exception) => xyLogFormatter.FormatExceptionDetails(exception, Microsoft.Extensions.Logging.LogLevel.Error);
-
+        private void UpdateCaretAndScroll()
+        {
+            _output.CaretIndex = _output.Text.Length;
+            var lineIndex = _output.Text.Length - 1;
+            _output.ScrollToLine(lineIndex);
+        }
 
         public override Encoding Encoding => Encoding.UTF8;
     }
