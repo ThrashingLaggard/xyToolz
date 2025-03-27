@@ -48,7 +48,14 @@ namespace xyAvalonia.Services
         private void UpdateCaretAndScroll()
         {
             _output.CaretIndex = _output.Text.Length;
-            var lineIndex = _output.Text.Length - 1;
+            // Split the text into lines based on Environment.NewLine
+            var lines = _output.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            int lineIndex = lines.Length - 1;
+            // Ensure that the lineIndex is at least zero
+            if (lineIndex < 0)
+            {
+                lineIndex = 0;
+            }
             _output.ScrollToLine(lineIndex);
         }
 

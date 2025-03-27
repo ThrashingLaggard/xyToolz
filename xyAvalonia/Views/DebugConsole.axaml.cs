@@ -18,45 +18,67 @@ using xyToolz.Helper.Logging;
 
 namespace xyAvalonia;
 
+// Neu hinzugefügter Delegate zur Unterstützung von zwei Parametern:
+public delegate void LogMessageHandler(string message, string? callerName);
+public delegate void ExLogMessageHandler(string message,  string? callerName);
+
 public partial class DebugConsole : Window
 {
-
-    private TextWriter _consoleWriter;
-
-    public event Action<String> LogMessageReceived;
-    public void OnMessageReceived(String message, [CallerMemberName] String? callerName = null)
+    private bool IsException(string input)
     {
-        LogMessageReceived?.Invoke((message));
+        if (!string.IsNullOrEmpty(input))
+        {
+            try
+            {
+                Exception exception = new Exception(input);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+            }
+        }
+            return false;
     }
 
 
+    private TextWriter _consoleWriter;
+    private event LogMessageHandler? LogMessageReceived;
+    private event LogMessageHandler? ExLogMessageReceived;
+    //public event Action<String> LogMessageReceived;
+    public async void OnMessageReceived(String message, [CallerMemberName] String? callerName = null)
+    {
+        if (FormatMsgForLogs(message) is string content)
+        {
+            await _consoleWriter.WriteAsync(content);
+            LogMessageReceived?.Invoke(content,callerName);
+        }
+    }
+
+    public async void OnExMessageReceived(String message, [CallerMemberName] String? callerName = null)
+    {
+        if (!string.IsNullOrEmpty(message))
+        {
+            Exception exception = new Exception(message);
+            if (FormatExMsgForLogs(exception) is string exContent)
+            {
+                await _consoleWriter.WriteAsync(message);
+                ExLogMessageReceived?.Invoke(message, callerName);
+            }
+        }
+    }
 
     public DebugConsole()
     {
         InitializeComponent();
-        xyLog.LogMessageSent += LogMessageReceived;
+        xyLog.LogMessageSent += OnMessageReceived;
+        xyLog.ExLogMessageSent += OnExMessageReceived;
         _consoleWriter = new ConsoleTextBoxWriter(ConsoleOutput);
         Console.SetOut(_consoleWriter);
         Console.SetError(_consoleWriter);
 
     }
      
-    
-
-    private async void Btn_StartMonitoringClick(object sender, RoutedEventArgs e)
-    {
-        if(txt_ProgramPath.Text is  string programPath)
-        {
-            await ReadProgramOutput(programPath);
-        }
-        else
-        {
-            await _consoleWriter.WriteAsync("Please enter valid program path");
-        }
-
-    }
-
-
     public async Task ReadProgramOutput(string programPath)
     {
         
@@ -67,9 +89,8 @@ public partial class DebugConsole : Window
                 FileName = programPath,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                UseShellExecute = true,
+                UseShellExecute = false,
                 CreateNoWindow = true,
-                Verb = "runas"
             }
         };
 
@@ -96,13 +117,45 @@ public partial class DebugConsole : Window
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
-        await process.WaitForExitAsync();
+        
         
         //mainWindow.Show();
     }
 
+    private async Task WriteIntoFile(String outputText)
+    {
+        // Beispiel: Speichern in eine Textdatei
+        var saveFileDialog = new SaveFileDialog
+        {
+            Title = "Export Console Output",
+            Filters = new List<FileDialogFilter>
+        {
+            new FileDialogFilter { Name = "Text Files", Extensions = { "txt" } },
+            new FileDialogFilter { Name = "All Files", Extensions = { "*" } }
+        }
+        };
 
+        var result = await saveFileDialog.ShowAsync(this);
+        if (result != null)
+        {
+            File.WriteAllText(result, outputText);
+        }
 
+    }
+    #region EvtHandler
+
+    private async void Btn_StartMonitoringClick(object sender, RoutedEventArgs e)
+    {
+        if(txt_ProgramPath.Text is  string programPath)
+        {
+            await ReadProgramOutput(programPath);
+        }
+        else
+        {
+            await _consoleWriter.WriteAsync("Please enter valid program path");
+        }
+
+    }
 
     /// <summary>
     /// Submit yout input
@@ -146,26 +199,6 @@ public partial class DebugConsole : Window
     }
 
 
-    private async Task WriteIntoFile(String outputText)
-    {
-        // Beispiel: Speichern in eine Textdatei
-        var saveFileDialog = new SaveFileDialog
-        {
-            Title = "Export Console Output",
-            Filters = new List<FileDialogFilter>
-        {
-            new FileDialogFilter { Name = "Text Files", Extensions = { "txt" } },
-            new FileDialogFilter { Name = "All Files", Extensions = { "*" } }
-        }
-        };
-
-        var result = await saveFileDialog.ShowAsync(this);
-        if (result != null)
-        {
-            File.WriteAllText(result, outputText);
-        }
-
-    }
 
     /// <summary>
     /// Delete the placehoder when clicking on it
@@ -193,7 +226,6 @@ public partial class DebugConsole : Window
         }
     }
 
-
     /// <summary>
     /// Delete the placehoder when clicking on it
     /// </summary>
@@ -219,6 +251,8 @@ public partial class DebugConsole : Window
             InputTextBox.Text = "Enter the path of the target program";
         }
     }
+
+#endregion
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
