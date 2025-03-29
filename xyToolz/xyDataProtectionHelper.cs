@@ -22,7 +22,7 @@ namespace xyToolz
         {
             try
             {
-                if (xy.StringBytes(data) is byte[] bytesFromInput)
+                if (xy.StringToBytes(data) is byte[] bytesFromInput)
                 {
                     return ProtectedData.Protect(bytesFromInput, null, DataProtectionScope.CurrentUser);
                 }
