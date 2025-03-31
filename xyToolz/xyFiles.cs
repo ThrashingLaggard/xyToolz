@@ -170,11 +170,13 @@ namespace xyToolz
         {
             try
             {
-                if (await File.ReadAllTextAsync(filePath) is string contentString)
+                string? contentString = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
+                if (!string.IsNullOrEmpty(contentString))
                 {
                     if (xy.StringToBytes(contentString) is byte[] buffer)
                     {
-                        MemoryStream memoryStream = new(buffer);
+                        MemoryStream memoryStream = new MemoryStream(buffer);
+                        memoryStream.Position = 0;
                         return memoryStream;
                     }
                 }
@@ -184,7 +186,7 @@ namespace xyToolz
                 await xyLog.AsxExLog(ex);
             }
             await xyLog.AsxLog($"Unable to get file content from {filePath}, please check it.");
-            return null!;
+            return new MemoryStream();
         }
 
         /// <summary>
@@ -215,7 +217,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        internal static async Task<IEnumerable<string>> ReadIntoEnum(string filePath)
+        public static async Task<IEnumerable<string>> ReadIntoEnum(string filePath)
         {
             string fileError = "Unreadable file?!";
             string fileHandlingError = "Unable to handle file";
@@ -236,6 +238,8 @@ namespace xyToolz
             return (null!);
         }
 
+
+
         /// <summary>
         /// Reads the content of a file into a string
         /// </summary>
@@ -255,6 +259,8 @@ namespace xyToolz
                 return null;
             }
         }
+
+
 
         /// <summary>
         /// CAUTION! 
@@ -281,5 +287,7 @@ namespace xyToolz
                 return false;
             }
         }
+
+
     }
 }
