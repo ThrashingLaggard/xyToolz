@@ -174,7 +174,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="target"></param>
         /// <returns>byte[]</returns>
-        public static byte[] StringBytes( string target )
+        public static byte[] StringToBytes( string target )
             {
                   try
                   {

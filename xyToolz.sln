@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xyToolz", "xyToolz\xyToolz.csproj", "{34B0C0BC-D5D3-48C6-92B6-BDA723F8B895}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xyToolz", "xyToolz\xyToolz.csproj", "{34B0C0BC-D5D3-48C6-92B6-BDA723F8B895}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xyAndroid", "xyAndroid\xyAndroid.csproj", "{74C4ADC6-EACD-E6BE-6F73-958AE95DA444}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xyAndroid", "xyAndroid\xyAndroid.csproj", "{74C4ADC6-EACD-E6BE-6F73-958AE95DA444}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xyAvalonia", "xyAvalonia\xyAvalonia.csproj", "{0DD3F516-4B74-4E8C-9C1B-1A5397266795}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xyAvalonia", "xyAvalonia\xyAvalonia.csproj", "{0DD3F516-4B74-4E8C-9C1B-1A5397266795}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xyPortHelper", "xyPorts\xyPortHelper.csproj", "{A51781D8-97BF-4212-BD77-9ECAC6E84140}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,10 @@ Global
 		{0DD3F516-4B74-4E8C-9C1B-1A5397266795}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DD3F516-4B74-4E8C-9C1B-1A5397266795}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DD3F516-4B74-4E8C-9C1B-1A5397266795}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A51781D8-97BF-4212-BD77-9ECAC6E84140}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A51781D8-97BF-4212-BD77-9ECAC6E84140}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A51781D8-97BF-4212-BD77-9ECAC6E84140}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A51781D8-97BF-4212-BD77-9ECAC6E84140}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,11 +17,18 @@ namespace xyToolz
         /// <summary>
         /// Event für die DebugingConsole
         /// </summary>
-        public static event Action<string>? LogMessageSent;
+        public static event Action<string,string>? LogMessageSent;
+
+        public static event Action<string,string>? ExLogMessageSent;
 
         public static void OnMessageSent(string message)
         {
-            LogMessageSent?.Invoke(message);
+            LogMessageSent?.Invoke(message, "msg sent via evt");
+        }
+
+        public static void OnExMessageSent(string message)
+        {
+            ExLogMessageSent?.Invoke(message, "exmsg sent via evt");
         }
 
 
@@ -62,7 +69,7 @@ namespace xyToolz
             Console.WriteLine(formattedMsg);
             Console.Out.Flush();
 
-            LogMessageSent?.Invoke(formattedMsg);
+            LogMessageSent?.Invoke(formattedMsg, callerName);
             return formattedMsg;
         }
 
@@ -89,7 +96,7 @@ namespace xyToolz
                             Console.WriteLine(formattedMsg);
                             Console.Out.Flush();
 
-                            LogMessageSent?.Invoke(formattedMsg);           // Fix???
+                            LogMessageSent?.Invoke(formattedMsg, callerName);           // Fix???
                         } );
                   }
                   return formattedMsg;
@@ -106,7 +113,7 @@ namespace xyToolz
             string exMessage = FormatEx(ex, level, callerName);
             Console.WriteLine(exMessage);
             Console.Out.Flush();
-            LogMessageSent?.Invoke(exMessage);
+            LogMessageSent?.Invoke(exMessage, callerName);
         }
 
 
@@ -123,7 +130,7 @@ namespace xyToolz
                 string exMessage = FormatEx(ex, level, callerName);
                 Console.WriteLine(exMessage);
                 Console.Out.Flush();
-                LogMessageSent?.Invoke(exMessage);
+                LogMessageSent?.Invoke(exMessage, callerName);
             });
         }
 
@@ -144,7 +151,7 @@ namespace xyToolz
                     File.AppendAllText(_logFilePath, formattedMessage);
                     Console.WriteLine(formattedMessage);
                     Console.Out.Flush();
-                    LogMessageSent?.Invoke(formattedMessage);
+                    LogMessageSent?.Invoke(formattedMessage, callerName);
                     return true;
                 }
                 catch (Exception ex)
@@ -171,7 +178,7 @@ namespace xyToolz
                     File.AppendAllText(_exLogFilePath, exceptionDetails);
                     Console.WriteLine(exceptionDetails);
                     Console.Out.Flush();
-                    LogMessageSent?.Invoke(exceptionDetails);
+                    LogMessageSent?.Invoke(exceptionDetails, callerName);
                     return true;
                 }
                 catch (Exception innerEx)

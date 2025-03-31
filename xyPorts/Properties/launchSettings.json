@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "xyPorts": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

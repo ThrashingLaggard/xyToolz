@@ -9,7 +9,7 @@
 		<ScrollViewer 
 			Name="ScrollViewer"
 			VerticalScrollBarVisibility="Auto" 
-			Height="500" 
+			Height="700" 
 		>
 			<TextBox 
 				Name="ConsoleOutput" 
@@ -51,8 +51,20 @@
 		HorizontalAlignment="Center"
         Content="Hinzufügen"
         Click="AddButton_Click"
-		/>	
-		
+		/>
+		<TextBox
+            Name="txt_ProgramPath"
+            Width="400"
+            Text ="Enter the path of the target program"
+			GotFocus="PathTextBox_GotFocus" 
+			LostFocus="PathTextBox_LostFocus" 
+        />
+		<Button
+			HorizontalAlignment="Center"
+            Name="btn_StartMonitoring"
+            Content="Start"
+            Click="Btn_StartMonitoringClick"
+        />
 	
        
 		
