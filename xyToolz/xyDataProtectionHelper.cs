@@ -34,6 +34,9 @@ namespace xyToolz
             return null!;
         }
 
+
+
+
         /// <summary>
         /// Use the Windows Data Protection API to decrypt data
         /// </summary>
@@ -56,6 +59,10 @@ namespace xyToolz
             }
             return null!;
         }
+
+
+
+
 
 
         public static async Task<byte[]> Encrypt(byte[] data, string password) 

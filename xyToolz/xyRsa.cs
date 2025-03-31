@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace xyToolz
 {
-   public static class xyRsa
+    /// <summary>
+    /// Useless class for now, needs to be filled with valid rsa methods
+    /// </summary>
+    public static class xyRsa
     {
 
 
@@ -34,6 +37,7 @@ namespace xyToolz
                   }
 
             }
+
             /// <summary>
             /// Fügt einen neuen Schlüssel hinzu oder aktualisiert einen bestehenden Schlüssel in der JSON-Datei.
             /// </summary>
@@ -84,6 +88,7 @@ namespace xyToolz
                   }
             }
 
+
             /// <summary>
             /// Update rsa key entry in json file
             /// </summary>
@@ -133,6 +138,9 @@ namespace xyToolz
                   }
                   return null;
             }
+
+
+
             /// <summary>
             /// Fügt einen neuen Schlüssel in der JSON-Datei hinzu.
             /// </summary>
