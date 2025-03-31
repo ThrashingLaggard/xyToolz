@@ -274,7 +274,7 @@ namespace xyToolz
 
             if (await xyFiles.GetStreamFromFile(filePath) is MemoryStream memoryStream)
             {
-                Dictionary<string, object>? jsonDic = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(memoryStream, defaultJsonOptions);
+                Dictionary<string, byte[]>? jsonDic = await JsonSerializer.DeserializeAsync<Dictionary<string, byte[]>>(memoryStream, defaultJsonOptions);
 
                 if (jsonDic is null)
                 {

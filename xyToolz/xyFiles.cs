@@ -172,7 +172,7 @@ namespace xyToolz
             {
                 if (await File.ReadAllTextAsync(filePath) is string contentString)
                 {
-                    if (Encoding.UTF8.GetBytes(contentString) is byte[] buffer)
+                    if (xy.StringToBytes(contentString) is byte[] buffer)
                     {
                         MemoryStream memoryStream = new(buffer);
                         return memoryStream;
