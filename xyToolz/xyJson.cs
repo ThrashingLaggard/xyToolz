@@ -100,7 +100,7 @@ namespace xyToolz
             string lastLine = firstLine_LastLine.Item2;
             return firstLine.StartsWith('{') && lastLine.EndsWith('}');
         }
-        
+
         /// <summary>
         /// Encapsulates a string wich curly braces
         /// </summary>
@@ -241,10 +241,30 @@ namespace xyToolz
             }
             return false;
         }
-
+        // Diese beiden liefern die ganze Datei als ersten Key im Dictionary zurück... das muss noch agepasst und verfeinert werden
         public static async Task<Dictionary<string, object>?> DeserializeFromFile(string filePath) => await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(await xyFiles.GetStreamFromFile(filePath));
+        public static async Task<Dictionary<string, object>?> DeserializeFileIntoDictionary(string filePath)
+        {
+            Dictionary<string, object> jsonDic = [];
+            try
+            {
+                if (await File.ReadAllTextAsync(filePath) is string jsonContent)
+                {
+                    MemoryStream mStream = new(xy.StringToBytes(jsonContent));
+                    jsonDic = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(mStream);
+                    if (jsonDic.Count < 1)
+                    {
+                        await xyLog.AsxLog("Unable to deserialize!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+            }
+            return jsonDic!;
+        }
 
- 
 
         public static async Task<object?> DeserializeFromKey(string filePath, string key)
         {
@@ -255,7 +275,7 @@ namespace xyToolz
             if (await xyFiles.GetStreamFromFile(filePath) is MemoryStream memoryStream)
             {
                 Dictionary<string, object>? jsonDic = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(memoryStream, defaultJsonOptions);
-                
+
                 if (jsonDic is null)
                 {
                     xyLog.Log(serializingError + filePath);
@@ -275,12 +295,27 @@ namespace xyToolz
             return null;
         }
 
+        public static async Task<Dictionary<string, object>> DeserializeKeyIntoDictionary(string fileName, string key)
+        {
+            Dictionary<string, object>? content = [];
+            if ( await GetJObjectFromFile(fileName) is JObject jsonObject)
+            {
+                if (jsonObject[key] is JObject targetValue)
+                {
+                    content = targetValue.ToObject<Dictionary<string, object>>();
+                    return content;
+                }
+            }
+            return content!;
+        }
+
         public static async Task<JObject?> GetJObjectFromFile(string filePath) => xyFiles.EnsurePathExists(filePath) ? (await File.ReadAllTextAsync(filePath) is string jsonFileContent) ? JObject.Parse(jsonFileContent) : (await xyLog.AsxLog("Cant read file content into JObject"), new JObject[0].FirstOrDefault()).Item2 : null;
 
         public static async Task<object?> DeserializeSubKey(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (jsonObject[key][subkey] is object value) ? value : (async Task<object> () => { await xyLog.AsxLog("Cant read JObject into Object"); return null!; }) : null;
 
         public static async Task<byte[]?> DeserializeSubKeyToBytes(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (xy.StringToBytes(jsonObject[key][subkey].ToString()) is byte[] value) ? value : (await xyLog.AsxLog("Cant read JObject into byte[]"), Array.Empty<byte>()).Item2 : null;
 
+        public static async Task<Dictionary<string, object>?> DeserializeSubKeyToDictionary(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (jsonObject[key][subkey] is object value) ? value as Dictionary<string, object> : (await xyLog.AsxLog("Cant read JObject into Dictionary"), new Dictionary<string, object>()).Item2 : null;
         #endregion
 
 
@@ -295,22 +330,7 @@ namespace xyToolz
 
         //                            Deserialize from File!!!!!!!!!!!
         //{
-        //      try
-        //      {
-        //            string? jsonContent = await File.ReadAllText(filePath);
-        //            MemoryStream mStream = new(Encoding.ASCII.GetBytes(jsonContent));
-        //            if(jsonContent is not null)
-        //            {
-        //                  Dictionary<string , object>? jsonDic = await JsonSerializer.DeserializeAsync<Dictionary<string , object>>(mStream);
-        //                  return jsonDic!;
-        //            }
-        //      }
-        //      catch(Exception ex)
-        //      {
-        //            xyLog.ExLog(ex);
-        //      }
-        //      return null;
-        //}
+
 
     }
 }
