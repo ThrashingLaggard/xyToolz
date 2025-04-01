@@ -8,6 +8,7 @@ namespace xyToolz.Helper
     public static class xyHashHelper
     {
         #region "Member"
+
         /// <summary>
         /// Populate with environment variable when using, default is "Ahuhu"...
         /// </summary>
@@ -21,7 +22,7 @@ namespace xyToolz.Helper
         /// <summary>
         /// SHA512  =  64 Bytes    -->   Base64 => 86 characters (88 with padding)
         /// </summary>
-        private const UInt16 KeyLength512 = 64;   
+        private const UInt16 KeyLength512 = 64;
 
         /// <summary>
         /// Number of iterations for the generator to choose the key from
@@ -30,21 +31,22 @@ namespace xyToolz.Helper
 
         private static HashAlgorithmName Sha256 = HashAlgorithmName.SHA256;
         private static HashAlgorithmName Sha512 = HashAlgorithmName.SHA512;
-            #endregion
 
-            #region "Hashing"
+        #endregion
 
-            /// <summary>
-            /// Hashes the given pasword in the specified algorithm
-            /// </summary>
-            /// <param name="hashAlgorithm"></param>
-            /// <param name="password"></param>
-            /// <param name="salt"></param>
-            /// <returns>hashed password as base64 string</returns>
-            public static String HashPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
+        #region "Hashing"
+
+        /// <summary>
+        /// Hashes the given pasword in the specified algorithm
+        /// </summary>
+        /// <param name="hashAlgorithm"></param>
+        /// <param name="password"></param>
+        /// <param name="salt"></param>
+        /// <returns>hashed password as base64 string</returns>
+        public static String HashPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
         {
             String hashedPasswordString = "";
-            int length = SetKeySize(hashAlgorithm); 
+            int length = SetKeySize(hashAlgorithm);
             String pepperedPassword = PepperPassword(password);
             Byte[] hash = new Byte[length];
 
@@ -61,28 +63,28 @@ namespace xyToolz.Helper
         /// </returns>
         public static byte[] HashToBytes(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
         => (new Rfc2898DeriveBytes(PepperPassword(password), salt, Iterations, Sha256)).GetBytes(SetKeySize(hashAlgorithm));
-        
+
         /// <summary>
         /// Hash the given password in  the specified algorithm, without creating local variables
         /// </summary>
         /// <param name="hashAlgorithm"></param>
         /// <param name="password"></param>
         /// <returns> base64 string     password</returns>
-        public static String HashToString(HashAlgorithmName hashAlgorithm, String password, Byte[] salt) 
+        public static String HashToString(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
         => Convert.ToBase64String((new Rfc2898DeriveBytes(PepperPassword(password), salt, Iterations, Sha256)).GetBytes(SetKeySize(hashAlgorithm)));
-        
+
         /// <summary>
         /// Hashes the given pasword in the specified algorithm and returns hash and salt as base64 string
         /// </summary>
         /// <param name="hashAlgorithm"></param>
         /// <param name="password"></param>
         /// <returns>salt:hash</returns>
-        public static String HashPasswordGetSaltAndHash(HashAlgorithmName hashAlgorithm,string password)
+        public static String HashPasswordGetSaltAndHash(HashAlgorithmName hashAlgorithm, string password)
         {
             string saltNhash = "";
             int length = SetKeySize(hashAlgorithm);
             String pepperedPassword = PepperPassword(password);
-            Byte[] salt = GetSalt((UInt16)( length / 2 ));
+            Byte[] salt = GetSalt((UInt16)(length / 2));
             Byte[] hash = new Byte[length];
 
             using (var pbkdf2 = new Rfc2898DeriveBytes(pepperedPassword, salt, Iterations, hashAlgorithm))
@@ -104,7 +106,7 @@ namespace xyToolz.Helper
         /// <param name="salt"></param>
         /// <returns></returns>
         public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt) => CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), HashToBytes(hashAlgorithm, password, salt));
-        
+
         /// <summary>
         /// This is the same function as the others but working step by step and using local variables
         /// </summary>
@@ -123,7 +125,7 @@ namespace xyToolz.Helper
 
             return CryptographicOperations.FixedTimeEquals(hash, hashToCheck);
         }
-        
+
         #endregion
 
         #region "Misc"
@@ -131,7 +133,7 @@ namespace xyToolz.Helper
         /// Create an array of cryptographically strong random values
         /// </summary>
         /// <returns></returns>
-        public static Byte[] GetSalt(UInt16 saltLength ) => RandomNumberGenerator.GetBytes((int)saltLength );
+        public static Byte[] GetSalt(UInt16 saltLength) => RandomNumberGenerator.GetBytes((int)saltLength);
 
         /// <summary>
         /// Checks the given algorithm and returns the according length in Bytes
@@ -233,7 +235,7 @@ namespace xyToolz.Helper
         public static String HashPassword256(String password)
         {
             UInt16 length = KeyLength256;
-            Byte[] salt = RandomNumberGenerator.GetBytes(length/2);
+            Byte[] salt = RandomNumberGenerator.GetBytes(length / 2);
             Byte[] hash = new Byte[length];
             String pepperedPassword = PepperPassword(password);
             String hashedPassword = "";
@@ -253,7 +255,7 @@ namespace xyToolz.Helper
         /// <param name="password"></param>
         /// <returns>salt:hash</returns>
         public static String HashPwGetSaltHash(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
-        => $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(new Rfc2898DeriveBytes(PepperPassword(password), GetSalt((UInt16)salt.Length ) , Iterations, hashAlgorithm).GetBytes(SetKeySize(hashAlgorithm)))}";
+        => $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(new Rfc2898DeriveBytes(PepperPassword(password), GetSalt((UInt16)salt.Length), Iterations, hashAlgorithm).GetBytes(SetKeySize(hashAlgorithm)))}";
 
         /// <summary>
         /// Returns either the value of the target env_var      or      the value of the member "Pepper"
@@ -285,5 +287,5 @@ namespace xyToolz.Helper
         #endregion
 
     }
-}        
+}
 

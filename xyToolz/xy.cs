@@ -10,13 +10,23 @@ using System.Collections;
 
 namespace xyToolz
 {
+
     /// <summary>
     /// Little helpers:
     /// 
     /// Repeat  or  reverse   strings
     /// ---
+    /// TryCatch for  async  and  sync  methods
+    /// ---
+    /// Print  on Console
+    /// ---
+    /// String to Bytes     
+    /// ---
+    /// Bytes to String
+    /// ---
     /// Open Editor 
     ///         -> also with file
+    ///         
     ///         ---------------------------
     ///         
     /// "Useless" experiments:
