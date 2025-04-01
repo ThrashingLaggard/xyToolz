@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace xyToolz
 {
+
     /// <summary>
     /// JsonUtils:
     /// 
@@ -36,6 +37,7 @@ namespace xyToolz
             AllowTrailingCommas = false,
             Encoder = default,
             UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
+            
         };
 
         #region "Helper"
@@ -340,10 +342,16 @@ namespace xyToolz
             try
             {
                 IEnumerable<string> strings = await xyFiles.ReadIntoEnum(filePath);
-                if (strings.Count() <= 2) return [];
+                if (strings.Count() <= 4) return [];
                 if(await GetJObjectFromFile(filePath) is JObject jsonObject)
                 {
-                    if(xy.StringToBytes(jsonObject[key].ToString()) is byte[] value)
+                    string keyString = jsonObject[key].ToString();
+                    if(Convert.FromBase64String(keyString) is not byte[] value)
+                    {
+                        await xyLog.AsxLog($"Nothing to read for key{key}!");
+                        return null!;
+                    }
+                    else
                     {
                         return value;
                     }

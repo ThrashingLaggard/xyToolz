@@ -198,15 +198,52 @@ namespace xyToolz
             }
 
         /// <summary>
+        /// Get a byte array from Base64 string
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns>byte[]</returns>
+
+        public static byte[] BaseToBytes(string target)
+        {
+            try
+            {
+                return Convert.FromBase64String(target);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
+
+        /// <summary>
         /// Get an UTF8 string from a byte array
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
-        public static string ByteString(byte[] bytes)
+        public static string BytesToString(byte[] bytes)
         {
             try
             {
                 return Encoding.UTF8.GetString(bytes);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+            }
+            return null!;
+        }
+
+        /// <summary>
+        /// Get an Base64 string from a byte array
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        public static string BytesToBase(byte[] bytes)
+        {
+            try
+            {
+                return Convert.ToBase64String(bytes);
             }
             catch (Exception ex)
             {

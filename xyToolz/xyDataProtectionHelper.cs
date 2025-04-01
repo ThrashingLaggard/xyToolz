@@ -48,7 +48,7 @@ namespace xyToolz
             try
             {
                 byte[] unprotectedBytes =  ProtectedData.Unprotect(protectedData, null, DataProtectionScope.CurrentUser);
-                if (xy.ByteString(unprotectedBytes) is string unprotectedString)
+                if (xy.BytesToString(unprotectedBytes) is string unprotectedString)
                 {
                     return unprotectedString;
                 }

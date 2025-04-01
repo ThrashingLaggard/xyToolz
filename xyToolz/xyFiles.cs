@@ -160,6 +160,31 @@ namespace xyToolz
             }
         }
 
+        /// <summary>
+        /// Read a file's content into an ienumerable
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<string>> ReadIntoEnum(string filePath)
+        {
+            string fileError = "Unreadable file?!";
+            string fileHandlingError = "Unable to handle file";
+
+            if (xyFiles.EnsurePathExists(filePath))
+            {
+                if (File.ReadLines(filePath) is IEnumerable<string> lines)
+                {
+                    if (lines.Count() == 0) return (null!);
+                    else
+                    {
+                        return lines;
+                    }
+                }
+                await xyLog.AsxLog(fileError);
+            }
+            await xyLog.AsxLog(fileHandlingError);
+            return (null!);
+        }
 
         /// <summary>
         /// Generate a memorystream from the specified filepath
@@ -189,6 +214,7 @@ namespace xyToolz
             return new MemoryStream();
         }
 
+
         /// <summary>
         /// Save a string into a file
         /// </summary>
@@ -212,33 +238,6 @@ namespace xyToolz
             }
         }
 
-        /// <summary>
-        /// Read a file's content into an ienumerable
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public static async Task<IEnumerable<string>> ReadIntoEnum(string filePath)
-        {
-            string fileError = "Unreadable file?!";
-            string fileHandlingError = "Unable to handle file";
-
-            if (xyFiles.EnsurePathExists(filePath))
-            {
-                if (File.ReadLines(filePath) is IEnumerable<string> lines)
-                {
-                    if (lines.Count() == 0) return (null!);
-                    else
-                    {
-                        return lines;
-                    }
-                }
-                await xyLog.AsxLog(fileError);
-            }
-            await xyLog.AsxLog(fileHandlingError);
-            return (null!);
-        }
-
-
 
         /// <summary>
         /// Reads the content of a file into a string
@@ -259,7 +258,6 @@ namespace xyToolz
                 return null;
             }
         }
-
 
 
         /// <summary>
