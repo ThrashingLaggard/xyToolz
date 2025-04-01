@@ -195,7 +195,7 @@ namespace xyToolz
         {
             try
             {
-                string? contentString = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
+                string? contentString = await File.ReadAllTextAsync(filePath);
                 if (!string.IsNullOrEmpty(contentString))
                 {
                     if (xy.StringToBytes(contentString) is byte[] buffer)

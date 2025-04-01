@@ -35,7 +35,7 @@ namespace xyToolz
             AllowOutOfOrderMetadataProperties = true,
             DefaultBufferSize = 4096,
             AllowTrailingCommas = false,
-            Encoder = default,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default,
             UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
             
         };
@@ -185,7 +185,7 @@ namespace xyToolz
                     xyLog.ExLog(jEx);
                 }
                 await EnsureJsonRootTag(filePath);
-                await File.WriteAllTextAsync(filePath, updatedJsonContent,Encoding.UTF8);
+                await File.WriteAllTextAsync(filePath, updatedJsonContent);
             }
             catch (Exception ex)
             {
