@@ -37,7 +37,7 @@ namespace xyToolz
             AllowTrailingCommas = false,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default,
             UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
-            
+
         };
 
         #region "Helper"
@@ -45,8 +45,8 @@ namespace xyToolz
         {
             try
             {
-                if (await GetFirstAndLastLines(filePath) is (string, string, string) first_last_content )
-                {                  
+                if (await GetFirstAndLastLines(filePath) is (string, string, string) first_last_content)
+                {
                     if (CheckForJsonRootTag(first_last_content) is bool isTaggedAsJson)
                     {
                         if (isTaggedAsJson)
@@ -163,7 +163,7 @@ namespace xyToolz
             {
                 if (xyFiles.EnsurePathExists(filePath))
                 {
-                    keyValuePairsFromJsonFile = await DeserializeFromFile(filePath);
+                    keyValuePairsFromJsonFile = await DeserializeFileIntoDictionary(filePath);
                     if (keyValuePairsFromJsonFile is not null)
                     {
                         if (keyValuePairsFromJsonFile.ContainsKey(key))
@@ -178,7 +178,7 @@ namespace xyToolz
                 }
                 try
                 {
-                    updatedJsonContent = JsonSerializer.Serialize(keyValuePairsFromJsonFile,defaultJsonOptions);
+                    updatedJsonContent = JsonSerializer.Serialize(keyValuePairsFromJsonFile, defaultJsonOptions);
                 }
                 catch (JsonException jEx)
                 {
@@ -186,6 +186,7 @@ namespace xyToolz
                 }
                 await EnsureJsonRootTag(filePath);
                 await File.WriteAllTextAsync(filePath, updatedJsonContent);
+
             }
             catch (Exception ex)
             {
@@ -284,6 +285,40 @@ namespace xyToolz
 
         public static async Task<JObject?> GetJObjectFromFile(string filePath) => xyFiles.EnsurePathExists(filePath) ? (await File.ReadAllTextAsync(filePath) is string jsonFileContent) ? JObject.Parse(jsonFileContent) : (await xyLog.AsxLog("Cant read file content into JObject"), new JObject[0].FirstOrDefault()).Item2 : null;
 
+        public static async Task<JToken> GetJTokenFromJsonFile(string filePath, string key)
+        {
+            string keyOk = $"Token for '{key}' was found in '{filePath}' ";
+            string keyError = $"Key '{key}' wasnt found in '{filePath}' ";
+            string pathError = $"Cant read data from the specified path: '{filePath}'";
+            // Prüfe, ob die Datei existiert und lese sie als JObject
+            JObject? jsonObject = await GetJObjectFromFile(filePath);
+            if (jsonObject == null)
+            {
+                await xyLog.AsxLog(pathError);
+                return null!;
+            }
+            if (jsonObject.TryGetValue(key, out JToken? token))
+            {
+                await xyLog.AsxLog(keyOk);
+                return token;
+            }
+            else
+            {
+                await xyLog.AsxLog(keyError);
+                return null!;
+            }
+        }
+
+        public static async Task<string> GetStringFromJsonFile(string filePath, string key)
+        {
+            JToken? token = await GetJTokenFromJsonFile(filePath, key);
+            if(token is not null)
+            {
+                return token.ToString();
+            }
+            return "";
+        }
+
         public static async Task<object?> DeserializeFromKey(string filePath, string key)
         {
             string pathError = "Cant read data from the specified path: ";
@@ -292,7 +327,7 @@ namespace xyToolz
 
             if ((await File.ReadAllLinesAsync(filePath)).Count() == 0)
             {
-                File.WriteAllText(filePath,AddRootTag(""));
+                File.WriteAllText(filePath, AddRootTag(""));
             }
 
             if (await xyFiles.GetStreamFromFile(filePath) is MemoryStream memoryStream)
@@ -301,7 +336,7 @@ namespace xyToolz
 
                 if (jsonDic is null)
                 {
-                    xyLog.Log(serializingError + filePath); 
+                    xyLog.Log(serializingError + filePath);
                     return null;
                 }
                 else
@@ -320,7 +355,7 @@ namespace xyToolz
         public static async Task<Dictionary<string, object>> DeserializeKeyIntoDictionary(string fileName, string key)
         {
             Dictionary<string, object>? content = [];
-            if ( await GetJObjectFromFile(fileName) is JObject jsonObject)
+            if (await GetJObjectFromFile(fileName) is JObject jsonObject)
             {
                 if (jsonObject[key] is JObject targetValue)
                 {
@@ -343,10 +378,10 @@ namespace xyToolz
             {
                 IEnumerable<string> strings = await xyFiles.ReadIntoEnum(filePath);
                 if (strings.Count() <= 4) return [];
-                if(await GetJObjectFromFile(filePath) is JObject jsonObject)
+                if (await GetJObjectFromFile(filePath) is JObject jsonObject)
                 {
                     string keyString = jsonObject[key].ToString();
-                    if(Convert.FromBase64String(keyString) is not byte[] value)
+                    if (Convert.FromBase64String(keyString) is not byte[] value)
                     {
                         await xyLog.AsxLog($"Nothing to read for key{key}!");
                         return null!;
