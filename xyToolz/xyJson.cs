@@ -137,6 +137,7 @@ namespace xyToolz
 
 
         #region "File I/O"
+
         /// <summary>
         /// Erstellt eine neue JSON-Datei, wenn sie nicht existiert.
         /// </summary>
@@ -236,6 +237,7 @@ namespace xyToolz
             return false;
         }
 
+
         /// <summary>
         /// Write a dictionary into the target file OVERWRITING it completely
         /// </summary>
@@ -282,9 +284,7 @@ namespace xyToolz
             return jsonDic!;
         }
 
-
         public static async Task<JObject?> GetJObjectFromFile(string filePath) => xyFiles.EnsurePathExists(filePath) ? (await File.ReadAllTextAsync(filePath) is string jsonFileContent) ? JObject.Parse(jsonFileContent) : (await xyLog.AsxLog("Cant read file content into JObject"), new JObject[0].FirstOrDefault()).Item2 : null;
-
         public static async Task<JToken> GetJTokenFromJsonFile(string filePath, string key)
         {
             string keyOk = $"Token for '{key}' was found in '{filePath}' ";
@@ -308,7 +308,6 @@ namespace xyToolz
                 return null!;
             }
         }
-
         public static async Task<string> GetStringFromJsonFile(string filePath, string key)
         {
             JToken? token = await GetJTokenFromJsonFile(filePath, key);
