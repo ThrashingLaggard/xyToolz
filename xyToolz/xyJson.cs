@@ -37,10 +37,10 @@ namespace xyToolz
             AllowTrailingCommas = false,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default,
             UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
-
         };
 
         #region "Helper"
+
         public static async Task EnsureJsonRootTag(string filePath)
         {
             try
@@ -68,7 +68,6 @@ namespace xyToolz
                 await xyLog.AsxExLog(ex);
             }
         }
-
 
         internal static async Task<(string, string, string)> GetFirstAndLastLines(string filePath)
         {
