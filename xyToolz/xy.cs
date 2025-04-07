@@ -139,6 +139,8 @@ namespace xyToolz
         #endregion
 
         #region "QOL"
+
+
         /// <summary>
         /// Repeat the string the given number of times
         /// </summary>
@@ -154,7 +156,7 @@ namespace xyToolz
             }
             return stringBuilder.ToString();
         }
-
+        
         /// <summary>
         /// Reverse the target String
         /// </summary>
