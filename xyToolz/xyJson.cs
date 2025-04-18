@@ -25,8 +25,10 @@ namespace xyToolz
     /// </summary>
     public class xyJson
     {
+        #region Json Configuration
+
         /// <summary>
-        /// Provide default options for the serializer, so he shutteth the fucketh up
+        /// Default <see cref="JsonSerializerOptions"/> used by all serialization / deserialization helpers.
         /// </summary>
         internal static readonly JsonSerializerOptions defaultJsonOptions = new()
         {
@@ -39,380 +41,381 @@ namespace xyToolz
             UnknownTypeHandling = JsonUnknownTypeHandling.JsonElement,
         };
 
-        #region "Helper"
+        #endregion
 
-        public static async Task EnsureJsonRootTag(string filePath)
-        {
-            try
-            {
-                if (await GetFirstAndLastLines(filePath) is (string, string, string) first_last_content)
-                {
-                    if (CheckForJsonRootTag(first_last_content) is bool isTaggedAsJson)
-                    {
-                        if (isTaggedAsJson)
-                        {
-                            await xyLog.AsxLog("File is already rooted to Json");
-                        }
-                        else
-                        {
-                            string rooted = AddRootTag(first_last_content.Item3);
-                            await File.WriteAllTextAsync(filePath, rooted);
-                            await xyLog.AsxLog("Added a Json root tag to the file");
-                        }
-                    }
-                }
-                await xyLog.AsxLog("Cant ensure json root tag for target file");
-            }
-            catch (Exception ex)
-            {
-                await xyLog.AsxExLog(ex);
-            }
-        }
+        #region File‑Utilities
 
-        internal static async Task<(string, string, string)> GetFirstAndLastLines(string filePath)
-        {
-            string lineError = "An error occured while trying to get the first and last line";
-            string fileError = "Unreadable file?!";
-            string fileHandlingError = "Unable to handle file";
-
-            if (xyFiles.EnsurePathExists(filePath))
-            {
-                if (File.ReadLines(filePath) is IEnumerable<string> lines)
-                {
-                    if (lines.Count() == 0) return (null!, null!, null!);
-                    else
-                    {
-                        if (lines.FirstOrDefault() is string firstLine && lines.LastOrDefault() is string lastLine)
-                        {
-                            return (firstLine, lastLine, xyColQol.Spill(lines));
-                        }
-                        await xyLog.AsxLog(lineError);
-                    }
-                }
-                await xyLog.AsxLog(fileError);
-            }
-            await xyLog.AsxLog(fileHandlingError);
-            return (null!, null!, null!);
-        }
-
-        /// <summary>
-        /// Looks at the first char of the first and the last char from the last line and checks if they are curly braces {...}
-        /// </summary>
-        /// <param name="firstLine_LastLine"></param>
-        /// <returns>
-        /// yes -> true 
-        /// no  -> false
-        /// </returns>
-        private static bool? CheckForJsonRootTag((string, string, string) firstLine_LastLine)
-        {
-            string firstLine = firstLine_LastLine.Item1;
-            string lastLine = firstLine_LastLine.Item2;
-            if (string.IsNullOrEmpty(firstLine) || string.IsNullOrEmpty(lastLine)) return false;
-
-            return firstLine.StartsWith('{') && lastLine.EndsWith('}');
-        }
-
-
-
-        /// <summary>
-        /// Encapsulates a string wich curly braces
-        /// </summary>
-        /// <param name="content"></param>
-        /// <returns>
-        /// {
-        /// content
-        /// }</returns>
-        private static string AddRootTag(string content)
-        {
-            string rootTag = "{\n";
-            string endTag = "\n}";
-
-            string rootedContent = rootTag + content + endTag;
-            return rootedContent;
-        }
-
+       
 
         #endregion
 
+        #region Serialization
 
-        #region "File I/O"
-
-        /// <summary>
-        /// Erstellt eine neue JSON-Datei, wenn sie nicht existiert.
-        /// </summary>
-        /// <param name="filePath">Der Pfad zur JSON-Datei.</param>
-        private static void CreateNewJsonFile(string filePath)
+        /// <inheritdoc cref="SaveDataToJsonAsync{T}(T,string,JsonSerializerOptions?)"/>
+        public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions? options = null)
         {
-            var json = new { };
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            var jsonContent = JsonSerializer.Serialize(json, options);
-            File.WriteAllText(filePath, jsonContent);
-        }
-
-        /// <summary>
-        /// Fügt einen neuen Schlüssel hinzu oder aktualisiert einen bestehenden Schlüssel in der JSON-Datei.
-        /// </summary>
-        /// <param name="filePath">Der Pfad zur JSON-Datei.</param>
-        /// <param name="key">Der Schlüssel, der hinzugefügt oder aktualisiert werden soll.</param>
-        /// <param name="value">Der Wert, der dem Schlüssel zugeordnet werden soll.</param>
-        public static async Task AddOrUpdateEntry<T>(string filePath, string key, T value)
-        {
-            Dictionary<string, object>? keyValuePairsFromJsonFile = null;
-            string? updatedJsonContent = null;
-            try
-            {
-                if (xyFiles.EnsurePathExists(filePath))
-                {
-                    keyValuePairsFromJsonFile = await DeserializeFileIntoDictionary(filePath);
-                    if (keyValuePairsFromJsonFile is not null)
-                    {
-                        if (keyValuePairsFromJsonFile.ContainsKey(key))
-                        {
-                            keyValuePairsFromJsonFile[key] = value;
-                        }
-                        else
-                        {
-                            keyValuePairsFromJsonFile.Add(key, value);
-                        }
-                    }
-                }
-                try
-                {
-                    updatedJsonContent = JsonSerializer.Serialize(keyValuePairsFromJsonFile, defaultJsonOptions);
-                }
-                catch (JsonException jEx)
-                {
-                    xyLog.ExLog(jEx);
-                }
-                await EnsureJsonRootTag(filePath);
-                await File.WriteAllTextAsync(filePath, updatedJsonContent);
-
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-            }
-        }
-        #endregion
-
-
-        #region "Serialization"
-
-
-        /// <summary>
-        /// Serialize data into a targetfile
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="subfolder"></param>
-        /// <param name="fileName"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions? options = default)
-        {
+            string successMessage = $"Successfully saved JSON data to '{fileName}'.";
+            string errorMessage = $"Failed to serialize data to JSON file: '{fileName}'.";
 
             try
             {
-                if (xyFiles.EnsurePathExists(fileName))
+                if ( await xyFiles.EnsurePathExistsAsync(fileName))
                 {
                     string jsonData = JsonSerializer.Serialize(data, options ?? defaultJsonOptions);
-
-                    if (File.ReadLines(fileName) is IEnumerable<string> lines)
-                    {
-                        await File.AppendAllTextAsync(fileName, jsonData);
-                    }
-                    else
-                    {
-                        await File.WriteAllTextAsync(fileName, jsonData);
-                    }
-                    await xyLog.AsxLog($"{jsonData} was now added to {fileName}");
+                    await File.WriteAllTextAsync(fileName, jsonData);
+                    await xyLog.AsxLog(successMessage);
                     return true;
                 }
             }
-            catch (JsonException jEx)
+            catch (Exception ex)
             {
-                xyLog.ExLog(jEx);
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(errorMessage);
             }
             return false;
         }
-
 
         /// <summary>
-        /// Write a dictionary into the target file OVERWRITING it completely
+        /// Serializes a dictionary to JSON (overwrites the file).
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="updatedDictionary"></param>
-        /// <returns></returns>
         public static async Task<bool> SerializeDictionary(string filePath, Dictionary<string, object> updatedDictionary)
         {
+            string successMessage = $"Successfully serialized {updatedDictionary.Count} entries to file: '{filePath}'.";
+            string errorMessage = $"Failed to serialize dictionary to file: '{filePath}'.";
+
             try
             {
-                await SaveDataToJsonAsync(updatedDictionary, filePath);
-                await xyLog.AsxLog($"{updatedDictionary.Count()} entrys are stored in the dictionary, it was now added to {filePath}");
-                return true;
-            }
-            catch (JsonException jEx)
-            {
-                xyLog.ExLog(jEx);
-            }
-            return false;
-        }
-
-
-        // Diese beiden liefern die ganze Datei als ersten Key im Dictionary zurück... das muss noch agepasst und verfeinert werden
-        public static async Task<Dictionary<string, object>?> DeserializeFromFile(string filePath) => await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(await xyFiles.GetStreamFromFile(filePath));
-        public static async Task<Dictionary<string, object>?> DeserializeFileIntoDictionary(string filePath)
-        {
-            Dictionary<string, object> jsonDic = [];
-            try
-            {
-                if (await File.ReadAllTextAsync(filePath) is string jsonContent)
+                bool saveSuccess = await SaveDataToJsonAsync(updatedDictionary, filePath);
+                if (saveSuccess)
                 {
-                    MemoryStream mStream = new(xy.StringToBytes(jsonContent));
-                    jsonDic = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(mStream);
-                    if (jsonDic.Count < 1)
-                    {
-                        await xyLog.AsxLog("Unable to deserialize!");
-                    }
+                    await xyLog.AsxLog(successMessage);
+                    return true;
                 }
+                await xyLog.AsxLog(errorMessage);
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(errorMessage);
             }
-            return jsonDic!;
+            return false;
         }
 
-        public static async Task<JObject?> GetJObjectFromFile(string filePath) => xyFiles.EnsurePathExists(filePath) ? (await File.ReadAllTextAsync(filePath) is string jsonFileContent) ? JObject.Parse(jsonFileContent) : (await xyLog.AsxLog("Cant read file content into JObject"), new JObject[0].FirstOrDefault()).Item2 : null;
-        public static async Task<JToken> GetJTokenFromJsonFile(string filePath, string key)
+        /// <summary>
+        /// Adds or updates a key/value pair in a JSON file.
+        /// </summary>
+        public static async Task AddOrUpdateEntry<T>(string filePath, string key, T value)
         {
-            string keyOk = $"Token for '{key}' was found in '{filePath}' ";
-            string keyError = $"Key '{key}' wasnt found in '{filePath}' ";
-            string pathError = $"Cant read data from the specified path: '{filePath}'";
-            // Prüfe, ob die Datei existiert und lese sie als JObject
-            JObject? jsonObject = await GetJObjectFromFile(filePath);
-            if (jsonObject == null)
-            {
-                await xyLog.AsxLog(pathError);
-                return null!;
-            }
-            if (jsonObject.TryGetValue(key, out JToken? token))
-            {
-                await xyLog.AsxLog(keyOk);
-                return token;
-            }
-            else
-            {
-                await xyLog.AsxLog(keyError);
-                return null!;
-            }
-        }
-        public static async Task<string> GetStringFromJsonFile(string filePath, string key)
-        {
-            JToken? token = await GetJTokenFromJsonFile(filePath, key);
-            if(token is not null)
-            {
-                return token.ToString();
-            }
-            return "";
-        }
+            string updateMessage = $"Updated key '{key}' in '{filePath}'.";
+            string addMessage = $"Added key '{key}' to '{filePath}'.";
+            string errorMessage = $"Failed to update key '{key}' in file '{filePath}'.";
 
-        public static async Task<object?> DeserializeFromKey(string filePath, string key)
-        {
-            string pathError = "Cant read data from the specified path: ";
-            string serializingError = "Error in deserialization of the file ";
-            string keyError = "No matching key for the given parameters!";
-
-            if ((await File.ReadAllLinesAsync(filePath)).Count() == 0)
+            try
             {
-                File.WriteAllText(filePath, AddRootTag(""));
-            }
+                Dictionary<string, object> data = await DeserializeFromFile(filePath) ?? new();
 
-            if (await xyFiles.GetStreamFromFile(filePath) is MemoryStream memoryStream)
-            {
-                Dictionary<string, object>? jsonDic = await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(memoryStream, defaultJsonOptions);
-
-                if (jsonDic is null)
+                if (data.ContainsKey(key))
                 {
-                    xyLog.Log(serializingError + filePath);
-                    return null;
+                    data[key] = value!;
+                    await xyLog.AsxLog(updateMessage);
                 }
                 else
                 {
-                    if (!jsonDic.ContainsKey(key))
-                    {
-                        xyLog.Log(keyError);
-                        return null;
-                    }
-                    return jsonDic[key];
+                    data.Add(key, value!);
+                    await xyLog.AsxLog(addMessage);
                 }
-            }
-            xyLog.Log(pathError);
-            return null;
-        }
-        public static async Task<Dictionary<string, object>> DeserializeKeyIntoDictionary(string fileName, string key)
-        {
-            Dictionary<string, object>? content = [];
-            if (await GetJObjectFromFile(fileName) is JObject jsonObject)
-            {
-                if (jsonObject[key] is JObject targetValue)
-                {
-                    content = targetValue.ToObject<Dictionary<string, object>>();
-                    return content;
-                }
-            }
-            return content!;
-        }
 
-
-        public static async Task<object?> DeserializeSubKey(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (jsonObject[key][subkey] is object value) ? value : (async Task<object> () => { await xyLog.AsxLog("Cant read JObject into Object"); return null!; }) : null;
-        public static async Task<Dictionary<string, object>?> DeserializeSubKeyToDictionary(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (jsonObject[key][subkey] is object value) ? value as Dictionary<string, object> : (await xyLog.AsxLog("Cant read JObject into Dictionary"), new Dictionary<string, object>()).Item2 : null;
-        public static async Task<byte[]?> DeserializeSubKeyToBytes(string filePath, string key, string subkey) => (await GetJObjectFromFile(filePath) is JObject jsonObject) ? (xy.StringToBytes(jsonObject[key][subkey].ToString()) is byte[] value) ? value : (await xyLog.AsxLog("Cant read JObject into byte[]"), Array.Empty<byte>()).Item2 : null;
-
-
-        public static async Task<byte[]?> DeserializeKeyToBytes(string filePath, string key)
-        {
-            try
-            {
-                IEnumerable<string> strings = await xyFiles.ReadIntoEnum(filePath);
-                if (strings.Count() <= 4) return [];
-                if (await GetJObjectFromFile(filePath) is JObject jsonObject)
-                {
-                    string keyString = jsonObject[key].ToString();
-                    if (Convert.FromBase64String(keyString) is not byte[] value)
-                    {
-                        await xyLog.AsxLog($"Nothing to read for key{key}!");
-                        return null!;
-                    }
-                    else
-                    {
-                        return value;
-                    }
-                }
+                await SerializeDictionary(filePath, data);
             }
             catch (Exception ex)
             {
-                await xyLog.AsxLog("Cant read JObject into byte[]");
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(errorMessage);
             }
-            return null!;
+        }
+
+        #endregion
+
+        #region "Deserialization – full file / top‑level key"
+
+        /// <summary>
+        /// Reads the entire JSON file and deserializes it into a dictionary.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <returns>Deserialized dictionary or null if reading fails.</returns>
+        public static async Task<Dictionary<string, object>?> DeserializeFromFile(string filePath)
+        {
+            try
+            {
+                dynamic stream = await xyFiles.GetStreamFromFileAsync(filePath);
+                if (stream == null) return null;
+                return await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(stream, defaultJsonOptions);
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Reads a single key from the JSON file and returns it as an object.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="key">Top-level key to extract.</param>
+        /// <returns>Value at the key or null if not found.</returns>
+        public static async Task<object?> DeserializeFromKey(string filePath, string key) => await TryDeserializeKey<object>(filePath, key);
+
+        /// <summary>
+        /// Reads and deserializes the object behind a key into a dictionary.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="key">Top-level key pointing to an object.</param>
+        /// <returns>Dictionary at the key or empty dictionary if missing.</returns>
+        public static async Task<Dictionary<string, object>> DeserializeKeyIntoDictionary(string filePath, string key)  => await TryDeserializeKey<Dictionary<string, object>>(filePath, key) ?? new();
+
+        /// <summary>
+        /// Retrieves a base64-encoded value from the given key and decodes it into a byte array.
+        /// </summary>
+        /// <param name="filePath">The path to the JSON file.</param>
+        /// <param name="key">The top-level key containing the base64 string.</param>
+        /// <returns>Decoded byte array or null if conversion fails.</returns>
+        public static async Task<byte[]?> DeserializeKeyToBytes(string filePath, string key)
+        {
+            string errorMessage = $"Key '{key}' could not be decoded to bytes from '{filePath}'.";
+            string? base64 = await TryDeserializeKey<string>(filePath, key);
+            byte[]? decoded = xy.BaseToBytes(base64);
+            if (decoded == null)
+            {
+                await xyLog.AsxLog(errorMessage);
+            }
+            return decoded;
         }
 
 
         #endregion
 
+        #region "Generic Helpers (top‑level & subkey)"
+
+        /// <summary>
+        /// Internal helper that attempts to extract a value of type <typeparamref name="T"/> from a top-level JSON key.
+        /// </summary>
+        /// <typeparam name="T">The expected return type.</typeparam>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="key">Top-level key.</param>
+        /// <returns>The deserialized value or default if not found or failed.</returns>
+        private static async Task<T?> TryDeserializeKey<T>(string filePath, string key)
+        {
+            try
+            {
+                JObject? obj = await GetJObjectFromFile(filePath);
+                if (obj != null && obj.TryGetValue(key, out JToken? token))
+                {
+                    return token!.ToObject<T>();
+                }
+                else
+                {
+                    string missingKeyMessage = $"Key '{key}' not found in '{filePath}'.";
+                    await xyLog.AsxLog(missingKeyMessage);
+                    return default;
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// Internal helper that attempts to extract a value of type <typeparamref name="T"/> from a nested key within a JSON object.
+        /// </summary>
+        /// <typeparam name="T">The expected return type.</typeparam>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="key">Parent key containing the nested object.</param>
+        /// <param name="subkey">Subkey to extract the value from.</param>
+        /// <returns>The deserialized value or default if not found or failed.</returns>
+        private static async Task<T?> TryDeserializeSubkey<T>(string filePath, string key, string subkey)
+        {
+            string parentKeyMessage = $"Parent key '{key}' not found or not an object in '{filePath}'.";
+            string subkeyMessage = $"Subkey '{subkey}' not found under '{key}' in '{filePath}'.";
+            try
+            {
+                JObject? obj = await GetJObjectFromFile(filePath);
+                if (obj is null) return default;
+
+                if (!obj.TryGetValue(key, out JToken? parent) || parent is not JObject nested)
+                {
+
+                    await xyLog.AsxLog(parentKeyMessage);
+                    return default;
+                }
+
+                if (nested.TryGetValue(subkey, out JToken? subToken))
+                {
+                    return subToken!.ToObject<T>();
+                }
+                else
+                {
+
+                    await xyLog.AsxLog(subkeyMessage);
+                    return default;
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return default;
+            }
+        }
 
 
+        #endregion
+
+        #region "Subkey helper wrapper"
+
+        /// <summary>
+        /// Reads a subkey from an object under a key and returns the raw object.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="key">Parent key.</param>
+        /// <param name="subkey">Subkey within the parent object.</param>
+        /// <returns>Object at the subkey or null.</returns>
+        public static Task<object?> DeserializeSubKey(string filePath, string key, string subkey)=> TryDeserializeSubkey<object>(filePath, key, subkey);
+
+        /// <summary>
+        /// Deserializes the subkey into a dictionary.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="key">Parent key.</param>
+        /// <param name="subkey">Subkey within the parent object.</param>
+        /// <returns>Dictionary at the subkey or null.</returns>
+        public static Task<Dictionary<string, object>?> DeserializeSubKeyToDictionary(string filePath, string key, string subkey) => TryDeserializeSubkey<Dictionary<string, object>>(filePath, key, subkey);
+
+        /// <summary>
+        /// Retrieves a base64-encoded value from the given subkey of a JSON object and decodes it into a byte array.
+        /// </summary>
+        /// <param name="filePath">The path to the JSON file.</param>
+        /// <param name="key">The top-level key containing the sub-object.</param>
+        /// <param name="subkey">The subkey whose value should be converted.</param>
+        /// <returns>Decoded byte array or null if conversion fails.</returns>
+        public static async Task<byte[]?> DeserializeSubKeyToBytes(string filePath, string key, string subkey)
+        {
+            string errorMessage = $"Subkey '{subkey}' under '{key}' could not be decoded to bytes from '{filePath}'.";
+            string? b64 = await TryDeserializeSubkey<string>(filePath, key, subkey);
+            byte[]? decoded = xy.BaseToBytes(b64);
+            if (decoded == null)
+            {
+                await xyLog.AsxLog(errorMessage);
+            }
+            return decoded;
+        }
 
 
-        //public static Object GetAppsettingsJson()
-        //{
-        //      var developmentConfig = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+        #endregion
 
-        //}
+        #region "JObject& JToken"
 
-        //                            Deserialize from File!!!!!!!!!!!
-        //{
+        /// <summary>
+        /// Reads a JSON file and parses it into a JObject.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <returns>Parsed JObject or null on failure.</returns>
+        public static async Task<JObject?> GetJObjectFromFile(string filePath)
+        {
+            try
+            {
+                string json = await File.ReadAllTextAsync(filePath);
+                return JObject.Parse(json);
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Extracts a raw JToken from the given key.
+        /// </summary>
+        /// <param name="filePath">Path to the file.</param>
+        /// <param name="key">Key to extract.</param>
+        /// <returns>The token or null.</returns>
+        public static async Task<JToken?> GetJTokenFromFile(string filePath, string key)
+        {
+            string errorMessage = $"Key '{key}' not found in file '{filePath}'.";
+            try
+            {
+                JObject? jsonObject = await GetJObjectFromFile(filePath);
+                if (jsonObject != null && jsonObject.TryGetValue(key, out JToken? token))
+                {
+                    return token;
+                }
+                await xyLog.AsxLog(errorMessage);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return null;
+            }
+        }
+
+        #endregion
+
+        #region "Root tag helper"
+
+        /// <summary>
+        /// Adds surrounding braces to content to ensure JSON root structure.
+        /// </summary>
+        /// <param name="content">The content to wrap.</param>
+        /// <returns>Wrapped content as a JSON object.</returns>
+        private static string AddRootTag(string content) => $"\n{content}\n";
+
+        /// <summary>
+        /// Ensures the JSON file begins with '{' and ends with '}'.
+        /// Adds root structure if missing.
+        /// </summary>
+        public static async Task EnsureJsonRootTag(string filePath)
+        {
+            string addedRootMsg = $"Added JSON‑root braces to file '{filePath}'.";
+            string alreadyRooted = $"File '{filePath}' already contains a valid root object.";
+
+            try
+            {
+                string content = await File.ReadAllTextAsync(filePath);
+                if (content.TrimStart().StartsWith('{') && content.TrimEnd().EndsWith('}'))
+                {
+                    await xyLog.AsxLog(alreadyRooted);
+                    return;
+                }
+
+                string rooted = AddRootTag(content);
+                await File.WriteAllTextAsync(filePath, rooted);
+                await xyLog.AsxLog(addedRootMsg);
+            }
+            catch (Exception ex) { await xyLog.AsxExLog(ex); }
+        }
 
 
+        #endregion
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>
+        /// Returns the first line, last line, and full joined content from a text file.
+        /// </summary>
+        public static async Task<(string First, string Last, string Full)> GetFirstAndLastLinesAsync(string filePath)
+        {
+            try
+            {
+                string[] lines = await File.ReadAllLinesAsync(filePath);
+                if (lines.Length == 0) return (string.Empty, string.Empty, string.Empty);
+                return (lines.First(), lines.Last(), string.Join('\n', lines));
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return (string.Empty, string.Empty, string.Empty);
+            }
+        }
     }
 }

@@ -1,291 +1,499 @@
-﻿
-using Microsoft.Extensions.Logging;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.Json.Serialization;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
-
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using xyToolz.Helper;
-using System.Text;
 
 #if ANDROID
 using Android.Content;
 using Android.App;
-using System.IO;
 #endif
-
 
 namespace xyToolz
 {
     /// <summary>
-    /// Dateihandling
+    /// Provides file system utilities for reading, writing, copying, renaming,
+    /// and validating files or folders across supported platforms.
+    ///
+    /// <para><b>Available Features:</b></para>
+    /// <list type="bullet">
+    ///   <item><description>Directory management (EnsureDirectory, CheckForDirectories).</description></item>
+    ///   <item><description>File path validation (EnsurePathExistsAsync).</description></item>
+    ///   <item><description>File metadata & manipulation (Inventory, InventoryNames, RenameFileAsync, OpenAsync, CopyAsync).</description></item>
+    ///   <item><description>File content handling (ReadLinesAsync, GetStreamFromFileAsync, SaveToFileAsync, LoadFileAsync, DeleteFile).</description></item>
+    /// </list>
+    ///
+    /// <para><b>Thread Safety:</b></para>
+    /// Thread-safe: only static methods, no mutable instance state.
+    ///
+    /// <para><b>Limitations:</b></para>
+    /// Does not support file system transactions or advanced locking; limited to System.IO capabilities.
+    ///
+    /// <para><b>Performance:</b></para>
+    /// Asynchronous methods use buffered I/O; performance depends on file size and underlying storage.
+    ///
+    /// <para><b>Configuration:</b></para>
+    /// Serializer options via xyJson.defaultJsonOptions; path resolution via xyPathHelper.
+    ///
+    /// <para><b>Example Usage:</b></para>
+    /// <code>
+    /// // List all file names
+    /// var names = xyFiles.InventoryNames("C:\\Temp");
+    ///
+    /// // Rename a file
+    /// if (await xyFiles.RenameFileAsync("old.txt", "new.txt", out var newPath))
+    /// {
+    ///     Console.WriteLine($"Renamed to {newPath}");
+    /// }
+    ///
+    /// // Read lines from a file
+    /// var lines = await xyFiles.ReadLinesAsync("data.txt");
+    ///
+    /// // Delete a file
+    /// bool deleted = xyFiles.DeleteFile("AppData", "config.json");
+    /// </code>
+    ///
+    /// <para><b>Related:</b></para>
+    /// <see cref="System.IO.File"/>, <see cref="System.IO.Directory"/>, <see cref="xyToolz.Helper.xyPathHelper"/>
     /// </summary>
-    public class xyFiles
+    public static class xyFiles
     {
         private static readonly JsonSerializerOptions DefaultJsonOptions = xyJson.defaultJsonOptions;
 
-        /// <summary>
-        /// Stellt sicher alle angegebenen Verzeichnisse existieren
-        /// </summary>
-        /// <param name="directories"></param>
-        /// <returns></returns>
-        public static bool CheckForDirectories(string[] directories) => directories.All(dir => Directory.Exists(EnsureDirectory(dir)));
+        #region Directory Management
 
         /// <summary>
-        /// Make sure the target directory exists by creating it if necessary
+        /// Checks whether all specified directories currently exist.
         /// </summary>
-        /// <param name="dir"></param>
-        /// <returns>
-        /// True, if everything worked splendidly
-        /// False, if an error occured
-        /// </returns>
+        /// <param name="directories">An array of directory paths.</param>
+        /// <returns>True if all directories exist; otherwise, false.</returns>
+        public static bool CheckForDirectories(string[] directories) =>
+            directories.All(dir => Directory.Exists(dir));
+
+        /// <summary>
+        /// Ensures the target directory path is constructed appropriately across platforms.
+        /// </summary>
+        /// <param name="dir">Relative or absolute directory path.</param>
+        /// <returns>The resolved directory path.</returns>
         private static string EnsureDirectory(string dir)
         {
-#if ANDROID
-                  string path = Path.Combine(Android.App.Application.Context.FilesDir(null)!.AbsolutePath, dir);
-                  if(String.IsNullOrEmpty(path))
-                  path = Path.Combine(Android.App.Application.Context.GetExternalFilesDir(null)!.AbsolutePath, dir);
-#else
+    #if ANDROID
+            string path = Path.Combine(Android.App.Application.Context.FilesDir(null)!.AbsolutePath, dir);
+            if (string.IsNullOrEmpty(path))
+                path = Path.Combine(Android.App.Application.Context.GetExternalFilesDir(null)!.AbsolutePath, dir);
+    #else
             string path = xyPathHelper.EnsureDirectory(dir);
-#endif
+    #endif
             return path;
         }
 
+        #endregion
+
+        #region File Path Validation
+
         /// <summary>
-        /// Make sure the target file exists by creating it if necessary
+        /// Ensures the target file path exists by creating it if necessary.
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns>
-        /// True, if everything worked splendidly
-        /// False, if an error occured
-        /// </returns>
-        internal static bool EnsurePathExists(string filePath)
+        /// <param name="filePath">Full path to the file.</param>
+        /// <returns>True if the file exists or was created successfully; otherwise, false.</returns>
+        public static async Task<bool> EnsurePathExistsAsync(string filePath)
         {
+            const string errorEmptyPath = "The given file path is null or empty.";
+            string createdMsg = $"{filePath} was created.";
+            string existsMsg = $"{filePath} already exists.";
+
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                await xyLog.AsxLog(errorEmptyPath);
+                return false;
+            }
+
             try
             {
-                // Prüfen, ob die Datei existiert
                 if (!File.Exists(filePath))
                 {
-                    // Wenn nicht, eine neue Datei erstellen
-
-                    File.Create(filePath);
-                    xyLog.Log($"{filePath} was created");
+                    using (File.Create(filePath)) { }
+                    await xyLog.AsxLog(createdMsg);
                 }
                 else
                 {
-                    xyLog.Log($"{filePath} already exists");
+                    await xyLog.AsxLog(existsMsg);
                 }
                 return true;
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Return a list filled with the filnames in the target directory
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static List<string> Inventory(string path)
-        {
-            List<string> lstfullNames = new();
-            foreach (string file in Directory.GetFiles(xyPathHelper.Combine(path)))
-            {
-                FileInfo fileInfo = new(file);
-                lstfullNames.Add(fileInfo.FullName);
-                xyLog.Log(fileInfo.FullName);
-            }
-            return lstfullNames;
-        }
-
-        /// <summary>
-        ///  Rename a file
-        /// </summary>
-        /// <param name="completePath"></param>
-        /// <param name="newName"></param>
-        /// <returns>new complete path</returns>
-        public static string Rename(string completePath, string newName)
-        {
-            try
-            {
-                string dirPath = Path.GetDirectoryName(completePath);
-                string newPath = Path.Combine(dirPath, newName);
-                File.Move(completePath, newPath);
-                return newPath;
-            }
-            catch (Exception e)
-            {
-                xyLog.ExLog(e);
-                return "Error renaming file";
-            }
-        }
-
-        /// <summary>
-        /// Open the target File with the explorer
-        /// </summary>
-        /// <param name="fullPath"></param>
-        public static void Open(string fullPath)
-        {
-            try
-            {
-                Process.Start("explorer.exe", fullPath);
-            }
-            catch (Exception e)
-            {
-                xyLog.ExLog(e);
-            }
-        }
-
-        /// <summary>
-        /// Copy a file to the target path
-        /// </summary>
-        /// <param name="fullPath"></param>
-        /// <param name="targetPath"></param>
-        /// <param name="overwrite"></param>
-        /// <returns>The new FullName => complete path</returns>
-        public static string Copy(string fullPath, string targetPath, bool overwrite = false)
-        {
-            try
-            {
-                xyPathHelper.EnsureParentDirectoryExists(targetPath);
-                File.Copy(fullPath, targetPath, overwrite);
-                return new FileInfo(targetPath).FullName;
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return "Error copying file";
-            }
-        }
-
-        /// <summary>
-        /// Read a file's content into an ienumerable
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public static async Task<IEnumerable<string>> ReadIntoEnum(string filePath)
-        {
-            string fileError = "Unreadable file?!";
-            string fileHandlingError = "Unable to handle file";
-
-            if (xyFiles.EnsurePathExists(filePath))
-            {
-                if (File.ReadLines(filePath) is IEnumerable<string> lines)
-                {
-                    if (lines.Count() == 0) return (null!);
-                    else
-                    {
-                        return lines;
-                    }
-                }
-                await xyLog.AsxLog(fileError);
-            }
-            await xyLog.AsxLog(fileHandlingError);
-            return (null!);
-        }
-
-        /// <summary>
-        /// Generate a memorystream from the specified filepath
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns>MemoryStream (as Stream?)</returns>
-        public static async Task<Stream> GetStreamFromFile(string filePath)
-        {
-            try
-            {
-                string? contentString = await File.ReadAllTextAsync(filePath);
-                if (!string.IsNullOrEmpty(contentString))
-                {
-                    if (xy.StringToBytes(contentString) is byte[] buffer)
-                    {
-                        MemoryStream memoryStream = new MemoryStream(buffer);
-                        memoryStream.Position = 0;
-                        return memoryStream;
-                    }
-                }
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
+                return false;
             }
-            await xyLog.AsxLog($"Unable to get file content from {filePath}, please check it.");
-            return new MemoryStream();
         }
 
+        #endregion
+
+        #region File Metadata & Manipulation
 
         /// <summary>
-        /// Save a string into a file
+        /// Returns a list of <see cref="FileInfo"/> objects for all files in the given directory.
         /// </summary>
-        /// <param name="content"></param>
-        /// <param name="subfolder"></param>
-        /// <param name="fileName"></param>
-        /// <returns>true if successfull, false if not</returns>
-        public static async Task<bool> SaveToFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
+        /// <param name="path">Directory path.</param>
+        /// <returns>List of FileInfo.</returns>
+        public static List<FileInfo> Inventory(string path)
         {
+            List<FileInfo> fileList = new();
+            foreach (string file in Directory.GetFiles(xyPathHelper.Combine(path)))
+            {
+                FileInfo fileInfo = new(file);
+                fileList.Add(fileInfo);
+                xyLog.Log(fileInfo.FullName);
+            }
+            return fileList;
+        }
+
+        /// <summary>
+        /// Returns a list of full file names (paths) from the specified directory.
+        /// </summary>
+        /// <param name="path">Directory path.</param>
+        /// <returns>List of file path strings.</returns>
+        public static List<string> InventoryNames(string path) =>
+            Inventory(path).Select(f => f.FullName).ToList();
+
+        /// <summary>
+        /// Renames a file to a new name within its directory, returning success status.
+        /// </summary>
+        /// <param name="completePath">The full original path of the file.</param>
+        /// <param name="newName">The new name of the file (must not include directory separators).</param>
+        /// <param name="newPath">Returns the newly constructed file path if successful.</param>
+        /// <returns>True if the file was renamed successfully; otherwise, false.</returns>
+        public static async Task<bool> RenameFileAsync(string completePath, string newName)
+        {
+            string newPath;
+            string errorMissingInput = "The provided file path or new file name is null or empty.";
+            string errorInvalidName  = "The new file name contains invalid characters or is a directory path.";
+            string errorFileNotFound = "The original file does not exist.";
+            string errorTargetExists = "A file with the target name already exists.";
+            string successTemplate   = "File renamed successfully from '{0}' to '{1}'.";
+
+            if (string.IsNullOrWhiteSpace(completePath) || string.IsNullOrWhiteSpace(newName))
+            {
+                await xyLog.AsxLog(errorMissingInput);
+                return false;
+            }
+
+            if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||newName.Contains(Path.DirectorySeparatorChar))
+            {
+                await xyLog.AsxLog(errorInvalidName);
+                return false;
+            }
+
             try
             {
-                EnsureDirectory(subfolder);
-                string filePath = xyPathHelper.Combine(subfolder, fileName);
+                if (!File.Exists(completePath))
+                {
+                    await xyLog.AsxLog(errorFileNotFound);
+                    return false;
+                }
+
+                string? dirPath = Path.GetDirectoryName(completePath);
+                if (string.IsNullOrWhiteSpace(dirPath))
+                    return false;
+
+                newPath = Path.Combine(dirPath, newName);
+                if (File.Exists(newPath))
+                {
+                    await xyLog.AsxLog(errorTargetExists);
+                    return false;
+                }
+
+                File.Move(completePath, newPath);
+                await xyLog.AsxLog(string.Format(successTemplate, completePath, newPath));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously opens a file or folder in the system’s default file explorer.
+        /// Cross‑platform (Windows, Linux, macOS) and fully logged.
+        /// </summary>
+        /// <param name="fullPath">Absolute path to the file or directory.</param>
+        /// <returns>True if opened successfully; otherwise, false.</returns>
+        public static async Task<bool> OpenAsync(string fullPath)
+        {
+            const string invalidPathMsg   = "The given path was null or empty.";
+            const string notFoundMsg      = "Target does not exist:";
+            const string successTemplate  = "Explorer opened in {0} ms: {1}";
+            const string unsupportedOsMsg = "No suitable explorer command found for this OS.";
+
+            if (string.IsNullOrWhiteSpace(fullPath))
+            {
+                await xyLog.AsxLog(invalidPathMsg);
+                return false;
+            }
+            if (!File.Exists(fullPath) && !Directory.Exists(fullPath))
+            {
+                await xyLog.AsxLog($"{notFoundMsg} {fullPath}");
+                return false;
+            }
+
+            string cmd, args;
+            var stopwatch = new Stopwatch();
+
+            if (OperatingSystem.IsWindows())
+            {
+                cmd  = "explorer";
+                args = $"\"{fullPath}\"";
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                cmd  = "xdg-open";
+                args = fullPath;
+            }
+            else if (OperatingSystem.IsMacOS())
+            {
+                cmd  = "open";
+                args = fullPath;
+            }
+            else
+            {
+                await xyLog.AsxLog(unsupportedOsMsg);
+                return false;
+            }
+
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName        = cmd,
+                    Arguments       = args,
+                    UseShellExecute = true,
+                    CreateNoWindow  = true
+                };
+
+                stopwatch.Start();
+                Process.Start(psi);
+                stopwatch.Stop();
+
+                await xyLog.AsxLog(string.Format(successTemplate, stopwatch.ElapsedMilliseconds, fullPath));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return false;
+            }
+        }
+
+        #endregion
+
+        #region File Content Handling
+
+        /// <summary>
+        /// Asynchronously reads all lines from the specified file.
+        /// Returns an empty sequence if the path is invalid or on error.
+        /// </summary>
+        public static async Task<IEnumerable<string>> ReadLinesAsync(string filePath)
+        {
+            const string invalidPathMsg  = "The given file path is null or empty.";
+            const string notFoundMsg     = "File does not exist:";
+            const string errorReadMsg    = "Error reading file:";
+            const string successTemplate = "Read {0} lines from file:";
+
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                await xyLog.AsxLog(invalidPathMsg);
+                return Enumerable.Empty<string>();
+            }
+
+            bool exists = await EnsurePathExistsAsync(filePath);
+            if (!exists || !File.Exists(filePath))
+            {
+                await xyLog.AsxLog($"{notFoundMsg} {filePath}");
+                return Enumerable.Empty<string>();
+            }
+
+            string[] allLines;
+            try
+            {
+                allLines = await File.ReadAllLinesAsync(filePath);
+                await xyLog.AsxLog(string.Format(successTemplate, allLines.Length) + $" {filePath}");
+                return allLines;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog($"{errorReadMsg} {filePath}");
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously reads the entire file into a MemoryStream.
+        /// Returns an empty stream on error or if the file doesn’t exist.
+        /// </summary>
+        public static async Task<Stream> GetStreamFromFileAsync(string filePath)
+        {
+            const string invalidPathMsg  = "The given file path is null or empty.";
+            const string notFoundMsg     = "File does not exist:";
+            const string errorReadMsg    = "Error reading file into stream:";
+            const string successTemplate = "Loaded file into stream ({0} bytes) from:";
+
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                await xyLog.AsxLog(invalidPathMsg);
+                return new MemoryStream();
+            }
+
+            bool exists = await EnsurePathExistsAsync(filePath);
+            if (!exists || !File.Exists(filePath))
+            {
+                await xyLog.AsxLog($"{notFoundMsg} {filePath}");
+                return new MemoryStream();
+            }
+
+            byte[] buffer;
+            MemoryStream memoryStream;
+            try
+            {
+                buffer = await File.ReadAllBytesAsync(filePath);
+                memoryStream = new MemoryStream(buffer) { Position = 0 };
+
+                await xyLog.AsxLog(string.Format(successTemplate, buffer.Length) + $" {filePath}");
+                return memoryStream;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog($"{errorReadMsg} {filePath}");
+                return new MemoryStream();
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously saves the given content to a file in the specified subfolder.
+        /// Ensures the directory exists, writes the content, and logs success or failure.
+        /// </summary>
+        public static async Task<bool> SaveToFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
+        {
+            const string invalidContentMsg = "Content is null or empty.";
+            const string invalidPathMsg    = "Subfolder or filename is null or empty.";
+            const string saveSuccessMsg    = "Successfully saved file to:";
+            const string saveErrorMsg      = "Error saving file:";
+
+            if (string.IsNullOrEmpty(content))
+            {
+                await xyLog.AsxLog(invalidContentMsg);
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(subfolder) || string.IsNullOrWhiteSpace(fileName))
+            {
+                await xyLog.AsxLog(invalidPathMsg);
+                return false;
+            }
+
+            string directoryPath = EnsureDirectory(subfolder);
+            string filePath      = xyPathHelper.Combine(directoryPath, fileName);
+
+            try
+            {
                 await File.WriteAllTextAsync(filePath, content);
+                await xyLog.AsxLog(saveSuccessMsg + $" {filePath}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog($"{saveErrorMsg} {filePath}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously loads the content of a file as a string.
+        /// Returns null if the file doesn’t exist or an error occurs.
+        /// </summary>
+        public static async Task<string?> LoadFileAsync(string subfolder = "AppData", string fileName = "config.json")
+        {
+            const string invalidPathMsg = "Subfolder or filename is null or empty.";
+            const string notFoundMsg    = "File does not exist:";
+            const string readErrorMsg   = "Error reading file:";
+
+            if (string.IsNullOrWhiteSpace(subfolder) || string.IsNullOrWhiteSpace(fileName))
+            {
+                await xyLog.AsxLog(invalidPathMsg);
+                return null;
+            }
+
+            string directoryPath = EnsureDirectory(subfolder);
+            string filePath      = xyPathHelper.Combine(directoryPath, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                await xyLog.AsxLog($"{notFoundMsg} {filePath}");
+                return null;
+            }
+
+            try
+            {
+                string content = await File.ReadAllTextAsync(filePath);
+                await xyLog.AsxLog("Loaded content from: " + filePath);
+                return content;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog($"{readErrorMsg} {filePath}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Deletes the specified file under the given subfolder.
+        /// Validates inputs, ensures the directory exists, logs success or failure.
+        /// </summary>
+        public static bool DeleteFile(string subfolder = "AppData", string fileName = "config.json")
+        {
+            const string invalidPathMsg    = "Subfolder or filename is null or empty.";
+            const string notFoundMsg       = "File to delete does not exist:";
+            const string deleteSuccessMsg  = "File deleted successfully:";
+            const string deleteErrorMsg    = "Error deleting file:";
+
+            if (string.IsNullOrWhiteSpace(subfolder) || string.IsNullOrWhiteSpace(fileName))
+            {
+                xyLog.Log(invalidPathMsg);
+                return false;
+            }
+
+            string directoryPath = EnsureDirectory(subfolder);
+            string filePath      = xyPathHelper.Combine(directoryPath, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                xyLog.Log($"{notFoundMsg} {filePath}");
+                return false;
+            }
+
+            try
+            {
+                File.Delete(filePath);
+                xyLog.Log($"{deleteSuccessMsg} {filePath}");
                 return true;
             }
             catch (Exception ex)
             {
                 xyLog.ExLog(ex);
+                xyLog.Log($"{deleteErrorMsg} {filePath}");
                 return false;
             }
         }
 
-
-        /// <summary>
-        /// Reads the content of a file into a string
-        /// </summary>
-        /// <param name="subfolder"></param>
-        /// <param name="fileName"></param>
-        /// <returns>string filecontent</returns>
-        public static async Task<string?> LoadFileAsync(string subfolder = "AppData", string fileName = "config.json")
-        {
-            try
-            {
-                string filePath = xyPathHelper.Combine(subfolder, fileName);
-                return File.Exists(filePath) ? await File.ReadAllTextAsync(filePath) : null;
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null;
-            }
-        }
-
-
-        /// <summary>
-        /// CAUTION! 
-        /// Delete the target file
-        /// </summary>
-        /// <param name="subfolder"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public static bool DeleteFile(string subfolder = "AppData", string fileName = "config.json")
-        {
-            try
-            {
-                string filePath = xyPathHelper.Combine(subfolder, fileName);
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex, LogLevel.Error);
-                return false;
-            }
-        }
-
-
+        #endregion
     }
 }
