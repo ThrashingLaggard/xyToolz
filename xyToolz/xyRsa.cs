@@ -1,21 +1,39 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace xyToolz
 {
 
 
     /// <summary>
-    /// Hilfsklasse zur Erzeugung und Validierung von JWTs mit RSA-Schlüsseln.
-    /// Wiederverwendbar in verschiedenen Projekten.
+    /// Utility class for handling JWT creation and validation using RSA public/private key encryption.
+    ///
+    /// <para><b>Available Features:</b></para>
+    /// <list type="bullet">
+    ///   <item><description>Asymmetric key loading from PEM (public/private).</description></item>
+    ///   <item><description>JWT generation with arbitrary claims and expiration.</description></item>
+    ///   <item><description>Token validation with issuer, audience, signature and lifetime checks.</description></item>
+    ///   <item><description>Public key export in PEM format for client distribution.</description></item>
+    /// </list>
+    ///
+    /// <para><b>Thread Safety:</b></para>
+    /// Not thread-safe due to internal static RSA references. Must not be used concurrently across multiple threads.
+    ///
+    /// <para><b>Limitations:</b></para>
+    /// No support for rotating keys or refresh tokens out of the box.
+    ///
+    /// <para><b>Example Usage:</b></para>
+    /// <code>
+    /// await xyRsa.LoadKeysAsync(pubKey, privKey);
+    /// await xyRsa.ConfigureAsync("https://myapi", "myAudience");
+    /// string jwt = await xyRsa.GenerateJwtAsync(claims, TimeSpan.FromHours(1));
+    /// var user = await xyRsa.ValidateJwtAsync(jwt);
+    /// </code>
     /// </summary>
+
     public static class xyRsa
     {
         private static RSA? _privateRsa;
@@ -24,12 +42,22 @@ namespace xyToolz
         private static string? _audience;
 
         /// <summary>
-        /// Initialisiert die internen RSA-Objekte mit PEM-Schlüsseln.
+        /// Loads RSA public and private Keys from PEM-formatted strings and initializes internal key containers.
         /// </summary>
-        public static async Task LoadKeysAsync(string publicKeyPem, string privateKeyPem)
+        /// <param name="publicKeyPem">PEM-formatted public key string.</param>
+        /// <param name="privateKeyPem">PEM-formatted private key string.</param>
+        /// <returns>True if keys were loaded successfully; otherwise, false.</returns>
+        public static async Task<bool> LoadKeysAsync(string publicKeyPem, string privateKeyPem)
         {
-            const string logSuccess = "RSA-Schlüssel erfolgreich geladen.";
-            const string logError = "Fehler beim Laden der RSA-Schlüssel.";
+            const string success = "RSA keys were successfully loaded.";
+            const string noPem = "Provided PEM string is null or empty.";
+            const string fail = "Failed to load RSA keys from PEM input.";
+
+            if (string.IsNullOrWhiteSpace(publicKeyPem) || string.IsNullOrWhiteSpace(privateKeyPem))
+            {
+                await xyLog.AsxLog(noPem);
+                return false;
+            }
 
             try
             {
@@ -39,15 +67,17 @@ namespace xyToolz
                 _publicRsa = RSA.Create();
                 _publicRsa.ImportFromPem(publicKeyPem.ToCharArray());
 
-                await xyLog.AsxLog(logSuccess);
+                await xyLog.AsxLog(success);
+                return true;
             }
             catch (Exception ex)
             {
-                await xyLog.AsxLog(logError);
-                xyLog.ExLog(ex);
-                throw;
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(fail);
+                return false;
             }
         }
+
 
         /// <summary>
         /// Konfiguriert Issuer und Audience für den Token.
@@ -66,13 +96,13 @@ namespace xyToolz
         /// </summary>
         public static async Task<string> GenerateJwtAsync(IDictionary<string, object> claims, TimeSpan validFor)
         {
-            const string logError = "PrivateKey nicht geladen – Token kann nicht erstellt werden.";
-            const string logSuccess = "JWT erfolgreich erstellt.";
-            const string invalidPrivateKey = "PrivateKey nicht geladen.";
+           string success = "JWT erfolgreich erstellt.";
+           string error = "PrivateKey nicht geladen – Token kann nicht erstellt werden.";
+    
 
             if (_privateRsa == null)
             {
-                await xyLog.AsxExLog(new InvalidOperationException(logError));
+                await xyLog.AsxExLog(new InvalidOperationException(error));
                 return "";
             }
 
@@ -90,7 +120,7 @@ namespace xyToolz
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
             string jwt = tokenHandler.WriteToken(token);
 
-            await xyLog.AsxLog(logSuccess);
+            await xyLog.AsxLog(success);
             return jwt;
         }
 

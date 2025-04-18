@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -40,7 +41,7 @@ namespace xyToolz.Helper
     /// </summary>
     public static class xyHashHelper
     {
-        #region Configuration
+        #region "Configuration"
 
         /// <summary>
         /// Separator used between salt and hash when combining to a single string.
@@ -56,15 +57,13 @@ namespace xyToolz.Helper
         /// <summary>
         /// Name of the environment variable used to retrieve the pepper value.
         /// </summary>
-        private const string PepperEnvVarName = "XYTOOLZ_PEPPER";
+        private const string PepperEnvVarName = "PEPPER";
 
         /// <summary>
         /// The configured pepper value, loaded from environment variable or defaults to "Ahuhu".
         /// </summary>
-        private static readonly string? Pepper =
-            string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(PepperEnvVarName))
-                ? "Ahuhu"
-                : Environment.GetEnvironmentVariable(PepperEnvVarName);
+        private static readonly string? Pepper = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(PepperEnvVarName)) ? "Ahuhu" : Environment.GetEnvironmentVariable(PepperEnvVarName);
+
         /// <summary>
         /// Number of iterations used in PBKDF2 password hashing.
         /// </summary>
@@ -80,45 +79,113 @@ namespace xyToolz.Helper
 
         #endregion
 
+
+        /// <summary>
+        /// Derives a secure cryptographic key from a password and salt using PBKDF2 (RFC 2898).
+        ///
+        /// <para><b>Internals:</b></para>
+        /// - Uses HMAC-SHA256 as PRF (Pseudorandom Function).
+        /// - Internally applies the password, salt, and iteration count to generate the key.
+        /// - Suitable for use with AES encryption or HMAC-based signing.
+        ///
+        /// <para><b>Thread Safety:</b></para>
+        /// Thread-safe: stateless and does not cache results.
+        ///
+        /// <para><b>Limitations:</b></para>
+        /// - Requires caller to provide a strong, unique salt.
+        /// - Not suitable for hardware tokens or FIDO where key derivation must be deterministic.
+        ///
+        /// <para><b>Example Usage:</b></para>
+        /// <code>
+        /// byte[] salt = RandomNumberGenerator.GetBytes(16);
+        /// byte[] key  = xyHashHelper.BuildKeyFromPassword("mySecret123", salt, 32);
+        /// </code>
+        /// </summary>
+        /// <param name="password">The input password from which the key will be derived.</param>
+        /// <param name="salt">A cryptographically secure random salt (minimum 8 bytes recommended).</param>
+        /// <param name="keyLength">The desired length of the derived key (e.g., 32 for AES-256).</param>
+        /// <param name="iterations">The number of iterations (default: 100,000).</param>
+        /// <returns>A derived key as a byte array.</returns>
+        /// <exception cref="ArgumentException">Thrown if password or salt is invalid, or key length is too short.</exception>
+        public static byte[] BuildKeyFromPassword(string password, byte[] salt)
+        {
+
+            string errorSalt = "Salt must not be null or empty.";
+            string errorPassword = "Password must not be null or empty.";
+            string ok = "Seems to work";
+
+            xyLog.Log((salt is null || salt.Length == 0) ? errorSalt : string.IsNullOrWhiteSpace(password) ? errorPassword : ok);
+
+            using Rfc2898DeriveBytes pbkdf2 = new(xy.StringToBytes(password), salt, Iterations, HashAlgorithmName.SHA256);
+
+            return pbkdf2.GetBytes(KeyLength256);
+        }
+
+
+
+
         #region Hashing Functions
 
         /// <summary>
         /// Returns a Base64-encoded hash string created with PBKDF2 from the provided password and salt.
         /// </summary>
-        /// <param name="hashAlgorithm">The hash algorithm to use (e.g., SHA256).</param>
+        /// <param name="hashAlgorithm">The hash algorithm to use</param>
         /// <param name="password">The plaintext password.</param>
         /// <param name="salt">The cryptographic salt.</param>
         /// <returns>Base64-encoded hash string.</returns>
         public static string HashToString(HashAlgorithmName hashAlgorithm, string password, byte[] salt)
         {
-            const string logMessage = "HashToString was called.";
-            xyLog.Log(logMessage);
+            string result = "";
 
-            byte[] bytes = HashToBytes(hashAlgorithm, password, salt);
-            return Convert.ToBase64String(bytes);
+            if (HashToBytes(hashAlgorithm, password, salt) is byte[] bytes)
+            {
+                if (bytes.Length > 0)
+                {
+                    result = xy.BytesToBase(bytes);
+                }
+            }
+            return result;
         }
 
         /// <summary>
-        /// Returns a derived key (hash) as a byte array using PBKDF2.
+        /// Returns a derived key (hash) as a byte array using PBKDF2 and the given hash algorithm.
         /// </summary>
         /// <param name="hashAlgorithm">The hash algorithm to use.</param>
         /// <param name="password">The plaintext password.</param>
         /// <param name="salt">The cryptographic salt.</param>
-        /// <returns>Derived hash as byte array.</returns>
+        /// <returns>Derived key as byte array.</returns>
         public static byte[] HashToBytes(HashAlgorithmName hashAlgorithm, string password, byte[] salt)
         {
-            const string logMessage = "HashToBytes was called.";
-            xyLog.Log(logMessage);
+            string log = $"Algorithm: {hashAlgorithm.Name}, SaltLength: {salt.Length}";
+            string logSaltError = "Provided salt is null or empty.";
+            string logPasswordError = "Provided password is null or empty.";
+
+
+            if (salt is null || salt.Length == 0)
+            {
+                xyLog.Log(logSaltError);
+                return Array.Empty<byte>();
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                xyLog.Log(logPasswordError);
+                return Array.Empty<byte>();
+            }
+
+
+            xyLog.Log(log);
 
             string pepperedPassword = PepperPassword(password);
-            int length = SetKeySize(hashAlgorithm);
+            int keySize = SetKeySize(hashAlgorithm);
 
-            using var pbkdf2 = new Rfc2898DeriveBytes(pepperedPassword, salt, Iterations, hashAlgorithm);
-            return pbkdf2.GetBytes(length);
+            using Rfc2898DeriveBytes pbkdf2 = new(pepperedPassword, salt, Iterations, hashAlgorithm);
+            return pbkdf2.GetBytes(keySize);
         }
 
+
         /// <summary>
-        /// Creates a Base64 hash string by delegating to HashToString().
+        /// Creates a Base64 hash string by calling HashToString().
         /// </summary>
         /// <param name="hashAlgorithm">Hash algorithm to use.</param>
         /// <param name="password">The password to hash.</param>
@@ -126,10 +193,22 @@ namespace xyToolz.Helper
         /// <returns>Base64-encoded password hash.</returns>
         public static string HashPassword(HashAlgorithmName hashAlgorithm, string password, byte[] salt)
         {
-            const string logMessage = "HashPassword was called.";
-            xyLog.Log(logMessage);
+            string saltError = "Salt is null or empty.";
+            string pwError = "Password is null or empty.";
+            string weird = "You should not be able to read this, please inform experts immediately!";
 
-            return HashToString(hashAlgorithm, password, salt);
+            bool isSaltValid = (salt is not null && salt.Length > 0);
+            bool isPwValid = (!string.IsNullOrWhiteSpace(password));
+
+            if (isSaltValid && isPwValid)
+            {
+                return HashToString(hashAlgorithm, password, salt);
+            }
+            else
+            {
+                xyLog.Log(!isSaltValid ? saltError : (!isPwValid ? pwError : weird));
+                return string.Empty;
+            }
         }
 
         #endregion
@@ -145,27 +224,39 @@ namespace xyToolz.Helper
         /// <returns>True if the password is valid; otherwise, false.</returns>
         public static bool VerifyPassword(HashAlgorithmName hashAlgorithm, string password, string saltNhash)
         {
-            string separator = Separator;
-            const string logMessage = "VerifyPassword (string) was called.";
-            const string logInvalidFormat = "Invalid format in saltNhash.";
-            byte[] salt = default!;
-            byte[] hash = default!;
+            string bug = "This text is unreachable, please stay calm and call a supervisor";
+            string logInvalidFormat = "Invalid format in saltNhash.";
+            string logSaltNull = "Salt is null or empty.";
+            string logPasswordNull = "Password is null or empty.";
+            string[] input = [];
+
             byte[] hashToCheck = default!;
+            byte[] hash = default!;
+            byte[] salt = default!;
+            bool isValid = false;
+            bool isFormat = false;
+            bool isSaltValid = false;
+            bool isPwNull = (string.IsNullOrWhiteSpace(password));
+            bool isCheckNull = (string.IsNullOrWhiteSpace(saltNhash));
 
-            xyLog.Log(logMessage);
-
-            string[] input = saltNhash.Split(separator);
-            if (input.Length != 2)
+            if (!isPwNull &&  !isCheckNull)
             {
-                xyLog.Log(logInvalidFormat);
-                return false;
-            }
-
-            salt = Convert.FromBase64String(input[0]);
-            hash = Convert.FromBase64String(input[1]);
-            hashToCheck = HashToBytes(hashAlgorithm, password, salt);
-
-            return CryptographicOperations.FixedTimeEquals(hash, hashToCheck);
+                input = saltNhash.Split(Separator);
+                isFormat = (input.Length == 2);
+                if (isFormat)
+                {
+                    salt = xy.BaseToBytes(input[0]);
+                    hash = xy.BaseToBytes(input[1]);
+                    isSaltValid = salt is not null && salt.Length > 0;
+                    if (isSaltValid)
+                    {
+                        hashToCheck = HashToBytes(hashAlgorithm, password, salt);
+                        isValid = CryptographicOperations.FixedTimeEquals(hash, hashToCheck);
+                    }
+                }
+            }     
+            xyLog.Log(!isSaltValid? logSaltNull :(!isFormat ? logInvalidFormat : isPwNull ? logPasswordNull : bug));
+            return isValid;
         }
 
         /// <summary>
@@ -177,10 +268,25 @@ namespace xyToolz.Helper
         /// <returns>True if the hashes are identical; otherwise, false.</returns>
         public static bool VerifyPassword(HashAlgorithmName hashAlgorithm, byte[] hash1, byte[] hash2)
         {
-            const string logMessage = "VerifyPassword (byte[]) was called.";
-            xyLog.Log(logMessage);
+            string nullHash1 = "First array is null or empty.";
+            string nullHash2 = "Second hash is null or empty.";
+            string lengthNotEqual = "Arrays have different length and cant be compared.";
+            string bugMessage = "Unexpected level reached. Please investigate somewhere else.";
 
-            return CryptographicOperations.FixedTimeEquals(hash1, hash2);
+            bool isHash2Valid = hash2 is not null && hash2.Length > 0;
+            bool isHash1Valid = hash1 is not null && hash1.Length > 0;
+            bool isSameLength = isHash1Valid && isHash2Valid && (hash1.Length == hash2.Length); 
+            bool result = false;
+
+            if (isHash1Valid && isHash2Valid)
+            {
+                if (isSameLength)
+                {
+                    result= CryptographicOperations.FixedTimeEquals(hash1, hash2);
+                }
+            }  
+            xyLog.Log(!isHash1Valid ? nullHash1 : (!isHash2Valid ? nullHash2 : !isSameLength? lengthNotEqual : bugMessage));
+            return result;
         }
 
         #endregion
@@ -188,28 +294,35 @@ namespace xyToolz.Helper
         #region Salt & Helper Functions
 
         /// <summary>
-        /// Generates a cryptographically secure random salt of the specified length.
+        /// Generates a secure random Salt, using a cryptographically strong RNG.
         /// </summary>
-        /// <param name="length">Length of the salt in bytes. Default is 32 bytes.</param>
-        /// <returns>A byte array containing the random salt.</returns>
+        /// <param name="length">The length of the salt in bytes: 16 or more.</param>
+        /// <returns>A secure salt, or an empty array if the generation fails.</returns>
         public static byte[] GenerateSalt(int length = 32)
         {
-            const string logMessage = "GenerateSalt was called.";
-            xyLog.Log(logMessage);
+            string tooShort = "WARNING: Salt length too short. Minimum requirement: 16 bytes.";
+
+            if (length < 16)
+            {
+                xyLog.Log(tooShort);
+                return Array.Empty<byte>();
+            }
 
             try
             {
                 byte[] salt = new byte[length];
-                using var rng = RandomNumberGenerator.Create();
+                using RandomNumberGenerator rng = RandomNumberGenerator.Create();
                 rng.GetBytes(salt);
                 return salt;
             }
             catch (Exception ex)
             {
+    
                 xyLog.ExLog(ex);
-                throw;
+                return Array.Empty<byte>();
             }
         }
+
 
         /// <summary>
         /// Builds a combined salt and Base64-encoded password hash string in the format "salt:hash".
@@ -220,16 +333,12 @@ namespace xyToolz.Helper
         /// <returns>Combined string of Base64 salt and hash separated by a colon.</returns>
         public static string BuildSaltedHash(HashAlgorithmName hashAlgorithm, string password, out byte[] salt)
         {
-            string separator = Separator;
-            const string logMessage = "BuildSaltedHash was called.";
-            xyLog.Log(logMessage);
-
             try
             {
                 salt = GenerateSalt();
                 string hash = HashPassword(hashAlgorithm, password, salt);
                 string saltString = Convert.ToBase64String(salt);
-                return string.Concat(saltString, separator, hash);
+                return string.Concat(saltString, Separator, hash);
             }
             catch (Exception ex)
             {
@@ -251,15 +360,17 @@ namespace xyToolz.Helper
         /// <exception cref="ArgumentException">Thrown when an unsupported algorithm is provided.</exception>
         private static int SetKeySize(HashAlgorithmName algorithm)
         {
-            const string unsupportedAlgorithmMessage = "Unsupported algorithm";
-            const string logMessage = "SetKeySize was called.";
-            xyLog.Log(logMessage);
-
+            string unsupAlgoMsg = "Unsupported algorithm...";
             try
             {
-                if (algorithm == HashAlgorithmName.SHA256) return KeyLength256;
-                if (algorithm == HashAlgorithmName.SHA512) return KeyLength512;
-                throw new ArgumentException(unsupportedAlgorithmMessage, nameof(algorithm));
+                return algorithm switch                                                                                     // Super Sache!!!
+                {
+                    { } a when a == HashAlgorithmName.SHA256 => KeyLength256,                   
+                    { } a when a == HashAlgorithmName.SHA512 => KeyLength512,                   // {} a when a ==           ist also ein gültiges Objekt => nicht null
+                    _ => throw new ArgumentException(unsupAlgoMsg, nameof(algorithm))      // Für alles, was nicht abgedeckt wurde
+                };
+
+       
             }
             catch (Exception ex)
             {
@@ -275,8 +386,13 @@ namespace xyToolz.Helper
         /// <returns>The password combined with the pepper string.</returns>
         private static string PepperPassword(string password)
         {
-            const string logMessage = "PepperPassword was called.";
-            xyLog.Log(logMessage);
+            string logPasswordMissing = "Password was null or empty. Using only pepper.";
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                xyLog.Log(logPasswordMissing);
+                return Pepper ?? string.Empty;
+            }
 
             return string.Concat(password, Pepper);
         }

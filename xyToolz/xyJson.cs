@@ -10,25 +10,49 @@ namespace xyToolz
 {
 
     /// <summary>
-    /// JsonUtils:
-    /// 
-    /// New Entry in json file
-    ///     
-    /// Update Entry 
-    /// 
-    /// new or  update for rsa key
-    /// 
-    /// Read all contents from the given json file
-    ///         --> read value from target key
-    /// 
-    /// new json file?!
+    /// Static utility class for handling various JSON operations used throughout the application.
+    ///
+    /// <para><b>Available Features:</b></para>
+    /// <list type="bullet">
+    /// <item><description>Serialize and deserialize objects and dictionaries to and from JSON files.</description></item>
+    /// <item><description>Access individual keys and nested subkeys as objects, dictionaries, or byte arrays.</description></item>
+    /// <item><description>Automatic root-tag wrapping and file structure validation for JSON content.</description></item>
+    /// <item><description>Supports both System.Text.Json and Newtonsoft.Json querying models (JObject/JToken).</description></item>
+    /// <item><description>Built-in structured logging via xyLog for errors and operations.</description></item>
+    /// </list>
+    ///
+    /// <para><b>Thread Safety:</b></para>
+    /// This class is fully static and does not maintain any instance-level state.
+    ///
+    /// <para><b>Limitations:</b></para>
+    /// - Only top-level and single-level subkey access supported explicitly.
+    /// - Not optimized for complex nested arrays or mixed-content JSON structures.
+    ///
+    /// <para><b>Performance:</b></para>
+    /// Performance depends on file size and structure; optimized for configuration-style JSON files (few KB).
+    ///
+    /// <para><b>Configuration:</b></para>
+    /// Uses consistent serializer options for formatting and allows override via optional parameters.
+    ///
+    /// <para><b>Example Usage:</b></para>
+    /// <code>
+    /// string value = await xyJson.GetStringFromJsonFile("settings.json", "jwtPublicKey");
+    /// var settings = await xyJson.DeserializeFromFile("appconfig.json");
+    /// await xyJson.AddOrUpdateEntry("userprefs.json", "theme", "dark");
+    /// </code>
+    ///
+    /// <para><b>Related:</b></para>
+    /// <see cref="System.Text.Json"/>
+    /// <see cref="Newtonsoft.Json.Linq.JObject"/>
+    /// <see cref="xyToolz.Logging.xyLog"/>
     /// </summary>
     public class xyJson
     {
         #region Json Configuration
 
         /// <summary>
-        /// Default <see cref="JsonSerializerOptions"/> used by all serialization / deserialization helpers.
+        /// Preconfigured JSON serialization settings for consistent formatting and behavior.
+        /// Used as default across all JSON-related methods in this class.
         /// </summary>
         internal static readonly JsonSerializerOptions defaultJsonOptions = new()
         {
@@ -51,7 +75,14 @@ namespace xyToolz
 
         #region Serialization
 
-        /// <inheritdoc cref="SaveDataToJsonAsync{T}(T,string,JsonSerializerOptions?)"/>
+        /// <summary>
+        /// Save into file and overwrite it!
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="fileName"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions? options = null)
         {
             string successMessage = $"Successfully saved JSON data to '{fileName}'.";
@@ -102,8 +133,13 @@ namespace xyToolz
         }
 
         /// <summary>
-        /// Adds or updates a key/value pair in a JSON file.
+        /// Adds or updates a key-value pair in a JSON file.
+        /// If the key exists, its value is updated; otherwise, a new entry is added.
         /// </summary>
+        /// <typeparam name="T">The type of the value to store.</typeparam>
+        /// <param name="filePath">The path to the JSON file.</param>
+        /// <param name="key">The key to add or update.</param>
+        /// <param name="value">The value to assign to the key.</param>
         public static async Task AddOrUpdateEntry<T>(string filePath, string key, T value)
         {
             string updateMessage = $"Updated key '{key}' in '{filePath}'.";
@@ -341,7 +377,7 @@ namespace xyToolz
         /// <param name="filePath">Path to the file.</param>
         /// <param name="key">Key to extract.</param>
         /// <returns>The token or null.</returns>
-        public static async Task<JToken?> GetJTokenFromFile(string filePath, string key)
+        public static async Task<JToken?> GetJTokenFromKey(string filePath, string key)
         {
             string errorMessage = $"Key '{key}' not found in file '{filePath}'.";
             try
@@ -359,6 +395,46 @@ namespace xyToolz
                 await xyLog.AsxExLog(ex);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Tries to access a nested subkey inside a top-level key and returns its value.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="key">Top-level key to look into.</param>
+        /// <param name="subkey">Nested subkey whose value should be retrieved.</param>
+        /// <returns>The corresponding JToken, or null if not found.</returns>
+        private static async Task<JToken?> GetJTokenFromSubkey(string filePath, string key, string subkey)
+        {
+            string errorMessage = $"Unable to locate subkey '{subkey}' in key '{key}' from file '{filePath}'.";
+            JObject? jsonObject = await GetJObjectFromFile(filePath);
+            var token = jsonObject?[key]?[subkey];
+            if (token is null)
+            {
+                await xyLog.AsxLog(errorMessage);
+            }
+            return token;
+        }
+
+
+        /// <summary>
+        /// Returns the value of a key in the JSON file as string.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="key">Key whose value to retrieve.</param>
+        /// <returns>Value of the key as string, or empty if not found.</returns>
+        public static async Task<string> GetStringFromJsonFile(string filePath, string key)
+        {
+            string keyReadSuccessMessage = $"Successfully read key '{key}' from '{filePath}'.";
+            string keyReadFailMessage = $"Key '{key}' not found or file '{filePath}' unreadable.";
+            var token = await GetJTokenFromKey(filePath, key);
+            if (token is not null)
+            {
+                await xyLog.AsxLog(keyReadSuccessMessage);
+                return token.ToString();
+            }
+            await xyLog.AsxLog(keyReadFailMessage);
+            return string.Empty;
         }
 
         #endregion

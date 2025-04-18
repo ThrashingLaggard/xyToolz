@@ -1,34 +1,43 @@
-﻿### Class: xyHashHelper
+﻿# xyHashHelper.cs
 
-**Purpose:** Provides secure password hashing and verification functionality using PBKDF2.
+Der `xyHashHelper` bietet robuste und sichere Methoden zum Hashen, Vergleichen und Abspeichern von Passwörtern, Salts und kryptografischen Schlüsseln.
 
-# Features
-- Environment-based configurable peppering (default: "Ahuhu")
-- Secure salt generation using RNGCryptoServiceProvider
-- PBKDF2 password hashing (configurable iterations)
-- Base64 encoding
-- Constant-time hash comparison
-- Logging with xyLog (sync)
+## 📌 Features
 
-# Thread Safety
-✅ Thread-safe — fully static, no instance state
+- 🔐 Salted Hashing via PBKDF2 (Rfc2898DeriveBytes)
+- 🔑 Dynamische Salt-Generierung mit Secure RNG
+- 🌶️ Optionale Pepper-Absicherung via Umgebungsvariable `PEPPER`
+- 🧮 Unterstützt SHA256 und SHA512
+- 🔁 Sichere Passwortverifikation mit `FixedTimeEquals`
+- 🧪 Umfangreiches Logging
+- 📦 Kompatibel mit AES-Key-Derivation (z. B. für Verschlüsselung)
 
-# Limitations
-❗ Only SHA256 and SHA512 supported
+## 🔧 Konfiguration
 
-# Performance
-⏱ Iterations affect CPU load — consider tuning for performance-sensitive applications
+| Option           | Beschreibung                                  | Default     |
+|------------------|-----------------------------------------------|-------------|
+| `PEPPER`         | Umgebungsvariable für zusätzliche Entropie    | `"Ahuhu"`   |
+| `Iterations`     | Wiederholungen in PBKDF2                      | `100_000`   |
+| `KeyLength256`   | Keylänge für AES-256 / SHA256                 | `32 Bytes`  |
+| `KeyLength512`   | Keylänge für SHA512                           | `64 Bytes`  |
 
-# Configuration
-🔧 Set `PEPPER` env var to override default pepper ("Ahuhu")
+## 📌 Methodenübersicht
 
-# Example
+| Methode                          | Zweck                                        |
+|----------------------------------|----------------------------------------------|
+| `BuildSaltedHash()`             | Erstellt neuen Salt + Hash im Format `salt:hash` |
+| `VerifyPassword()`              | Vergleicht Password gegen Salt+Hash          |
+| `BuildKeyFromPassword()`        | Generiert AES-Schlüssel aus Passwort + Salt  |
+| `GenerateSalt()`                | Erstellt sicheren Salt in gewünschter Länge  |
+| `HashToBytes()` / `HashToString()` | Raw-Hash oder Base64-Hash erzeugen        |
+| `TryVerifyPassword()` *(neu)*   | Sicherer Passwort-Vergleich mit `out bool`   |
+
+## 🧪 Beispiel
+
 ```csharp
-byte[] salt;
-string hash = xyHashHelper.BuildSaltedHash(HashAlgorithmName.SHA256, "password", out salt);
-bool ok = xyHashHelper.VerifyPassword(HashAlgorithmName.SHA256, "password", hash);
+// Hash erstellen
+string password = "MeinSicheresPasswort123!";
+string saltedHash = xyHashHelper.BuildSaltedHash(HashAlgorithmName.SHA256, password, out byte[] salt);
 
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
+// Passwort prüfen
+bool isCorrect = xyHashHelper.VerifyPassword(HashAlgorithmName.SHA256, password, saltedHash);
