@@ -35,11 +35,11 @@ public static class xyDataProtectionHelper
     /// </summary>
     public static async Task<byte[]?> EncryptAsync<T>(T obj, string password, byte[] salt)
     {
-        const string logStart = "Starting AES encryption process...";
-        const string logNullInput = "The object to encrypt is null.";
-        const string logKeyFail = "Key derivation failed or returned invalid key.";
-        const string logError = "An error occurred during encryption.";
-        const string logSuccess = "Object was successfully encrypted.";
+        string logStart = "Starting AES encryption process...";
+        string logNullInput = "The object to encrypt is null.";
+        string logKeyFail = "Key derivation failed or returned invalid key.";
+        string logError = "An error occurred during encryption.";
+        string logSuccess = "Object was successfully encrypted.";
 
         await xyLog.AsxLog(logStart);
 
@@ -94,11 +94,11 @@ public static class xyDataProtectionHelper
     /// </summary>
     public static async Task<T?> DecryptAsync<T>(byte[] encryptedData, string password, byte[] salt)
     {
-        const string logStart = "Starting AES decryption process...";
-        const string logInvalid = "Encrypted data is null or too short.";
-        const string logKeyFail = "Key derivation failed or returned invalid key.";
-        const string logError = "An error occurred during decryption.";
-        const string logSuccess = "Decryption completed and data successfully deserialized.";
+        string logStart = "Starting AES decryption process...";
+        string logInvalid = "Encrypted data is null or too short.";
+        string logKeyFail = "Key derivation failed or returned invalid key.";
+        string logError = "An error occurred during decryption.";
+        string logSuccess = "Decryption completed and data successfully deserialized.";
 
         await xyLog.AsxLog(logStart);
 
@@ -147,9 +147,9 @@ public static class xyDataProtectionHelper
     /// </summary>
     public static async Task<byte[]> ProtectAsync(string plainText, byte[] key)
     {
-        const string errorEmptyInput = "Either plain text or key was null or empty.";
-        const string errorEncryption = "Encryption failed.";
-        const string successMsg = "Text encrypted successfully.";
+        string errorEmptyInput = "Either plain text or key was null or empty.";
+        string errorEncryption = "Encryption failed.";
+        string successMsg = "Text encrypted successfully.";
 
         if (string.IsNullOrWhiteSpace(plainText) || key is null || key.Length == 0)
         {
@@ -185,10 +185,10 @@ public static class xyDataProtectionHelper
     /// </summary>
     public static async Task<string> UnprotectAsync(byte[] cipherData, byte[] key)
     {
-        const string errorEmptyInput = "Either cipher data or key was null or empty.";
-        const string errorTooShort = "Encrypted data does not contain a valid IV.";
-        const string errorDecryption = "Decryption failed.";
-        const string successMsg = "Text decrypted successfully.";
+        string errorEmptyInput = "Either cipher data or key was null or empty.";
+        string errorTooShort = "Encrypted data does not contain a valid IV.";
+        string errorDecryption = "Decryption failed.";
+        string successMsg = "Text decrypted successfully.";
 
         if (cipherData is null || cipherData.Length == 0 || key is null || key.Length == 0)
         {
