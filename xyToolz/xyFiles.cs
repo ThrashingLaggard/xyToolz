@@ -141,7 +141,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="path">Directory path.</param>
         /// <returns>List of FileInfo.</returns>
-        public static List<FileInfo> Inventory(string path)
+        public static IEnumerable<FileInfo> Inventory(string path)
         {
             List<FileInfo> fileList = new();
             foreach (string file in Directory.GetFiles(xyPathHelper.Combine(path)))
@@ -158,8 +158,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="path">Directory path.</param>
         /// <returns>List of file path strings.</returns>
-        public static List<string> InventoryNames(string path) =>
-            Inventory(path).Select(f => f.FullName).ToList();
+        public static IEnumerable<string> InventoryNames(string path) => Inventory(path).Select(f => f.FullName).ToList();
 
         /// <summary>
         /// Renames a file to a new name within its directory, returning success status.
@@ -218,79 +217,6 @@ namespace xyToolz
                 return false;
             }
         }
-
-        /// <summary>
-        /// Asynchronously opens a file or folder in the system’s default file explorer.
-        /// Cross‑platform (Windows, Linux, macOS) and fully logged.
-        /// </summary>
-        /// <param name="fullPath">Absolute path to the file or directory.</param>
-        /// <returns>True if opened successfully; otherwise, false.</returns>
-        public static async Task<bool> OpenAsync(string fullPath)
-        {
-            const string invalidPathMsg   = "The given path was null or empty.";
-            const string notFoundMsg      = "Target does not exist:";
-            const string successTemplate  = "Explorer opened in {0} ms: {1}";
-            const string unsupportedOsMsg = "No suitable explorer command found for this OS.";
-
-            if (string.IsNullOrWhiteSpace(fullPath))
-            {
-                await xyLog.AsxLog(invalidPathMsg);
-                return false;
-            }
-            if (!File.Exists(fullPath) && !Directory.Exists(fullPath))
-            {
-                await xyLog.AsxLog($"{notFoundMsg} {fullPath}");
-                return false;
-            }
-
-            string cmd, args;
-            var stopwatch = new Stopwatch();
-
-            if (OperatingSystem.IsWindows())
-            {
-                cmd  = "explorer";
-                args = $"\"{fullPath}\"";
-            }
-            else if (OperatingSystem.IsLinux())
-            {
-                cmd  = "xdg-open";
-                args = fullPath;
-            }
-            else if (OperatingSystem.IsMacOS())
-            {
-                cmd  = "open";
-                args = fullPath;
-            }
-            else
-            {
-                await xyLog.AsxLog(unsupportedOsMsg);
-                return false;
-            }
-
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName        = cmd,
-                    Arguments       = args,
-                    UseShellExecute = true,
-                    CreateNoWindow  = true
-                };
-
-                stopwatch.Start();
-                Process.Start(psi);
-                stopwatch.Stop();
-
-                await xyLog.AsxLog(string.Format(successTemplate, stopwatch.ElapsedMilliseconds, fullPath));
-                return true;
-            }
-            catch (Exception ex)
-            {
-                await xyLog.AsxExLog(ex);
-                return false;
-            }
-        }
-
         #endregion
 
         #region File Content Handling

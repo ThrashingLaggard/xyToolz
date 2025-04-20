@@ -244,6 +244,74 @@ namespace xyToolz
         #region System Utilities & Experiments
 
         /// <summary>
+        /// Asynchronously opens a file or folder in the system’s default file explorer.
+        /// Cross‑platform (Windows, Linux, macOS) and fully logged.
+        /// </summary>
+        /// <param name="fullPath">Absolute path to the file or directory.</param>
+        /// <returns>True if opened successfully; otherwise, false.</returns>
+        public static async Task<bool> OpenAsync(string fullPath)
+        {
+            string invalidPathMsg = "The given path was null or empty.";
+            string notFoundMsg = "Target does not exist:";
+            string successTemplate = "Explorer opened in {0} ms: {1}";
+            string unsupportedOsMsg = "No suitable explorer command found for this OS.";
+
+            if (string.IsNullOrWhiteSpace(fullPath))
+            {
+                await xyLog.AsxLog(invalidPathMsg);
+                return false;
+            }
+            else
+            {
+                if (!File.Exists(fullPath) && !Directory.Exists(fullPath))
+                {
+                    await xyLog.AsxLog($"{notFoundMsg} {fullPath}");
+                    return false;
+                }
+            }
+
+            Stopwatch stopwatch = new ();
+
+            // Switch Expressions stiften doch Freude
+            (string? cmd, string args) = OperatingSystem.IsWindows() switch
+            {
+                true => ("explorer", $"\"{fullPath}\""),
+                _ when OperatingSystem.IsLinux() => ("xdg-open", fullPath),
+                _ when OperatingSystem.IsMacOS() => ("open", fullPath),
+                _ => (null, "Hier könnte ihre Werbung stehen!")
+            };
+
+            if (cmd is null)
+            {
+                await xyLog.AsxLog(unsupportedOsMsg);
+                return false;
+            }
+
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = cmd,
+                    Arguments = args,
+                    UseShellExecute = true,
+                    CreateNoWindow = true
+                };
+
+                stopwatch.Start();
+                Process.Start(psi);
+                stopwatch.Stop();
+
+                await xyLog.AsxLog(string.Format(successTemplate, stopwatch.ElapsedMilliseconds, fullPath));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Opens Notepad without any file.
         /// </summary>
         public static void Editor()
