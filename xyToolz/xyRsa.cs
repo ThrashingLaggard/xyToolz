@@ -36,8 +36,8 @@ namespace xyToolz
 
     public static class xyRsa
     {
-        private static RSA? _privateRsa;
-        private static RSA? _publicRsa;
+        private static RSA? _privateRsaKey;
+        private static RSA? _publicRsaKey;
         private static string? _issuer;
         private static string? _audience;
 
@@ -49,9 +49,9 @@ namespace xyToolz
         /// <returns>True if keys were loaded successfully; otherwise, false.</returns>
         public static async Task<bool> LoadKeysAsync(string publicKeyPem, string privateKeyPem)
         {
-            const string success = "RSA keys were successfully loaded.";
-            const string noPem = "Provided PEM string is null or empty.";
-            const string fail = "Failed to load RSA keys from PEM input.";
+            string success = "RSA keys were successfully loaded.";
+            string noPem = "Provided PEM string is null or empty.";
+            string fail = "Failed to load RSA keys from PEM input.";
 
             if (string.IsNullOrWhiteSpace(publicKeyPem) || string.IsNullOrWhiteSpace(privateKeyPem))
             {
@@ -61,11 +61,11 @@ namespace xyToolz
 
             try
             {
-                _privateRsa = RSA.Create();
-                _privateRsa.ImportFromPem(privateKeyPem.ToCharArray());
+                _privateRsaKey = RSA.Create();
+                _privateRsaKey.ImportFromPem(privateKeyPem.ToCharArray());
 
-                _publicRsa = RSA.Create();
-                _publicRsa.ImportFromPem(publicKeyPem.ToCharArray());
+                _publicRsaKey = RSA.Create();
+                _publicRsaKey.ImportFromPem(publicKeyPem.ToCharArray());
 
                 await xyLog.AsxLog(success);
                 return true;
@@ -80,121 +80,164 @@ namespace xyToolz
 
 
         /// <summary>
-        /// Konfiguriert Issuer und Audience für den Token.
+        /// Configures the issuer and audience values for JWT generation and validation.
         /// </summary>
-        public static async Task ConfigureAsync(string issuer, string audience)
+        /// <param name="issuer">The issuer identifier to use in the token.</param>
+        /// <param name="audience">The audience identifier for the token.</param>
+        /// <returns>True if both values were set successfully; otherwise, false.</returns>
+        public static async Task<bool> ConfigureAsync(string issuer, string audience)
         {
+            string logSuccess = "Issuer and Audience configured successfully.";
+            string logError = "Issuer or Audience input was null or empty.";
+
+            if (string.IsNullOrWhiteSpace(issuer) || string.IsNullOrWhiteSpace(audience))
+            {
+                await xyLog.AsxLog(logError);
+                return false;
+            }
+
             _issuer = issuer;
             _audience = audience;
 
-            string configMessage = $"Konfiguration gesetzt: Issuer={issuer}, Audience={audience}";
-            await xyLog.AsxLog(configMessage);
+            await xyLog.AsxLog($"{logSuccess} Issuer = {_issuer}, Audience = {_audience}");
+            return true;
         }
 
         /// <summary>
-        /// Erstellt ein signiertes JWT mit den angegebenen Claims und der Gültigkeitsdauer.
+        /// Generates a signed JSON Web Token (JWT) using the configured RSA private key and provided claims.
         /// </summary>
+        /// <param name="claims">A dictionary containing the custom claims to include in the token payload.</param>
+        /// <param name="validFor">The duration for which the token should remain valid.</param>
+        /// <returns>
+        /// The encoded JWT string if successful; otherwise, an empty string if key is missing or an error occurs.
+        /// </returns>
         public static async Task<string> GenerateJwtAsync(IDictionary<string, object> claims, TimeSpan validFor)
         {
-           string success = "JWT erfolgreich erstellt.";
-           string error = "PrivateKey nicht geladen – Token kann nicht erstellt werden.";
-    
+            string success = "JWT generated successfully.";
+            string noKey = "Private RSA key not loaded. Cannot generate token.";
+            string logError = "An error occurred while generating the JWT.";
 
-            if (_privateRsa == null)
+            if (_privateRsaKey == null)
             {
-                await xyLog.AsxExLog(new InvalidOperationException(error));
-                return "";
+                await xyLog.AsxLog(noKey);
+                return string.Empty;
             }
 
-            var credentials = new SigningCredentials(new RsaSecurityKey(_privateRsa), SecurityAlgorithms.RsaSha256);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Issuer = _issuer,
-                Audience = _audience,
-                Expires = DateTime.UtcNow.Add(validFor),
-                Claims = claims,
-                SigningCredentials = credentials
-            };
+                SigningCredentials credentials = new SigningCredentials(new RsaSecurityKey(_privateRsaKey), SecurityAlgorithms.RsaSha256);
 
-            JwtSecurityTokenHandler tokenHandler = new ();
-            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-            string jwt = tokenHandler.WriteToken(token);
+                SecurityTokenDescriptor tokenDescriptor = new()
+                {
+                    Issuer = _issuer,
+                    Audience = _audience,
+                    Expires = DateTime.UtcNow.Add(validFor),
+                    Claims = claims,
+                    SigningCredentials = credentials
+                };
 
-            await xyLog.AsxLog(success);
-            return jwt;
+                JwtSecurityTokenHandler tokenHandler = new();
+                SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+                string jwt = tokenHandler.WriteToken(token);
+
+                await xyLog.AsxLog(success);
+                return jwt;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(logError);
+                return string.Empty;
+            }
         }
 
+
         /// <summary>
-        /// Validiert ein übergebenes JWT. Gibt null zurück, wenn ungültig.
+        /// Validates a JWT using the configured RSA public key and returns the extracted ClaimsPrincipal if valid.
         /// </summary>
+        /// <param name="token">The JWT string to be validated.</param>
+        /// <param name="validateLifetime">Optional flag to enforce expiration check (default: true).</param>
+        /// <returns>
+        /// The authenticated <see cref="ClaimsPrincipal"/> if the token is valid; otherwise, <c>null</c>.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">Thrown if the public key has not been loaded.</exception>
         public static async Task<ClaimsPrincipal?> ValidateJwtAsync(string token, bool validateLifetime = true)
         {
-            const string logErrorInit = "PublicKey nicht geladen – Tokenvalidierung nicht möglich.";
-            const string logSuccess = "JWT erfolgreich validiert.";
-            const string logFailure = "Fehler bei der JWT-Validierung.";
-            const string invalidPublicKey = "PublicKey nicht geladen.";
+            string initError = "Public RSA key is not loaded. Token validation cannot proceed.";
+            string success = "JWT successfully validated.";
+            string fail = "JWT validation failed.";
 
-            if (_publicRsa == null)
+            if (_publicRsaKey == null)
             {
-                await xyLog.AsxLog(logErrorInit);
-                throw new InvalidOperationException(invalidPublicKey);
+                await xyLog.AsxLog(initError);
+                return null;
             }
 
             JwtSecurityTokenHandler tokenHandler = new ();
-            TokenValidationParameters validationParameters = new() 
+            TokenValidationParameters validationParameters = new ()
             {
                 ValidateIssuer = true,
                 ValidIssuer = _issuer,
                 ValidateAudience = true,
                 ValidAudience = _audience,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new RsaSecurityKey(_publicRsa),
+                IssuerSigningKey = new RsaSecurityKey(_publicRsaKey),
                 ValidateLifetime = validateLifetime,
                 ClockSkew = TimeSpan.FromMinutes(2)
             };
 
             try
             {
-                ClaimsPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken? validatedToken);
-                await xyLog.AsxLog(logSuccess);
+                ClaimsPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+                await xyLog.AsxLog(success);
                 return principal;
             }
             catch (Exception ex)
             {
-                await xyLog.AsxLog(logFailure);
-                xyLog.ExLog(ex);
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(fail);
                 return null;
             }
         }
 
         /// <summary>
-        /// Gibt den öffentlichen Schlüssel im PEM-Format zurück.
+        /// Exports the configured public RSA key as a PEM-formatted string.
         /// </summary>
+        /// <returns>
+        /// A PEM string containing the public key, or an empty string if the key is not initialized.
+        /// </returns>
         public static async Task<string> GetPublicKeyAsPemAsync()
         {
-            const string logError = "PublicKey nicht geladen – kein PEM export möglich.";
-            const string logSuccess = "PublicKey PEM exportiert.";
-            const string pemBegin = "-----BEGIN PUBLIC KEY-----";
-            const string pemEnd = "-----END PUBLIC KEY-----";
+            string noKey = "Public key not loaded – unable to export.";
+            string success = "Public key exported as PEM.";
+            string pemStart = "-----BEGIN PUBLIC KEY-----";
+            string pemEnd = "-----END PUBLIC KEY-----";
+            
 
-            if (_publicRsa == null)
+            if (_publicRsaKey is null)
             {
-                await xyLog.AsxExLog(new Exception(logError));
-                return "";
+                await xyLog.AsxExLog(new Exception(noKey));
+                return string.Empty;
             }
-            else
+
+            try
             {
-                var builder = new StringBuilder();
-                builder.AppendLine(pemBegin);
-                builder.AppendLine(Convert.ToBase64String(_publicRsa.ExportSubjectPublicKeyInfo(), Base64FormattingOptions.InsertLineBreaks));
-                builder.AppendLine(pemEnd);
-                
-                await xyLog.AsxLog(logSuccess);
+                byte[] keyBytes = _publicRsaKey.ExportSubjectPublicKeyInfo();
+                string base64 = Convert.ToBase64String(keyBytes, Base64FormattingOptions.InsertLineBreaks);
+
+                StringBuilder builder = new();
+                builder.AppendLine(pemStart).AppendLine(base64).AppendLine(pemEnd);
+
+                await xyLog.AsxLog(success);
                 return builder.ToString();
             }
-
-
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return string.Empty;
+            }
         }
+
 
     }
 }

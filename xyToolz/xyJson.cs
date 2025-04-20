@@ -51,7 +51,7 @@ namespace xyToolz
         #region Json Configuration
 
         /// <summary>
-        /// Preconfigured JSON serialization settings for consistent formatting and behavior.
+        /// JSON serialization settings for consistent formatting and behavior.
         /// Used as default across all JSON-related methods in this class.
         /// </summary>
         internal static readonly JsonSerializerOptions defaultJsonOptions = new()
@@ -85,7 +85,6 @@ namespace xyToolz
         /// <returns></returns>
         public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions? options = null)
         {
-            string successMessage = $"Successfully saved JSON data to '{fileName}'.";
             string errorMessage = $"Failed to serialize data to JSON file: '{fileName}'.";
 
             try
@@ -93,8 +92,7 @@ namespace xyToolz
                 if ( await xyFiles.EnsurePathExistsAsync(fileName))
                 {
                     string jsonData = JsonSerializer.Serialize(data, options ?? defaultJsonOptions);
-                    await File.WriteAllTextAsync(fileName, jsonData);
-                    await xyLog.AsxLog(successMessage);
+                    await File.WriteAllTextAsync(fileName, jsonData);                  
                     return true;
                 }
             }
@@ -114,22 +112,10 @@ namespace xyToolz
             string successMessage = $"Successfully serialized {updatedDictionary.Count} entries to file: '{filePath}'.";
             string errorMessage = $"Failed to serialize dictionary to file: '{filePath}'.";
 
-            try
-            {
-                bool saveSuccess = await SaveDataToJsonAsync(updatedDictionary, filePath);
-                if (saveSuccess)
-                {
-                    await xyLog.AsxLog(successMessage);
-                    return true;
-                }
-                await xyLog.AsxLog(errorMessage);
-            }
-            catch (Exception ex)
-            {
-                await xyLog.AsxExLog(ex);
-                await xyLog.AsxLog(errorMessage);
-            }
-            return false;
+            bool isSaved = await SaveDataToJsonAsync(updatedDictionary, filePath);
+
+            await xyLog.AsxLog(isSaved ? successMessage : errorMessage);
+            return isSaved;
         }
 
         /// <summary>

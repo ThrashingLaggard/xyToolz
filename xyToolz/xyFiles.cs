@@ -301,35 +301,27 @@ namespace xyToolz
         /// </summary>
         public static async Task<IEnumerable<string>> ReadLinesAsync(string filePath)
         {
-            const string invalidPathMsg  = "The given file path is null or empty.";
-            const string notFoundMsg     = "File does not exist:";
-            const string errorReadMsg    = "Error reading file:";
-            const string successTemplate = "Read {0} lines from file:";
+            string noFile     = $"File does not exist:{filePath}";
+            string error    = $"Error reading file:{filePath}";
+            string success= $"Bytes have been read from {filePath}:";
+            string [] allLines ;
 
-            if (string.IsNullOrWhiteSpace(filePath))
+            if (!await EnsurePathExistsAsync(filePath))
             {
-                await xyLog.AsxLog(invalidPathMsg);
+                await xyLog.AsxLog($"{noFile} {filePath}");
                 return Enumerable.Empty<string>();
             }
 
-            bool exists = await EnsurePathExistsAsync(filePath);
-            if (!exists || !File.Exists(filePath))
-            {
-                await xyLog.AsxLog($"{notFoundMsg} {filePath}");
-                return Enumerable.Empty<string>();
-            }
-
-            string[] allLines;
             try
             {
                 allLines = await File.ReadAllLinesAsync(filePath);
-                await xyLog.AsxLog(string.Format(successTemplate, allLines.Length) + $" {filePath}");
+                await xyLog.AsxLog(string.Format(success, allLines.Length) + $" {filePath}");
                 return allLines;
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
-                await xyLog.AsxLog($"{errorReadMsg} {filePath}");
+                await xyLog.AsxLog($"{error} {filePath}");
                 return Enumerable.Empty<string>();
             }
         }
@@ -338,24 +330,24 @@ namespace xyToolz
         /// Asynchronously reads the entire file into a MemoryStream.
         /// Returns an empty stream on error or if the file doesn’t exist.
         /// </summary>
-        public static async Task<Stream> GetStreamFromFileAsync(string filePath)
+        public static async Task<Stream?> GetStreamFromFileAsync(string filePath)
         {
             const string invalidPathMsg  = "The given file path is null or empty.";
-            const string notFoundMsg     = "File does not exist:";
-            const string errorReadMsg    = "Error reading file into stream:";
-            const string successTemplate = "Loaded file into stream ({0} bytes) from:";
+            string notFoundMsg     = "File does not exist:";
+            string errorReadMsg    = "Error reading file into stream:";
+            string success= $"Loaded file into stream from {filePath}:";
 
             if (string.IsNullOrWhiteSpace(filePath))
             {
                 await xyLog.AsxLog(invalidPathMsg);
-                return new MemoryStream();
+                return null;
             }
 
             bool exists = await EnsurePathExistsAsync(filePath);
             if (!exists || !File.Exists(filePath))
             {
                 await xyLog.AsxLog($"{notFoundMsg} {filePath}");
-                return new MemoryStream();
+                return null; ;
             }
 
             byte[] buffer;
@@ -365,14 +357,14 @@ namespace xyToolz
                 buffer = await File.ReadAllBytesAsync(filePath);
                 memoryStream = new MemoryStream(buffer) { Position = 0 };
 
-                await xyLog.AsxLog(string.Format(successTemplate, buffer.Length) + $" {filePath}");
+                await xyLog.AsxLog($"{ buffer.Length} bytes");
                 return memoryStream;
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
                 await xyLog.AsxLog($"{errorReadMsg} {filePath}");
-                return new MemoryStream();
+                return null;
             }
         }
 
@@ -380,12 +372,35 @@ namespace xyToolz
         /// Asynchronously saves the given content to a file in the specified subfolder.
         /// Ensures the directory exists, writes the content, and logs success or failure.
         /// </summary>
-        public static async Task<bool> SaveToFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
+        public static async Task<bool> SaveToFile(string content, string filePath = "config.json")
         {
-            const string invalidContentMsg = "Content is null or empty.";
-            const string invalidPathMsg    = "Subfolder or filename is null or empty.";
-            const string saveSuccessMsg    = "Successfully saved file to:";
-            const string saveErrorMsg      = "Error saving file:";
+   
+            string saveSuccessMsg = "Successfully saved file to:";
+            string saveErrorMsg = "Error saving file:";
+
+            try
+            {
+                await File.WriteAllTextAsync(filePath, content);
+                await xyLog.AsxLog(saveSuccessMsg + $" {filePath}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog($"{saveErrorMsg} {filePath}");
+                return false;
+            }
+        }
+        public static async Task<bool> SaveBytesToFileAsync(byte[] data, string filePath = "config.json")
+        {
+                string content = xy.BytesToString(data);
+                return await SaveToFile(content, filePath);
+        }
+        public static async Task<bool> SaveStringToFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
+        {
+            string invalidContentMsg = "Content is null or empty.";
+            string invalidPathMsg    = "Subfolder or filename is null or empty.";
+       
 
             if (string.IsNullOrEmpty(content))
             {
@@ -401,19 +416,11 @@ namespace xyToolz
             string directoryPath = EnsureDirectory(subfolder);
             string filePath      = xyPathHelper.Combine(directoryPath, fileName);
 
-            try
-            {
-                await File.WriteAllTextAsync(filePath, content);
-                await xyLog.AsxLog(saveSuccessMsg + $" {filePath}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                await xyLog.AsxExLog(ex);
-                await xyLog.AsxLog($"{saveErrorMsg} {filePath}");
-                return false;
-            }
+            return await SaveToFile(content, filePath);
         }
+
+  
+
 
         /// <summary>
         /// Asynchronously loads the content of a file as a string.
@@ -421,37 +428,77 @@ namespace xyToolz
         /// </summary>
         public static async Task<string?> LoadFileAsync(string subfolder = "AppData", string fileName = "config.json")
         {
-            const string invalidPathMsg = "Subfolder or filename is null or empty.";
-            const string notFoundMsg    = "File does not exist:";
-            const string readErrorMsg   = "Error reading file:";
-
-            if (string.IsNullOrWhiteSpace(subfolder) || string.IsNullOrWhiteSpace(fileName))
-            {
-                await xyLog.AsxLog(invalidPathMsg);
-                return null;
-            }
-
             string directoryPath = EnsureDirectory(subfolder);
             string filePath      = xyPathHelper.Combine(directoryPath, fileName);
+            return await LoadFileAsync(filePath);
+        }
+        /// <summary>
+        /// Asynchronously loads the content of a file as a string.
+        /// Returns null if the file doesn’t exist or an error occurs.
+        /// </summary>
+        public static async Task<string?> LoadFileAsync(string fileName = "config.json")
+        {
+            string noFile = "File does not exist:";
 
-            if (!File.Exists(filePath))
+            if (!File.Exists(fileName))
             {
-                await xyLog.AsxLog($"{notFoundMsg} {filePath}");
+                await xyLog.AsxLog($"{noFile} {fileName}");
                 return null;
             }
+            else
+            {
+                try
+                {
+                    string content = await File.ReadAllTextAsync(fileName);
+                    await xyLog.AsxLog("Successfully loaded content from: " + fileName);
+                    return content;
+                }
+                catch (Exception ex)
+                {
+                    await xyLog.AsxExLog(ex);
+                    return null;
+                }
+            }
+        }
 
+
+        public static async Task<byte[]?> LoadBytesFromFile(string fullPath)
+        {
+            string noBytes = "No bytes to read";
             try
             {
-                string content = await File.ReadAllTextAsync(filePath);
-                await xyLog.AsxLog("Loaded content from: " + filePath);
-                return content;
+                if (File.Exists(fullPath))
+                {
+                    if(await File.ReadAllBytesAsync(fullPath) is   byte[] bytes)
+                    {
+                        return bytes;
+                    }
+                    await xyLog.AsxLog(noBytes);
+                    return null;
+                }
+                await xyLog.AsxLog($"File not found: {fullPath}");
+                return null;
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
-                await xyLog.AsxLog($"{readErrorMsg} {filePath}");
                 return null;
             }
+        }
+        public static async Task<byte[]?> LoadBytes(string fullPath)
+        {
+            string noBytes = "No bytes to read";
+            byte[] bytes = [];
+
+            if (await LoadFileAsync(fullPath) is    string content)
+            {
+                bytes = xy.StringToBytes(content);
+                if (bytes.Length == 0)
+                {
+                    await xyLog.AsxLog(noBytes);
+                }
+            }            
+            return bytes;
         }
 
         /// <summary>

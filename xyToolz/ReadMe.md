@@ -41,3 +41,42 @@ string saltedHash = xyHashHelper.BuildSaltedHash(HashAlgorithmName.SHA256, passw
 
 // Passwort prüfen
 bool isCorrect = xyHashHelper.VerifyPassword(HashAlgorithmName.SHA256, password, saltedHash);
+
+
+
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# xyRsa
+
+`xyRsa` is a reusable, fully static utility class designed for secure handling of **JWT (JSON Web Tokens)** using **RSA encryption** in .NET-based Web APIs or desktop applications.  
+It enables easy generation, validation, and management of JWTs with **public/private key cryptography**, aligned with modern security practices.
+
+---
+
+## 🔐 Features
+
+- ✅ **JWT Creation** using `RS256` and `SecurityTokenDescriptor`
+- ✅ **JWT Validation** with configurable lifetime and signature checks
+- 🔑 **Public/Private Key Loading** from PEM-formatted strings
+- 📦 **Export Public Key** as PEM
+- 🏷️ **Issuer & Audience configuration**
+- 📜 Full logging of success, failure, and exceptions via `xyLog`
+
+---
+
+## 🧪 Example Usage
+
+```csharp
+await xyRsa.LoadKeysAsync(publicPem, privatePem);
+await xyRsa.ConfigureAsync("MyApiIssuer", "MyAudience");
+
+var token = await xyRsa.GenerateJwtAsync(new Dictionary<string, object>
+{
+    { "sub", "user123" },
+    { "role", "admin" }
+}, TimeSpan.FromHours(1));
+
+var principal = await xyRsa.ValidateJwtAsync(token);
+string pem = await xyRsa.GetPublicKeyAsPemAsync();
