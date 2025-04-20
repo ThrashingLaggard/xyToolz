@@ -2,6 +2,8 @@
 using System.Text;
 using System.Text.Json;
 using xyToolz.Helper;
+using xyToolz.Helper.Interfaces;
+using static xyToolz.xyDataProtector;
 
 namespace xyToolz
 {
@@ -25,6 +27,42 @@ namespace xyToolz
     /// </summary>
     public static class xyDataProtector
     {
+
+            private static IxyDataProtector? _override;
+      
+        /// <summary>
+        /// Replaces the default implementation with a mocked version .
+        /// </summary>
+        public static void OverrideForTests(IxyDataProtector testDouble)
+            => _override = testDouble;
+
+        /// <summary>
+        /// Resets to original implementation after testing.
+        /// </summary>
+        public static void ResetOverride()
+            => _override = null;
+
+        
+        public static async Task<T?> UnprotectFromFileAsync<T>(string path, string key)
+        {
+            if (_override is not null)
+            {
+               return await  _override?.UnprotectFromFileAsync<T>(path, key);
+            }
+            else
+            {
+                if (await xyJson.DeserializeKeyToBytes(path, key) is byte[] encrypted)
+                {
+                    return await UnprotectAsync<T>(encrypted);
+                }
+            }
+            return default;
+
+        }
+
+
+
+
         /// <summary>
         /// Protects an object by serializing and encrypting it with DPAPI.
         /// </summary>
@@ -175,15 +213,8 @@ namespace xyToolz
             return false;
         }
 
-        public static async Task<T?> UnprotectFromFileAsync<T>(string filePath, string key)
-        {
-            if(await xyJson.DeserializeKeyToBytes(filePath, key) is byte[] encrypted) 
-            {
-                return await UnprotectAsync<T>(encrypted);            
-            }
-            return default; 
-        }
+
+
+        
     }
-
-
 }

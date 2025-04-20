@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using xyToolz.Helper;
+using xyToolz.Helper.Interfaces;
 
 #if ANDROID
 using Android.Content;
@@ -135,13 +136,13 @@ namespace xyToolz
         /// <returns>The resolved and platform-correct directory path.</returns>
         private static string EnsureDirectory(string dir)
         {
-    #if ANDROID
+#if ANDROID
             string path = Path.Combine(Android.App.Application.Context.FilesDir(null)!.AbsolutePath, dir);
             if (string.IsNullOrEmpty(path))
                 path = Path.Combine(Android.App.Application.Context.GetExternalFilesDir(null)!.AbsolutePath, dir);
-    #else
+#else
             string path = xyPathHelper.EnsureDirectory(dir);
-    #endif
+#endif
             return path;
         }
 
@@ -340,10 +341,10 @@ namespace xyToolz
         {
             string newPath;
             string errorMissingInput = "The provided file path or new file name is null or empty.";
-            string errorInvalidName  = "The new file name contains invalid characters or is a directory path.";
+            string errorInvalidName = "The new file name contains invalid characters or is a directory path.";
             string errorFileNotFound = "The original file does not exist.";
             string errorTargetExists = "A file with the target name already exists.";
-            string successTemplate   = "File renamed successfully from '{0}' to '{1}'.";
+            string successTemplate = "File renamed successfully from '{0}' to '{1}'.";
 
             if (string.IsNullOrWhiteSpace(completePath) || string.IsNullOrWhiteSpace(newName))
             {
@@ -351,7 +352,7 @@ namespace xyToolz
                 return false;
             }
 
-            if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||newName.Contains(Path.DirectorySeparatorChar))
+            if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || newName.Contains(Path.DirectorySeparatorChar))
             {
                 await xyLog.AsxLog(errorInvalidName);
                 return false;
@@ -427,10 +428,10 @@ namespace xyToolz
         /// <returns>A collection of lines as strings, or an empty collection if failed.</returns>
         public static async Task<IEnumerable<string>> ReadLinesAsync(string filePath)
         {
-            string noFile     = $"File does not exist:{filePath}";
-            string error    = $"Error reading file:{filePath}";
-            string success= $"Bytes have been read from {filePath}:";
-            string [] allLines ;
+            string noFile = $"File does not exist:{filePath}";
+            string error = $"Error reading file:{filePath}";
+            string success = $"Bytes have been read from {filePath}:";
+            string[] allLines;
 
             if (!await EnsurePathExistsAsync(filePath))
             {
@@ -487,10 +488,10 @@ namespace xyToolz
         /// <returns>A <see cref="Stream"/> containing the file content, or null on failure.</returns>
         public static async Task<Stream?> GetStreamFromFileAsync(string filePath)
         {
-            const string invalidPathMsg  = "The given file path is null or empty.";
-            string notFoundMsg     = "File does not exist:";
-            string errorReadMsg    = "Error reading file into stream:";
-            string success= $"Loaded file into stream from {filePath}:";
+            const string invalidPathMsg = "The given file path is null or empty.";
+            string notFoundMsg = "File does not exist:";
+            string errorReadMsg = "Error reading file into stream:";
+            string success = $"Loaded file into stream from {filePath}:";
 
             if (string.IsNullOrWhiteSpace(filePath))
             {
@@ -512,7 +513,7 @@ namespace xyToolz
                 buffer = await File.ReadAllBytesAsync(filePath);
                 memoryStream = new MemoryStream(buffer) { Position = 0 };
 
-                await xyLog.AsxLog($"{ buffer.Length} bytes");
+                await xyLog.AsxLog($"{buffer.Length} bytes");
                 return memoryStream;
             }
             catch (Exception ex)
@@ -554,7 +555,7 @@ namespace xyToolz
         /// <returns>True if the content was successfully saved; otherwise, false.</returns>
         public static async Task<bool> SaveToFile(string content, string filePath = "config.json")
         {
-   
+
             string saveSuccessMsg = "Successfully saved file to:";
             string saveErrorMsg = "Error saving file:";
 
@@ -602,8 +603,8 @@ namespace xyToolz
         /// <returns>True if the content was successfully saved; otherwise, false.</returns>
         public static async Task<bool> SaveBytesToFileAsync(byte[] data, string filePath = "config.json")
         {
-                string content = xy.BytesToString(data);
-                return await SaveToFile(content, filePath);
+            string content = xy.BytesToString(data);
+            return await SaveToFile(content, filePath);
         }
         /// <summary>
         /// Saves a string to a file within a specified subfolder asynchronously.
@@ -640,8 +641,8 @@ namespace xyToolz
         public static async Task<bool> SaveStringToFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
         {
             string invalidContentMsg = "Content is null or empty.";
-            string invalidPathMsg    = "Subfolder or filename is null or empty.";
-       
+            string invalidPathMsg = "Subfolder or filename is null or empty.";
+
 
             if (string.IsNullOrEmpty(content))
             {
@@ -655,7 +656,7 @@ namespace xyToolz
             }
 
             string directoryPath = EnsureDirectory(subfolder);
-            string filePath      = xyPathHelper.Combine(directoryPath, fileName);
+            string filePath = xyPathHelper.Combine(directoryPath, fileName);
 
             return await SaveToFile(content, filePath);
         }
@@ -668,7 +669,7 @@ namespace xyToolz
         /// <remarks>
         /// <para><b>Behavior:</b></para>
         /// Resolves the full path from <paramref name="subfolder"/> and <paramref name="fileName"/> using <see cref="EnsureDirectory"/> and <c>xyPathHelper.Combine</c>,
-        /// and delegates the actual read operation to <see cref="LoadFileAsync(string)"/>.
+        /// and delegates the actual read operation to <see cref="TestLoadFileAsync(string)"/>.
         ///
         /// <para><b>Thread Safety:</b></para>
         /// Thread-safe due to async and stateless file access.
@@ -682,7 +683,7 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="LoadFileAsync(string)"/>
+        /// <see cref="TestLoadFileAsync(string)"/>
         /// </remarks>
         /// <param name="subfolder">The folder that contains the file.</param>
         /// <param name="fileName">The name of the file to load.</param>
@@ -690,7 +691,7 @@ namespace xyToolz
         public static async Task<string?> LoadFileAsync(string subfolder = "AppData", string fileName = "config.json")
         {
             string directoryPath = EnsureDirectory(subfolder);
-            string filePath      = xyPathHelper.Combine(directoryPath, fileName);
+            string filePath = xyPathHelper.Combine(directoryPath, fileName);
             return await LoadFileAsync(filePath);
         }
         /// <summary>
@@ -781,7 +782,7 @@ namespace xyToolz
             {
                 if (File.Exists(fullPath))
                 {
-                    if(await File.ReadAllBytesAsync(fullPath) is   byte[] bytes)
+                    if (await File.ReadAllBytesAsync(fullPath) is byte[] bytes)
                     {
                         return bytes;
                     }
@@ -817,7 +818,7 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="xy.StringToBytes(string)"/>, <see cref="LoadFileAsync(string)"/>
+        /// <see cref="xy.StringToBytes(string)"/>, <see cref="TestLoadFileAsync(string)"/>
         /// </remarks>
         /// <param name="fullPath">The full path of the file to load.</param>
         /// <returns>A byte array derived from the file content, or an empty array.</returns>
@@ -826,14 +827,14 @@ namespace xyToolz
             string noBytes = "No bytes to read";
             byte[] bytes = [];
 
-            if (await LoadFileAsync(fullPath) is    string content)
+            if (await LoadFileAsync(fullPath) is string content)
             {
                 bytes = xy.StringToBytes(content);
                 if (bytes.Length == 0)
                 {
                     await xyLog.AsxLog(noBytes);
                 }
-            }            
+            }
             return bytes;
         }
 
@@ -870,10 +871,10 @@ namespace xyToolz
         /// <returns>True if the file was deleted successfully; otherwise, false.</returns>
         public static bool DeleteFile(string subfolder = "AppData", string fileName = "config.json")
         {
-            const string invalidPathMsg    = "Subfolder or filename is null or empty.";
-            const string notFoundMsg       = "File to delete does not exist:";
-            const string deleteSuccessMsg  = "File deleted successfully:";
-            const string deleteErrorMsg    = "Error deleting file:";
+            const string invalidPathMsg = "Subfolder or filename is null or empty.";
+            const string notFoundMsg = "File to delete does not exist:";
+            const string deleteSuccessMsg = "File deleted successfully:";
+            const string deleteErrorMsg = "Error deleting file:";
 
             if (string.IsNullOrWhiteSpace(subfolder) || string.IsNullOrWhiteSpace(fileName))
             {
@@ -882,7 +883,7 @@ namespace xyToolz
             }
 
             string directoryPath = EnsureDirectory(subfolder);
-            string filePath      = xyPathHelper.Combine(directoryPath, fileName);
+            string filePath = xyPathHelper.Combine(directoryPath, fileName);
 
             if (!File.Exists(filePath))
             {
@@ -905,5 +906,16 @@ namespace xyToolz
         }
 
         #endregion
+
+        #region Tests
+        private static IxyFiles? _override;
+        public static void OverrideForTests(IxyFiles mocked) => _override = mocked;
+        public static void ResetOverride() => _override = null;
+
+        public static Task<string?> TestLoadFileAsync(string subfolder = "AppData", string fileName = "config.json")   =>  _override?.LoadFileAsync(subfolder, fileName)?? LoadFileAsync(subfolder, fileName);
+
+        public static Task<string?> TestLoadFileAsync(string fullPath)   =>  _override?.LoadFileAsync(fullPath) ?? LoadFileAsync(fullPath);
+        #endregion
+
     }
 }

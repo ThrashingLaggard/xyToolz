@@ -1,10 +1,7 @@
-﻿using System.Drawing.Imaging;
-using System.Text;
+﻿using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-using Newtonsoft.Json.Linq;
+using xyToolz.Helper.Interfaces;
 
 namespace xyToolz
 {
@@ -123,18 +120,23 @@ namespace xyToolz
         /// If the key exists, its value is updated; otherwise, a new entry is added.
         /// </summary>
         /// <typeparam name="T">The type of the value to store.</typeparam>
-        /// <param name="filePath">The path to the JSON file.</param>
+        /// <param name="path">The path to the JSON file.</param>
         /// <param name="key">The key to add or update.</param>
         /// <param name="value">The value to assign to the key.</param>
-        public static async Task AddOrUpdateEntry<T>(string filePath, string key, T value)
+        public static async Task AddOrUpdateEntry<T>(string path, string key, T value)
         {
-            string updateMessage = $"Updated key '{key}' in '{filePath}'.";
-            string addMessage = $"Added key '{key}' to '{filePath}'.";
-            string errorMessage = $"Failed to update key '{key}' in file '{filePath}'.";
+            string updateMessage = $"Updated key '{key}' in '{path}'.";
+            string addMessage = $"Added key '{key}' to '{path}'.";
+            string errorMessage = $"Failed to update key '{key}' in file '{path}'.";
 
+            if(_override is not null)
+            {
+                 await _override?.AddOrUpdateEntry(path, key, value as string);
+                return;
+            }
             try
             {
-                Dictionary<string, object> data = await DeserializeFromFile(filePath) ?? new();
+                Dictionary<string, object> data = await DeserializeFromFile(path) ?? new();
 
                 if (data.ContainsKey(key))
                 {
@@ -147,7 +149,7 @@ namespace xyToolz
                     await xyLog.AsxLog(addMessage);
                 }
 
-                await SerializeDictionary(filePath, data);
+                await SerializeDictionary(path, data);
             }
             catch (Exception ex)
             {
@@ -479,5 +481,20 @@ namespace xyToolz
                 return (string.Empty, string.Empty, string.Empty);
             }
         }
+
+
+        private static IxyJson? _override;
+
+        public static void OverrideForTests(IxyJson mocked) => _override = mocked;
+        public static void ResetOverride() => _override = null;
+
+
+        public static Task<string?> TestGetStringFromJsonFile(string path, string key) =>
+            _override?.GetStringFromJsonFile(path, key) ?? GetStringFromJsonFile(path, key);
+
+        public static Task TestAddOrUpdateEntry(string path, string key, string value) =>
+            _override?.AddOrUpdateEntry(path, key, value) ?? AddOrUpdateEntry(path, key, value);
+
     }
 }
+
