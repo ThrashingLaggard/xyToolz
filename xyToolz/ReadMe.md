@@ -1,4 +1,4 @@
-﻿# xyHashHelper.cs
+﻿#### xyHashHelper.cs
 
 Der `xyHashHelper` bietet robuste und sichere Methoden zum Hashen, Vergleichen und Abspeichern von Passwörtern, Salts und kryptografischen Schlüsseln.
 
@@ -33,8 +33,7 @@ Der `xyHashHelper` bietet robuste und sichere Methoden zum Hashen, Vergleichen u
 | `TryVerifyPassword()` *(neu)*   | Sicherer Passwort-Vergleich mit `out bool`   |
 
 ## 🧪 Beispiel
-
-```csharp
+``csharp
 // Hash erstellen
 string password = "MeinSicheresPasswort123!";
 string saltedHash = xyHashHelper.BuildSaltedHash(HashAlgorithmName.SHA256, password, out byte[] salt);
@@ -48,7 +47,8 @@ bool isCorrect = xyHashHelper.VerifyPassword(HashAlgorithmName.SHA256, password,
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# xyRsa
+
+#### xyRsa
 
 `xyRsa` is a reusable, fully static utility class designed for secure handling of **JWT (JSON Web Tokens)** using **RSA encryption** in .NET-based Web APIs or desktop applications.  
 It enables easy generation, validation, and management of JWTs with **public/private key cryptography**, aligned with modern security practices.
@@ -68,7 +68,7 @@ It enables easy generation, validation, and management of JWTs with **public/pri
 
 ## 🧪 Example Usage
 
-```csharp
+``csharp
 await xyRsa.LoadKeysAsync(publicPem, privatePem);
 await xyRsa.ConfigureAsync("MyApiIssuer", "MyAudience");
 
@@ -80,3 +80,26 @@ var token = await xyRsa.GenerateJwtAsync(new Dictionary<string, object>
 
 var principal = await xyRsa.ValidateJwtAsync(token);
 string pem = await xyRsa.GetPublicKeyAsPemAsync();
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Class: xyFiles
+
+### Purpose
+Provides a cross-platform, static utility class for file and directory operations such as reading, writing, renaming, and deleting.
+
+### Features
+- Directory management: EnsureDirectory, CheckForDirectories
+- File metadata & inspection: Inventory, InventoryNames
+- File I/O: ReadLinesAsync, SaveToFile, LoadFileAsync
+- File manipulation: RenameFileAsync, DeleteFile
+- Binary support: SaveBytesToFileAsync, LoadBytesFromFile
+
+### Thread Safety
+All methods are static and stateless, ensuring thread safety by design.
+
+### Platform Compatibility
+Special handling for Android via conditional compilation (`#if ANDROID`).
+
+### Example
+``csharp
+var lines = await xyFiles.ReadLinesAsync("settings.txt");
