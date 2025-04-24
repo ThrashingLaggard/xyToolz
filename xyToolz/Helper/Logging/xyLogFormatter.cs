@@ -136,7 +136,7 @@ namespace xyToolz.Helper.Logging
         public static string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)
         {
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            string logLevel = level?.ToString() ?? "Information";
+            string logLevel = level?.ToString() ?? "Debug";
             string caller = string.IsNullOrEmpty(callerName) ? "UnknownCaller" : callerName;
             return $"[{timestamp}] [{logLevel}] [{caller}] {message}";
         }
