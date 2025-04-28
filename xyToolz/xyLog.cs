@@ -12,37 +12,97 @@ using xyToolz.Helper.Logging;
 
 namespace xyToolz
 {
+
+    /// <summary>
+    /// Provides centralized logging functionality for the application.
+    /// Supports both synchronous and asynchronous logging for messages and exceptions.
+    /// Formats output with metadata such as timestamps, caller name, and log level.
+    ///
+    /// <para><b>Available Features:</b></para>
+    /// <list type="bullet">
+    /// <item><description>Synchronous logging of messages and exceptions</description></item>
+    /// <item><description>Asynchronous logging variants</description></item>
+    /// <item><description>Event-based log handling</description></item>
+    /// <item><description>Formatted exception output (text + JSON)</description></item>
+    /// <item><description>Caller name tracking via CallerMemberName</description></item>
+    /// </list>
+    ///
+    /// <para><b>Thread Safety:</b></para>
+    /// <para>Thread-safe log file access using locking mechanism</para>
+    ///
+    /// <para><b>Limitations:</b></para>
+    /// <para>No filtering, buffering, or custom log routing implemented</para>
+    ///
+    /// <para><b>Performance:</b></para>
+    /// <para>Suitable for low-to-medium frequency logging, may block on sync operations</para>
+    ///
+    /// <para><b>Configuration:</b></para>
+    /// <para>Log file paths and sizes are hardcoded</para>
+    ///
+    /// <para><b>Method Overview:</b></para>
+    /// <list type="table">
+    /// <item><term>Log</term><description>Log plain message synchronously</description></item>
+    /// <item><term>AsxLog</term><description>Log plain message asynchronously</description></item>
+    /// <item><term>ExLog</term><description>Log exception details synchronously</description></item>
+    /// <item><term>AsxExLog</term><description>Log exception details asynchronously</description></item>
+    /// <item><term>JsonExLog</term><description>Log exception as formatted JSON (sync)</description></item>
+    /// <item><term>JsonAsxExLog</term><description>Log exception as formatted JSON (async)</description></item>
+    /// </list>
+    ///
+    /// <para><b>Example Usage:</b></para>
+    /// <code>
+    /// try
+    /// {
+    ///     throw new InvalidOperationException("Test error");
+    /// }
+    /// catch (Exception ex)
+    /// {
+    ///     xyLog.ExLog(ex);
+    /// }
+    /// </code>
+    /// </summary>
     public static class xyLog
     {
         /// <summary>
-        /// Event für die DebugingConsole
+        /// Event triggered when a standard log message is sent.
         /// </summary>
-        public static event Action<string,string>? LogMessageSent;
+        public static event Action<string, string>? LogMessageSent;
 
-        public static event Action<string,string>? ExLogMessageSent;
+        /// <summary>
+        /// Event triggered when an exception log message is sent.
+        /// </summary>
+        public static event Action<string, string>? ExLogMessageSent;
 
+        /// <summary>
+        /// Helper method to manually trigger the LogMessageSent event.
+        /// </summary>
         public static void OnMessageSent(string message)
         {
             LogMessageSent?.Invoke(message, "msg sent via evt");
         }
 
+        /// <summary>
+        /// Helper method to manually trigger the ExLogMessageSent event.
+        /// </summary>
         public static void OnExMessageSent(string message)
         {
             ExLogMessageSent?.Invoke(message, "exmsg sent via evt");
         }
 
-
-        private static readonly string _logFilePath = "logs/app.log"; // Standard logs
-        private static readonly string _exLogFilePath = "logs/exceptions.log"; // Exceptional logs
-        private static readonly long _maxLogFileSize = 10485760; // 10 MB lol
+        // Default configuration and internal state
+        private static readonly string _logFilePath = "logs/app.log";
+        private static readonly string _exLogFilePath = "logs/exceptions.log";
+        private static readonly long _maxLogFileSize = 10485760;
         private static readonly Object _threadSafetyLock = new object();
         private static xyLogArchiver _archiver = new(_maxLogFileSize);
         private static Boolean IsLoggingToSystemConsole = true;
-        private static IEnumerable<xyLogTargets> _eTargets = new List<xyLogTargets>();      // 0 - System     |||   1 - OwnDebug
+        private static IEnumerable<xyLogTargets> _eTargets = new List<xyLogTargets>();
 
-
-
-
+        /// <summary>
+        /// Converts raw integer targets into the xyLogTargets enum.
+        /// </summary>
+        /// <param name="logTargets">List of target identifiers as UInt16</param>
+        /// <returns>Enumerable of xyLogTargets</returns>
         internal static IEnumerable<xyLogTargets> SetLogTargets(UInt16[] logTargets)
         {
             if (logTargets.Length < 1) return new xyLogTargets[] { 0 };
@@ -55,85 +115,83 @@ namespace xyToolz
             return targets;
         }
 
-
-
         #region Logging
+
         /// <summary>
-        /// Writes a log-Message into console and returns the message as string
+        /// Centralized method for printing log messages to console and firing events.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="callerName"></param>
+        /// <param name="formattedMessage">Already formatted log string</param>
+        /// <param name="callerName">Optional caller name</param>
+        private static void Output(string formattedMessage, string? callerName)
+        {
+            Console.WriteLine(formattedMessage);
+            Console.Out.Flush();
+            LogMessageSent?.Invoke(formattedMessage, callerName);
+        }
+
+        /// <summary>
+        /// Logs a simple text message synchronously.
+        /// </summary>
         public static string Log(string message, [CallerMemberName] string? callerName = null)
         {
             string formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
-            Console.WriteLine(formattedMsg);
-            Console.Out.Flush();
-
-            LogMessageSent?.Invoke(formattedMsg, callerName);
+            Output(formattedMsg, callerName);
             return formattedMsg;
         }
 
         /// <summary>
-        /// Writes a log-Message into console  "async"   and returns the message as string
+        /// Logs a simple text message asynchronously.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="callerName"></param>
         public static async Task<string> AsxLog(string message, [CallerMemberName] string? callerName = null)
+        {
+            string formattedMsg = await Task.Run(() => FormatMsg(message, callerName, LogLevel.Debug));
+            if (formattedMsg.Length == 0)
             {
-                  string formattedMsg ="";
-                  await Task.Run(() =>
-                  {           
-                        formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
-                  });
-                  if(formattedMsg.Length == 0)
-                  {
-                        return "What in the fucking hell happened here?";
-                  }
-                  else
-                  {
-                        await Task.Run( () =>
-                        {
-                            Console.WriteLine(formattedMsg);
-                            Console.Out.Flush();
-
-                            LogMessageSent?.Invoke(formattedMsg, callerName);           // Fix???
-                        } );
-                  }
-                  return formattedMsg;
+                return "What in the fucking hell happened here?";
+            }
+            await Task.Run(() => Output(formattedMsg, callerName));
+            return formattedMsg;
         }
 
         /// <summary>
-        /// Writes details for the given exception to into console
+        /// Logs details of an exception synchronously.
         /// </summary>
-        /// <param name="ex"></param>
-        /// <param name="level"></param>
-        /// <param name="callerName"></param>
         public static void ExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
             string exMessage = FormatEx(ex, level, callerName);
-            Console.WriteLine(exMessage);
-            Console.Out.Flush();
-            LogMessageSent?.Invoke(exMessage, callerName);
+            Output(exMessage, callerName);
         }
 
-
         /// <summary>
-        /// Writes details for the given exception to into console
+        /// Logs details of an exception asynchronously.
         /// </summary>
-        /// <param name="ex"></param>
-        /// <param name="level"></param>
-        /// <param name="callerName"></param>
         public static async Task AsxExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
             await Task.Run(() =>
             {
                 string exMessage = FormatEx(ex, level, callerName);
-                Console.WriteLine(exMessage);
-                Console.Out.Flush();
-                LogMessageSent?.Invoke(exMessage, callerName);
+                Output(exMessage, callerName);
             });
         }
 
+        /// <summary>
+        /// Logs an exception as JSON formatted string (synchronous).
+        /// </summary>
+        public static void JsonExLog(Exception ex)
+        {
+            string json = xyLogFormatter.FormatExceptionAsJson(ex);
+            Console.WriteLine(json);
+        }
+
+        /// <summary>
+        /// Logs an exception as JSON formatted string (asynchronous).
+        /// </summary>
+        public static async Task JsonAsxExLog(Exception ex)
+        {
+            string json = xyLogFormatter.FormatExceptionAsJson(ex);
+            await Console.Out.WriteLineAsync(json);
+        }
+        #endregion
         /// <summary>
         /// Synchronous: Writes a log message into file and console
         /// </summary>
@@ -188,7 +246,7 @@ namespace xyToolz
                 return false;
             }
         }
-        #endregion
+        
 
         #region Service
 

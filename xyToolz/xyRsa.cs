@@ -1,173 +1,243 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace xyToolz
 {
+
+
     /// <summary>
-    /// Useless class for now, needs to be filled with valid rsa methods
+    /// Utility class for handling JWT creation and validation using RSA public/private key encryption.
+    ///
+    /// <para><b>Available Features:</b></para>
+    /// <list type="bullet">
+    ///   <item><description>Asymmetric key loading from PEM (public/private).</description></item>
+    ///   <item><description>JWT generation with arbitrary claims and expiration.</description></item>
+    ///   <item><description>Token validation with issuer, audience, signature and lifetime checks.</description></item>
+    ///   <item><description>Public key export in PEM format for client distribution.</description></item>
+    /// </list>
+    ///
+    /// <para><b>Thread Safety:</b></para>
+    /// Not thread-safe due to internal static RSA references. Must not be used concurrently across multiple threads.
+    ///
+    /// <para><b>Limitations:</b></para>
+    /// No support for rotating keys or refresh tokens out of the box.
+    ///
+    /// <para><b>Example Usage:</b></para>
+    /// <code>
+    /// await xyRsa.LoadKeysAsync(pubKey, privKey);
+    /// await xyRsa.ConfigureAsync("https://myapi", "myAudience");
+    /// string jwt = await xyRsa.GenerateJwtAsync(claims, TimeSpan.FromHours(1));
+    /// var user = await xyRsa.ValidateJwtAsync(jwt);
+    /// </code>
     /// </summary>
+
     public static class xyRsa
     {
+        private static RSA? _privateRsaKey;
+        private static RSA? _publicRsaKey;
+        private static string? _issuer;
+        private static string? _audience;
 
+        /// <summary>
+        /// Loads RSA public and private Keys from PEM-formatted strings and initializes internal key containers.
+        /// </summary>
+        /// <param name="publicKeyPem">PEM-formatted public key string.</param>
+        /// <param name="privateKeyPem">PEM-formatted private key string.</param>
+        /// <returns>True if keys were loaded successfully; otherwise, false.</returns>
+        public static async Task<bool> LoadKeysAsync(string publicKeyPem, string privateKeyPem)
+        {
+            string success = "RSA keys were successfully loaded.";
+            string noPem = "Provided PEM string is null or empty.";
+            string fail = "Failed to load RSA keys from PEM input.";
 
-            /// <summary>
-            ///                                                         ===v
-            /// </summary>
-            /// <param name="filePath"></param>
-            /// <param name="key"></param>
-            /// <param name="value"></param>
-            /// <returns>A Dictionary and the entered byte[]</returns>
-            private static async Task<(Dictionary<string , object>?, byte[]?)> PrepareDictionaryAndKey( string filePath , string key , byte[] value )
+            if (string.IsNullOrWhiteSpace(publicKeyPem) || string.IsNullOrWhiteSpace(privateKeyPem))
             {
-                  string? updatedJsonContent = null;
-                  Dictionary<string , object>? keyValuePairsFromJsonFile = await xyJson.DeserializeFromFile(filePath);
-
-                  if (value is not byte[] secretKeyFromRsaValue)
-                  {
-                        xyLog.Log("Unable to read key from parameter");
-                        return (keyValuePairsFromJsonFile, null);
-                  }
-                  else
-                  {
-                        secretKeyFromRsaValue = value;
-                        return (keyValuePairsFromJsonFile, secretKeyFromRsaValue);
-                  }
-
+                await xyLog.AsxLog(noPem);
+                return false;
             }
 
-            /// <summary>
-            /// Fügt einen neuen Schlüssel hinzu oder aktualisiert einen bestehenden Schlüssel in der JSON-Datei.
-            /// </summary>
-            /// <param name="filePath">Der Pfad zur JSON-Datei.</param>
-            /// <param name="key">Der Schlüssel, der hinzugefügt oder aktualisiert werden soll.</param>
-            /// <param name="value">Der Wert, der dem Schlüssel zugeordnet werden soll.</param>
-            /// <param name="overwrite"></param>
-            public static async Task AddOrUpdateRSAEntry( string filePath , string key , byte[] value , bool overwrite )
+            try
             {
-                  try
-                  {
-                        if (overwrite)
-                        {
-                              await UpdateRsaEntry(filePath , key , value);
-                              xyLog.Log(key + " overwritten");
-                        }
-                        else
-                        {
-                              await AddRsaEntry(filePath , key , value);
-                              xyLog.Log(key + " added");
-                        }
-                  }
-                  catch (Exception ex)
-                  {
-                        xyLog.ExLog(ex);
-                  }
+                _privateRsaKey = RSA.Create();
+                _privateRsaKey.ImportFromPem(privateKeyPem.ToCharArray());
+
+                _publicRsaKey = RSA.Create();
+                _publicRsaKey.ImportFromPem(publicKeyPem.ToCharArray());
+
+                await xyLog.AsxLog(success);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(fail);
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Configures the issuer and audience values for JWT generation and validation.
+        /// </summary>
+        /// <param name="issuer">The issuer identifier to use in the token.</param>
+        /// <param name="audience">The audience identifier for the token.</param>
+        /// <returns>True if both values were set successfully; otherwise, false.</returns>
+        public static async Task<bool> ConfigureAsync(string issuer, string audience)
+        {
+            string logSuccess = "Issuer and Audience configured successfully.";
+            string logError = "Issuer or Audience input was null or empty.";
+
+            if (string.IsNullOrWhiteSpace(issuer) || string.IsNullOrWhiteSpace(audience))
+            {
+                await xyLog.AsxLog(logError);
+                return false;
             }
 
+            _issuer = issuer;
+            _audience = audience;
 
-            /// <summary>
-            /// New RsaKey Entry in target file
-            /// </summary>
-            /// <param name="filePath"></param>
-            /// <param name="key"></param>
-            /// <param name="value"></param>
-            /// <returns></returns>
-            public static async Task AddRsaEntry( string filePath , string key , byte[] value )
+            await xyLog.AsxLog($"{logSuccess} Issuer = {_issuer}, Audience = {_audience}");
+            return true;
+        }
+
+        /// <summary>
+        /// Generates a signed JSON Web Token (JWT) using the configured RSA private key and provided claims.
+        /// </summary>
+        /// <param name="claims">A dictionary containing the custom claims to include in the token payload.</param>
+        /// <param name="validFor">The duration for which the token should remain valid.</param>
+        /// <returns>
+        /// The encoded JWT string if successful; otherwise, an empty string if key is missing or an error occurs.
+        /// </returns>
+        public static async Task<string> GenerateJwtAsync(IDictionary<string, object> claims, TimeSpan validFor)
+        {
+            string success = "JWT generated successfully.";
+            string noKey = "Private RSA key not loaded. Cannot generate token.";
+            string logError = "An error occurred while generating the JWT.";
+
+            if (_privateRsaKey == null)
             {
-                  (Dictionary<string , object>?, byte[]?) dictionary_SecretKeyBytes = await PrepareDictionaryAndKey(filePath , key , value);
-
-                  if (await AddRsaKey(dictionary_SecretKeyBytes.Item1 , key , value) is not Dictionary<string , object> updatedDictionary)
-                  {
-                        xyLog.Log($"Cant add {key} to the {filePath} file");
-                  }
-                  else
-                  {
-                        await xyJson.SerializeDictionary(filePath , updatedDictionary);
-                  }
+                await xyLog.AsxLog(noKey);
+                return string.Empty;
             }
 
-
-            /// <summary>
-            /// Update rsa key entry in json file
-            /// </summary>
-            /// <param name="filePath"></param>
-            /// <param name="key"></param>
-            /// <param name="value"></param>
-            /// <returns></returns>
-            public static async Task UpdateRsaEntry( string filePath , string key , byte[] value )
+            try
             {
-                  (Dictionary<string , object>?, byte[]?) dictionary_SecretKeyBytes = await PrepareDictionaryAndKey(filePath , key , value);
+                SigningCredentials credentials = new SigningCredentials(new RsaSecurityKey(_privateRsaKey), SecurityAlgorithms.RsaSha256);
 
-                  if (await UpdateRsaKey(dictionary_SecretKeyBytes.Item1 , key , value) is not Dictionary<string , object> updatedDictionary)
-                  {
-                        xyLog.Log($"Cant add {key} to the {filePath} file");
-                  }
-                  else
-                  {
-                        await xyJson.SerializeDictionary(filePath , updatedDictionary);
-                  }
+                SecurityTokenDescriptor tokenDescriptor = new()
+                {
+                    Issuer = _issuer,
+                    Audience = _audience,
+                    Expires = DateTime.UtcNow.Add(validFor),
+                    Claims = claims,
+                    SigningCredentials = credentials
+                };
+
+                JwtSecurityTokenHandler tokenHandler = new();
+                SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+                string jwt = tokenHandler.WriteToken(token);
+
+                await xyLog.AsxLog(success);
+                return jwt;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(logError);
+                return string.Empty;
+            }
+        }
+
+
+        /// <summary>
+        /// Validates a JWT using the configured RSA public key and returns the extracted ClaimsPrincipal if valid.
+        /// </summary>
+        /// <param name="token">The JWT string to be validated.</param>
+        /// <param name="validateLifetime">Optional flag to enforce expiration check (default: true).</param>
+        /// <returns>
+        /// The authenticated <see cref="ClaimsPrincipal"/> if the token is valid; otherwise, <c>null</c>.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">Thrown if the public key has not been loaded.</exception>
+        public static async Task<ClaimsPrincipal?> ValidateJwtAsync(string token, bool validateLifetime = true)
+        {
+            string initError = "Public RSA key is not loaded. Token validation cannot proceed.";
+            string success = "JWT successfully validated.";
+            string fail = "JWT validation failed.";
+
+            if (_publicRsaKey == null)
+            {
+                await xyLog.AsxLog(initError);
+                return null;
             }
 
-
-            /// <summary>
-            /// Zielschlüssel überschreiben
-            /// </summary>
-            /// <param name="keyValuePairsFromJsonFile"></param>
-            /// <param name="key"></param>
-            /// <param name="value"></param>
-            /// <returns></returns>
-            private static async Task<Dictionary<string , object>?> UpdateRsaKey( Dictionary<string , object> keyValuePairsFromJsonFile , string key , byte[] value )
+            JwtSecurityTokenHandler tokenHandler = new ();
+            TokenValidationParameters validationParameters = new ()
             {
-                  try
-                  {
-                        if (keyValuePairsFromJsonFile is not null)
-                        {
-                              if (keyValuePairsFromJsonFile.ContainsKey(key))
-                              {
-                                    keyValuePairsFromJsonFile[ key ] = value;
-                                    xyLog.Log(key + " overwritten");
-                                    return keyValuePairsFromJsonFile;
-                              }
-                        }
-                  }
-                  catch (Exception ex)
-                  {
-                        xyLog.ExLog(ex);
-                  }
-                  return null;
+                ValidateIssuer = true,
+                ValidIssuer = _issuer,
+                ValidateAudience = true,
+                ValidAudience = _audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new RsaSecurityKey(_publicRsaKey),
+                ValidateLifetime = validateLifetime,
+                ClockSkew = TimeSpan.FromMinutes(2)
+            };
+
+            try
+            {
+                ClaimsPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+                await xyLog.AsxLog(success);
+                return principal;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                await xyLog.AsxLog(fail);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Exports the configured public RSA key as a PEM-formatted string.
+        /// </summary>
+        /// <returns>
+        /// A PEM string containing the public key, or an empty string if the key is not initialized.
+        /// </returns>
+        public static async Task<string> GetPublicKeyAsPemAsync()
+        {
+            string noKey = "Public key not loaded – unable to export.";
+            string success = "Public key exported as PEM.";
+            string pemStart = "-----BEGIN PUBLIC KEY-----";
+            string pemEnd = "-----END PUBLIC KEY-----";
+            
+
+            if (_publicRsaKey is null)
+            {
+                await xyLog.AsxExLog(new Exception(noKey));
+                return string.Empty;
             }
 
-
-
-            /// <summary>
-            /// Fügt einen neuen Schlüssel in der JSON-Datei hinzu.
-            /// </summary>
-            /// <param name="keyValuePairsFromJsonFile"></param>
-            /// <param name="key">Der Schlüssel, der hinzugefügt werden soll.</param>
-            /// <param name="value">Der Wert, der dem Schlüssel zugeordnet werden soll.</param>
-            private static async Task<Dictionary<string , object>?> AddRsaKey( Dictionary<string , object> keyValuePairsFromJsonFile , string key , byte[] value )
+            try
             {
-                  try
-                  {
-                        if (keyValuePairsFromJsonFile is Dictionary<string , object> keyValuePairs)
-                        {
-                              if (!keyValuePairs.ContainsKey(key))
-                              {
-                                    keyValuePairs.Add(key , value);
-                                    xyLog.Log(key + " added");
-                              }
-                              return keyValuePairs;
-                        }
-                  }
-                  catch (Exception ex)
-                  {
-                        xyLog.ExLog(ex);
-                  }
-                  return null;
+                byte[] keyBytes = _publicRsaKey.ExportSubjectPublicKeyInfo();
+                string base64 = Convert.ToBase64String(keyBytes, Base64FormattingOptions.InsertLineBreaks);
+
+                StringBuilder builder = new();
+                builder.AppendLine(pemStart).AppendLine(base64).AppendLine(pemEnd);
+
+                await xyLog.AsxLog(success);
+                return builder.ToString();
             }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return string.Empty;
+            }
+        }
 
 
-      }
+    }
 }

@@ -39,32 +39,9 @@ namespace xyToolz
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs yet.")]
     public static class xy
     {
-        #region "Try ... Catch!"
-        public static async Task<object> TryCatch(Func<object[], Task<object>> dangerousMethod, object[] parameters)
-        {
-            try
-            {
-                return await dangerousMethod(parameters);
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null!;
-            }
-        }
-        public static object TryCatch(Func<object[], object> dangerousMethod, object[] parameters)
-        {
-            try
-            {
-                return dangerousMethod(parameters);
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null!;
-            }
-        }
-        public static async Task<object> TryCatch(Func<object, object, Task<object>>dangerousMethod, object param1, object param2)
+        #region TryCatch – Error-handling helpers
+
+        public static async Task<object> TryCatch(Func<object, object, Task<object>> dangerousMethod, object param1, object param2)
         {
             try
             {
@@ -72,7 +49,7 @@ namespace xyToolz
             }
             catch (Exception ex)
             {
-                xyLog.ExLog(ex);
+                await xyLog.AsxExLog(ex);
                 return null!;
             }
         }
@@ -88,7 +65,7 @@ namespace xyToolz
                 return null!;
             }
         }
-        public static async Task<object >TryCatch(Func<object, Task<object>> dangerousMethod, object param)
+        public static async Task<object> TryCatch(Func<object, Task<object>> dangerousMethod, object param)
         {
             try
             {
@@ -96,7 +73,7 @@ namespace xyToolz
             }
             catch (Exception ex)
             {
-                xyLog.ExLog(ex);
+                await xyLog.AsxExLog(ex);
                 return null!;
             }
         }
@@ -112,104 +89,56 @@ namespace xyToolz
                 return null!;
             }
         }
-        public static async Task<object> TryCatch(Func<Task<object>> dangerousMethod)
+        /// <summary>
+        /// Wraps a synchronous delegate with exception handling.
+        /// </summary>
+        public static object TryCatch(Func<object[], object> method, params object[] args)
         {
-            try
-            {
-                return await dangerousMethod();
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null!;
-            }
+            try { return method(args); }
+            catch (Exception ex) { xyLog.ExLog(ex); return null!; }
         }
-        public static object TryCatch(Func<object> dangerousMethod)
+
+        /// <summary>
+        /// Wraps an asynchronous delegate with exception handling.
+        /// </summary>
+        public static async Task<object> TryCatch(Func<object[], Task<object>> method, params object[] args)
         {
-            try
-            {
-                return dangerousMethod();
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null!;
-            }
+            try { return await method(args); }
+            catch (Exception ex) { await xyLog.AsxExLog(ex); return null!; }
         }
+
+        /// <summary>
+        /// Wraps a parameterless synchronous delegate with exception handling.
+        /// </summary>
+        public static object TryCatch(Func<object> method)
+        {
+            try { return method(); }
+            catch (Exception ex) { xyLog.ExLog(ex); return null!; }
+        }
+
+        /// <summary>
+        /// Wraps a parameterless asynchronous delegate with exception handling.
+        /// </summary>
+        public static async Task<object> TryCatch(Func<Task<object>> method)
+        {
+            try { return await method(); }
+            catch (Exception ex) { await xyLog.AsxExLog(ex); return null!; }
+        }
+
         #endregion
 
-        #region "QOL"
-
-
-        /// <summary>
-        /// Repeat the string the given number of times
-        /// </summary>
-        /// <param name="what_to_repeat"></param>
-        /// <param name="quantity"></param>
-        /// <returns>  (+++ , 2 )  -->   +++ +++ +++ </returns>
-        public static string Repeat(string what_to_repeat, ushort quantity)
-        {
-            StringBuilder stringBuilder = new();
-            for (int i = 0; i < quantity -1; i++)
-            {
-                stringBuilder.Append(what_to_repeat);
-            }
-            return stringBuilder.ToString();
-        }
-        
-        /// <summary>
-        /// Reverse the target String
-        /// </summary>
-        /// <param name="old_order"></param>
-        /// <returns></returns>
-        public static string Reverse(string old_order)
-        {
-            char[] cache = old_order.ToCharArray();
-
-            Array.Reverse(cache);
-            string neues_Ergebnis = new string(cache);
-
-            return neues_Ergebnis;
-        }
+        #region Encoding – String and Byte Conversion
 
         /// <summary>
-        /// Write on Console, trigger evts
+        /// Converts a UTF-8 string into a byte array.
         /// </summary>
-        /// <param name="what_to_print"></param>
-        public static void Print(string what_to_print)
-        {
-            xyLog.Log(what_to_print);
-        }
-
-        /// <summary>
-        /// Get a byte array from  utf8 string
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns>byte[]</returns>
-        public static byte[] StringToBytes( string target )
-            {
-                  try
-                  {
-                        return Encoding.UTF8.GetBytes(target);
-                  }
-                  catch (Exception ex)
-                  {
-                        xyLog.ExLog(ex);
-                        return null!;
-                  }
-            }
-
-        /// <summary>
-        /// Get a byte array from Base64 string
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns>byte[]</returns>
-
-        public static byte[] BaseToBytes(string target)
+        /// <param name="input">The UTF-8 string to convert.</param>
+        /// <returns>A byte array representation of the input string.</returns>
+        public static byte[] StringToBytes(string input)
         {
             try
             {
-                return Convert.FromBase64String(target);
+                return Encoding.UTF8.GetBytes(input);
             }
             catch (Exception ex)
             {
@@ -219,10 +148,28 @@ namespace xyToolz
         }
 
         /// <summary>
-        /// Get an UTF8 string from a byte array
+        /// Converts a Base64-encoded string into a byte array.
         /// </summary>
-        /// <param name="bytes"></param>
-        /// <returns></returns>
+        /// <param name="base64">The Base64-encoded input string.</param>
+        /// <returns>The decoded byte array.</returns>
+        public static byte[] BaseToBytes(string base64)
+        {
+            try
+            {
+                return Convert.FromBase64String(base64);
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                return null!;
+            }
+        }
+
+        /// <summary>
+        /// Converts a byte array into a UTF-8 string.
+        /// </summary>
+        /// <param name="bytes">The input byte array.</param>
+        /// <returns>A UTF-8 string representation of the byte array.</returns>
         public static string BytesToString(byte[] bytes)
         {
             try
@@ -232,15 +179,15 @@ namespace xyToolz
             catch (Exception ex)
             {
                 xyLog.ExLog(ex);
+                return null!;
             }
-            return null!;
         }
 
         /// <summary>
-        /// Get an Base64 string from a byte array
+        /// Converts a byte array into a Base64-encoded string.
         /// </summary>
-        /// <param name="bytes"></param>
-        /// <returns></returns>
+        /// <param name="bytes">The input byte array.</param>
+        /// <returns>A Base64 string representation of the byte array.</returns>
         public static string BytesToBase(byte[] bytes)
         {
             try
@@ -250,16 +197,122 @@ namespace xyToolz
             catch (Exception ex)
             {
                 xyLog.ExLog(ex);
+                return null!;
             }
-            return null!;
         }
 
         #endregion
 
-        #region "Experiments and Research Chemicals"
+        #region QOL – String Utilities
 
         /// <summary>
-        /// Open Notepad.exe
+        /// Repeats a given string a specified number of times.
+        /// </summary>
+        /// <param name="text">The text to repeat.</param>
+        /// <param name="count">How many times to repeat the string.</param>
+        /// <returns>The repeated string.</returns>
+        public static string Repeat(string text, ushort count)
+        {
+            StringBuilder sb = new();
+            for (int i = 0; i < count; i++)
+            {
+                sb.Append(text);
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Reverses the characters in a given string.
+        /// </summary>
+        /// <param name="input">The string to reverse.</param>
+        /// <returns>The reversed string.</returns>
+        public static string Reverse(string input)
+        {
+            char[] chars = input.ToCharArray();
+            Array.Reverse(chars);
+            return new string(chars);
+        }
+
+        /// <summary>
+        /// Prints the given message to the console using xyLog.
+        /// </summary>
+        /// <param name="message">The message to print.</param>
+        public static void Print(string message) => xyLog.Log(message);
+
+        #endregion
+
+        #region System Utilities & Experiments
+
+        /// <summary>
+        /// Asynchronously opens a file or folder in the system’s default file explorer.
+        /// Cross‑platform (Windows, Linux, macOS) and fully logged.
+        /// </summary>
+        /// <param name="fullPath">Absolute path to the file or directory.</param>
+        /// <returns>True if opened successfully; otherwise, false.</returns>
+        public static async Task<bool> OpenAsync(string fullPath)
+        {
+            string invalidPathMsg = "The given path was null or empty.";
+            string notFoundMsg = "Target does not exist:";
+            string successTemplate = "Explorer opened in {0} ms: {1}";
+            string unsupportedOsMsg = "No suitable explorer command found for this OS.";
+
+            if (string.IsNullOrWhiteSpace(fullPath))
+            {
+                await xyLog.AsxLog(invalidPathMsg);
+                return false;
+            }
+            else
+            {
+                if (!File.Exists(fullPath) && !Directory.Exists(fullPath))
+                {
+                    await xyLog.AsxLog($"{notFoundMsg} {fullPath}");
+                    return false;
+                }
+            }
+
+            Stopwatch stopwatch = new ();
+
+            // Switch Expressions stiften doch Freude
+            (string? cmd, string args) = OperatingSystem.IsWindows() switch
+            {
+                true => ("explorer", $"\"{fullPath}\""),
+                _ when OperatingSystem.IsLinux() => ("xdg-open", fullPath),
+                _ when OperatingSystem.IsMacOS() => ("open", fullPath),
+                _ => (null, "Hier könnte ihre Werbung stehen!")
+            };
+
+            if (cmd is null)
+            {
+                await xyLog.AsxLog(unsupportedOsMsg);
+                return false;
+            }
+
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = cmd,
+                    Arguments = args,
+                    UseShellExecute = true,
+                    CreateNoWindow = true
+                };
+
+                stopwatch.Start();
+                Process.Start(psi);
+                stopwatch.Stop();
+
+                await xyLog.AsxLog(string.Format(successTemplate, stopwatch.ElapsedMilliseconds, fullPath));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Opens Notepad without any file.
         /// </summary>
         public static void Editor()
         {
@@ -267,74 +320,67 @@ namespace xyToolz
         }
 
         /// <summary>
-        /// Open Notepad.exe with the specified file
+        /// Opens Notepad and loads a specific file.
         /// </summary>
-        public static void Editor(string filepath)
+        /// <param name="filePath">The full path to the file to open.</param>
+        public static void Editor(string filePath)
         {
-            Process.Start("notepad.exe", filepath);
+            Process.Start("notepad.exe", filePath);
         }
 
         /// <summary>
-        /// Bei dir piepts wohl!
+        /// Triggers the console beep and logs it.
         /// </summary>
         public static void Piep()
         {
             Console.Beep();
-            String Beep = xyLog.Log("Beep!");
+            xyLog.Log("Beep!");
         }
 
         /// <summary>
-        /// Wenn dein Pc schnell genug ist, stürzt dieses Progamm nicht ab.
+        /// A recursive method that tests edge-case control flow with arbitrary branching using goto.
         /// </summary>
-        /// <param name="high_number"></param>
-        /// <returns></returns>
+        /// <param name="high_number">A large number used to trigger different flow paths.</param>
+        /// <returns>Diagnostic message string (not used meaningfully).</returns>
         public static string Crash(UInt128 high_number)
         {
             UInt128 a = 0;
             UInt128 b = 0;
-            string lol = "";
+            string output = "";
 
             if (high_number == 0)
             {
                 Console.WriteLine("NEIN");
-                return lol;
+                return output;
             }
-            else
+
+            high_number -= 88;
+            Console.WriteLine(high_number);
+
+            if (high_number < 8888) goto loop1;
+            return Crash(high_number);
+
+        loop1:
+            Console.WriteLine("Hey");
+            a++;
+            if (b > (high_number / 2))
             {
-                high_number -= 88;
-                Console.WriteLine(high_number);
-                if (high_number < 8888)
-                    goto lol;
-
-                return Crash(high_number);
-
-            lol:
-                {
-                    Console.WriteLine("Hey");
-                    a++;
-                    if (b > (high_number / 2))
-                    {
-                        Piep();
-                        Console.WriteLine(a);
-                    }
-                    goto rofl;
-                }
-
-            rofl:
-                {
-                    Console.WriteLine("Ho");
-                    if (a > (high_number / 2))
-                    {
-                        Piep();
-                        Console.WriteLine(b);
-                    }
-                    ++b;
-                    goto lol;
-                }
+                Piep();
+                Console.WriteLine(a);
             }
+            goto loop2;
+
+        loop2:
+            Console.WriteLine("Ho");
+            if (a > (high_number / 2))
+            {
+                Piep();
+                Console.WriteLine(b);
+            }
+            b++;
+            goto loop1;
         }
 
         #endregion
-
     }
 }
