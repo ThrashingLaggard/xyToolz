@@ -284,35 +284,67 @@ namespace xyToolz
         }
 
         public static async Task<JObject?> GetJObjectFromFile(string filePath) => xyFiles.EnsurePathExists(filePath) ? (await File.ReadAllTextAsync(filePath) is string jsonFileContent) ? JObject.Parse(jsonFileContent) : (await xyLog.AsxLog("Cant read file content into JObject"), new JObject[0].FirstOrDefault()).Item2 : null;
+
+        /// <summary>
+        /// Get a JToken from the given file and key by calling the GetJObjectFromFile() method
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static async Task<JToken> GetJTokenFromJsonFile(string filePath, string key)
         {
+            string objectOK = $"Object for '{key}' was found in '{filePath}' and read into JObject!!!";
             string keyOk = $"Token for '{key}' was found in '{filePath}' ";
             string keyError = $"Key '{key}' wasnt found in '{filePath}' ";
             string pathError = $"Cant read data from the specified path: '{filePath}'";
-            // Prüfe, ob die Datei existiert und lese sie als JObject
-            JObject? jsonObject = await GetJObjectFromFile(filePath);
-            if (jsonObject == null)
+            try
             {
-                await xyLog.AsxLog(pathError);
-                return null!;
+                JObject? jsonObject = await GetJObjectFromFile(filePath);
+                await xyLog.AsxLog(objectOK);
+                if (jsonObject == null)
+                {
+                    await xyLog.AsxLog(pathError);
+                    return null!;
+                }
+                if (jsonObject.TryGetValue(key, out JToken? token))
+                {
+                    await xyLog.AsxLog(keyOk);
+                    return token;
+                }
+                else
+                {
+                    await xyLog.AsxLog(keyError);
+                    return null!;
+                }
             }
-            if (jsonObject.TryGetValue(key, out JToken? token))
+            catch (Exception ex)
             {
-                await xyLog.AsxLog(keyOk);
-                return token;
-            }
-            else
-            {
-                await xyLog.AsxLog(keyError);
+                await xyLog.AsxExLog(ex);
                 return null!;
             }
         }
+
+        /// <summary>
+        /// Get a string from the given file and key by calling the GetJTokenFromJsonFile() method
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static async Task<string> GetStringFromJsonFile(string filePath, string key)
         {
-            JToken? token = await GetJTokenFromJsonFile(filePath, key);
-            if(token is not null)
+            string nextStep = "Trying to read a string from JToken!";
+            try
             {
-                return token.ToString();
+                JToken? token = await GetJTokenFromJsonFile(filePath, key);
+                if(token is not null)
+                {
+                    await xyLog.AsxLog(nextStep);
+                    return token.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
             }
             return "";
         }
