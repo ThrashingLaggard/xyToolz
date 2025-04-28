@@ -413,7 +413,7 @@ namespace xyToolz
         /// <returns>Value of the key as string, or empty if not found.</returns>
         public static async Task<string> GetStringFromJsonFile(string filePath, string key)
         {
-            JToken? token = await GetJTokenFromJsonFile(filePath, key);
+            JToken? token = await GetJTokenFromKey(filePath, key);
             if(token is not null)
             {
                 return token.ToString();
