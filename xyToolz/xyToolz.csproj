@@ -7,18 +7,21 @@
 		<SignAssembly>False</SignAssembly>
 		<Title>xyToolZ</Title>
 		<Company></Company>
-		<Authors>Hansi Bremstein</Authors>
+		<Authors>ThrashingLaggard</Authors>
 		<Description>
 			Little toolz to save some precious seconds with my doggo.
 
 		</Description>
 		<Copyright>Do with this, as you please. Go home to your dog   </Copyright>
-		<PackageTags>tools,pdf,qol,files,small,stuff,</PackageTags>
+		<PackageTags>tools,pdf,qol,files,small,stuff,dpapi,hashing,</PackageTags>
 		<PackAsTool>False</PackAsTool>
 		<NeutralLanguage>en-GB</NeutralLanguage>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<OutputType>Library</OutputType>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -32,6 +35,13 @@
 		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="7.0.0" />
 		<PackageReference Include="System.Text.Json" Version="9.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
 

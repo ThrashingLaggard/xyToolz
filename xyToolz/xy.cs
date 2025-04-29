@@ -205,6 +205,19 @@ namespace xyToolz
             return null!;
         }
 
+
+        public static async Task Start(string processName)
+        {
+            await TryCatch(async () =>
+            {
+                if (Process.Start(processName) is Process proc)
+                {
+                    return await Task.FromResult<object>(proc);
+                }
+                return Task.CompletedTask;
+            });
+        }
+
         #endregion
 
         #region "Experiments and Research Chemicals"
@@ -214,7 +227,7 @@ namespace xyToolz
         /// </summary>
         public static void Editor()
         {
-            Process.Start("notepad.exe");
+            Start("notepad.exe");
         }
 
         /// <summary>

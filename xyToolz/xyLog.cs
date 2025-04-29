@@ -113,7 +113,7 @@ namespace xyToolz
             string exMessage = FormatEx(ex, level, callerName);
             Console.WriteLine(exMessage);
             Console.Out.Flush();
-            LogMessageSent?.Invoke(exMessage, callerName);
+            ExLogMessageSent?.Invoke(exMessage, callerName);
         }
 
 
@@ -130,7 +130,7 @@ namespace xyToolz
                 string exMessage = FormatEx(ex, level, callerName);
                 Console.WriteLine(exMessage);
                 Console.Out.Flush();
-                LogMessageSent?.Invoke(exMessage, callerName);
+                ExLogMessageSent?.Invoke(exMessage, callerName);
             });
         }
 
@@ -178,7 +178,7 @@ namespace xyToolz
                     File.AppendAllText(_exLogFilePath, exceptionDetails);
                     Console.WriteLine(exceptionDetails);
                     Console.Out.Flush();
-                    LogMessageSent?.Invoke(exceptionDetails, callerName);
+                    ExLogMessageSent?.Invoke(exceptionDetails, callerName);
                     return true;
                 }
                 catch (Exception innerEx)
