@@ -1,0 +1,65 @@
+### CI/CD onboarding
+
+This guide explains how to onboard new subprojects like `xyPorts`, `xyAvalonia`, etc., using the ready-to-use GitHub Actions template.
+
+---
+
+## 📦 Required for each subproject
+
+- A `.csproj` file located inside your repository (e.g., `xyToolz/xyPorts/xyPorts.csproj`).
+- A valid NuGet API Key, stored as a **Secret** in GitHub Actions.
+- Semantic commit messages following the conventional commit style (e.g., `fix:`, `feat:`, `BREAKING CHANGE:`).
+
+---
+
+## ⚙ How to onboard a new project
+
+### 1. Copy the CI template
+
+- Copy the template YAML file (e.g., `ci-template-xyProjects.yml`) into `.github/workflows/`.
+- Rename it according to your project, e.g., `ci-xyPorts.yml`.
+
+### 2. Edit the workflow
+
+- Replace:
+  - `<relative-path-to>/<ProjectName>.csproj` → your project path, e.g., `xyToolz/xyPorts/xyPorts.csproj`
+  - `<nuget-id>` → your NuGet package name, e.g., `xyports`
+  - `<YOUR_SECRET_KEY>` → your GitHub secret for the API key, e.g., `XYPORTS_API_KEY`
+
+### 3. Add GitHub Secrets
+
+- Go to GitHub Repository → Settings → Secrets → Actions
+- Add your NuGet API Key:
+  - Name: `XYPORTS_API_KEY`
+  - Value: Your API key from [nuget.org](https://www.nuget.org/account/apikeys)
+
+### 4. Push and verify
+
+- Commit and push your updated workflow.
+- Go to GitHub Actions tab and watch the workflow run:
+  - ✅ Restore project
+  - ✅ Build project
+  - ✅ Test project
+  - ✅ Pack project into a `.nupkg`
+  - ✅ Push package to NuGet if version is new
+  - ✅ Create GitHub release
+
+---
+
+## ✍ Commit Message Conventions
+
+| Type | Example | Effect |
+|:-----|:--------|:-------|
+| fix: | `fix: correct typo in xyPorts` | Bump patch version (x.x.+1) |
+| feat: | `feat: add new TCP listener feature` | Bump minor version (x.+1.0) |
+| BREAKING CHANGE | Commit body includes breaking change notice | Bump major version (+1.0.0) |
+
+---
+
+## 🚀 Notes
+
+- Only if a version **does not exist** on NuGet, the package is published.
+- New GitHub releases are automatically tagged based on the new version.
+- `.csproj` version is automatically updated before building.
+
+---
