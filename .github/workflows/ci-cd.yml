@@ -2,7 +2,8 @@ name: CI/CD for xyToolz
 
 on:
   push:
-    branches: [ main ]
+    branches:  
+      - main 
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
