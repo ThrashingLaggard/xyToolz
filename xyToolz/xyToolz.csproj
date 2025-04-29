@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<PackageVersion>1.0.32</PackageVersion>
+		<PackageVersion>1.0.33</PackageVersion>
 		<Nullable>enable</Nullable>
 		<SignAssembly>False</SignAssembly>
 		<Title>xyToolZ</Title>
@@ -14,7 +14,7 @@
 
 		</Description>
 		<Copyright>Do with this, as you please. Go home to your dog   </Copyright>
-		<PackageTags>tools,pdf,qol,files,small,stuff,dpapi,hashing,</PackageTags>
+		<PackageTags>tools,pdf,qol,files,small,stuff,dpapi,hashing,rsa</PackageTags>
 		<PackAsTool>False</PackAsTool>
 		<NeutralLanguage>en-GB</NeutralLanguage>
 		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
