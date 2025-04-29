@@ -154,7 +154,7 @@ namespace xyToolz
         }
         public static async Task<bool> SaveProtectedToFileAsync<T>(T obj, string subfolder = "HyperSecret", string filename = "secret.md")
         {
-            if( xyPathHelper.Combine(subfolder, filename) is string fullPath && fullPath.Length > 3)    // Mucho intelligento
+            if( xyPath.Combine(subfolder, filename) is string fullPath && fullPath.Length > 3)    // Mucho intelligento
             {
                 return await SaveProtectedToFileAsync(obj, fullPath);
             }
@@ -193,7 +193,7 @@ namespace xyToolz
         }
         public static async Task<T?> LoadProtectedFromFileAsync<T>(string subfolder = "UltraSecret", string filename = "secret.bin")
         {
-                if (xyPathHelper.Combine(subfolder, filename)  is string path)
+                if (xyPath.Combine(subfolder, filename)  is string path)
                 {
                     return await LoadProtectedFromFileAsync<T>(path);   
                 }

@@ -1,4 +1,4 @@
 ### PortHelper Workflow
  
-./generate-workflow.sh xyPortHelper xyToolz/xyPortHelper xyporthelper XYPORTHELPER_API_KEY
+./generate-workflow.sh xyPortHelper xyToolz/xyPorts xyporthelper XYPORTHELPER_API_KEY
 Workflow created successfully: .github/workflows/ci-xyPortHelper.yml

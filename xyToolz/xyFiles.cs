@@ -70,7 +70,7 @@ namespace xyToolz
     /// </code>
     ///
     /// <para><b>See Also:</b></para>
-    /// <see cref="System.IO.File"/>, <see cref="System.IO.Directory"/>, <see cref="xyToolz.Helper.xyPathHelper"/>
+    /// <see cref="System.IO.File"/>, <see cref="System.IO.Directory"/>, <see cref="xyToolz.Helper.xyPath"/>
     /// </remarks>
     public static class xyFiles
     {
@@ -130,7 +130,7 @@ namespace xyToolz
         /// This method does not log directly. It assumes responsibility lies with caller.
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="xyPathHelper.EnsureDirectory(string)"/>
+        /// <see cref="xyPath.EnsureDirectory(string)"/>
         /// </remarks>
         /// <param name="dir">The relative or absolute path to resolve.</param>
         /// <returns>The resolved and platform-correct directory path.</returns>
@@ -141,7 +141,7 @@ namespace xyToolz
             if (string.IsNullOrEmpty(path))
                 path = Path.Combine(Android.App.Application.Context.GetExternalFilesDir(null)!.AbsolutePath, dir);
 #else
-            string path = xyPathHelper.EnsureDirectory(dir);
+            string path = xyPath.EnsureDirectory(dir);
 #endif
             return path;
         }
@@ -262,7 +262,7 @@ namespace xyToolz
         public static IEnumerable<FileInfo> Inventory(string path)
         {
             List<FileInfo> fileList = new();
-            foreach (string file in Directory.GetFiles(xyPathHelper.Combine(path)))
+            foreach (string file in Directory.GetFiles(xyPath.Combine(path)))
             {
                 FileInfo fileInfo = new(file);
                 fileList.Add(fileInfo);
@@ -632,7 +632,7 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="SaveToFile(string, string)"/>, <see cref="xyPathHelper.Combine(string, string)"/>
+        /// <see cref="SaveToFile(string, string)"/>, <see cref="xyPath.Combine(string, string)"/>
         /// </remarks>
         /// <param name="content">The content to be written to the file.</param>
         /// <param name="subfolder">Subdirectory where the file will be placed.</param>
@@ -656,7 +656,7 @@ namespace xyToolz
             }
 
             string directoryPath = EnsureDirectory(subfolder);
-            string filePath = xyPathHelper.Combine(directoryPath, fileName);
+            string filePath = xyPath.Combine(directoryPath, fileName);
 
             return await SaveToFile(content, filePath);
         }
@@ -691,7 +691,7 @@ namespace xyToolz
         public static async Task<string?> LoadFileAsync(string subfolder = "AppData", string fileName = "config.json")
         {
             string directoryPath = EnsureDirectory(subfolder);
-            string filePath = xyPathHelper.Combine(directoryPath, fileName);
+            string filePath = xyPath.Combine(directoryPath, fileName);
             return await LoadFileAsync(filePath);
         }
         /// <summary>
@@ -883,7 +883,7 @@ namespace xyToolz
             }
 
             string directoryPath = EnsureDirectory(subfolder);
-            string filePath = xyPathHelper.Combine(directoryPath, fileName);
+            string filePath = xyPath.Combine(directoryPath, fileName);
 
             if (!File.Exists(filePath))
             {

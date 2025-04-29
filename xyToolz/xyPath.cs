@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace xyToolz.Helper
 {
-    public static class xyPathHelper
+    public static class xyPath
     {
 #if ANDROID
                   public static string BasePath { get; } = Android.App.Application.Context.FilesDir.AbsolutePath;
