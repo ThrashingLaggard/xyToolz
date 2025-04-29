@@ -17,7 +17,7 @@
 		<PackageTags>tools,pdf,qol,files,small,stuff,dpapi,hashing,</PackageTags>
 		<PackAsTool>False</PackAsTool>
 		<NeutralLanguage>en-GB</NeutralLanguage>
-		<PackageLicenseExpression>GPLv3</PackageLicenseExpression>
+		<PackageLicenseExpression>GPL</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<OutputType>Library</OutputType>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
