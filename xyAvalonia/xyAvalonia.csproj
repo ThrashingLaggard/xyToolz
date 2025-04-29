@@ -6,6 +6,12 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>ThrashingLaggard</Authors>
+	  <PackageVersion>1.0.1</PackageVersion>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageReadmeFile>README_xyAvalonia.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,5 +41,12 @@
     <Compile Update="Views\DebugConsole.axaml.cs">
       <DependentUpon>DebugConsole.axaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README_xyAvalonia.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>
