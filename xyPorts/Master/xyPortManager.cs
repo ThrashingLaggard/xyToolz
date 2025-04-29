@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using xyPorts.Basix;
 using xyPorts.TCP;
 using xyPorts.UDP;
+using xyToolz;
 
 namespace xyPorts.Master
 {
@@ -54,7 +55,7 @@ namespace xyPorts.Master
             using (var reader = new StreamReader(process.StandardOutput.BaseStream))
             {
                 string output = reader.ReadToEnd();
-                sLog.Log(output);
+                xyLog.Log(output);
                 process.WaitForExit();
 
                 // Suchen Sie nach der Zeile, die den Port enthält

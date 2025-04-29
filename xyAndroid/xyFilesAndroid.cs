@@ -4,7 +4,7 @@ using xyToolz;
 
 namespace xyAndroid
 {
-      public class xyFilesAndroid : xyFiles
+      public class xyFilesAndroid
       {
 
            

@@ -822,7 +822,7 @@ namespace xyToolz
         /// </remarks>
         /// <param name="fullPath">The full path of the file to load.</param>
         /// <returns>A byte array derived from the file content, or an empty array.</returns>
-        public static async Task<byte[]?> LoadBytes(string fullPath)
+        public static async Task<byte[]?> ReadBytes(string fullPath)
         {
             string noBytes = "No bytes to read";
             byte[] bytes = [];
