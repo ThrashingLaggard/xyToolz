@@ -20,7 +20,7 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore xyToolz/xyPorts/xyPortHelper.csproj # Step 3: Restore project dependencies from NuGet
+      run: dotnet restore xyPorts/xyPortHelper.csproj # Step 3: Restore project dependencies from NuGet
 
     - name: Generate new version from commit message
       id: versioning
@@ -28,7 +28,7 @@ jobs:
         # Step 4: Determine new version based on commit message content
 
         # Read the current version from the .csproj file
-        current_version=$(grep -oPm1 "(?<=<PackageVersion>)[^<]+" xyToolz/xyPorts/xyPortHelper.csproj)
+        current_version=$(grep -oPm1 "(?<=<PackageVersion>)[^<]+" xyPorts/xyPortHelper.csproj)
         echo "Current version: $current_version"
 
         # Get the last commit message to decide the version bump
@@ -62,16 +62,16 @@ jobs:
     - name: Update .csproj with new version
       run: |
         # Step 5: Update the <PackageVersion> inside the .csproj file with the newly determined version
-        sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/" xyToolz/xyPorts/xyPortHelper.csproj
+        sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/" xyPorts/xyPortHelper.csproj
 
     - name: Build project
-      run: dotnet build xyToolz/xyPorts/xyPortHelper.csproj --configuration Release --no-restore  # Step 6: Build the project in Release mode
+      run: dotnet build xyPorts/xyPortHelper.csproj --configuration Release --no-restore  # Step 6: Build the project in Release mode
 
     - name: Run tests
-      run: dotnet test xyToolz/xyPorts/xyPortHelper.csproj --no-build --verbosity normal  # Step 7: Run all unit tests
+      run: dotnet test xyPorts/xyPortHelper.csproj --no-build --verbosity normal  # Step 7: Run all unit tests
 
     - name: Pack NuGet package
-      run: dotnet pack xyToolz/xyPorts/xyPortHelper.csproj --configuration Release --no-build -o out  # Step 8: Create a NuGet package (.nupkg)
+      run: dotnet pack xyPorts/xyPortHelper.csproj --configuration Release --no-build -o out  # Step 8: Create a NuGet package (.nupkg)
 
     - name: Check if version already exists on NuGet
       id: check_version
