@@ -158,6 +158,7 @@ See: [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses
 
 ## 👤 Author
 
+Created by the ThrashingLaggard
 > Part of the `xyToolz` ecosystem  
 > Created for internal tooling, education, and experimentation.
 ---
