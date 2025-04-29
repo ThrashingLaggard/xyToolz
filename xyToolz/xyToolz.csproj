@@ -21,7 +21,7 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<OutputType>Library</OutputType>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<PackageReadmeFile>ReadMe.md</PackageReadmeFile>
+		<PackageReadmeFile></PackageReadmeFile>
 		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
