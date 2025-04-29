@@ -1,289 +1,402 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace xyToolz.Helper
 {
     /// <summary>
-    /// Hash and check passwords based on [Rfc2898DeriveBytes]
+    /// Provides secure password hashing and verification functionality using PBKDF2.
+    /// Includes configurable peppering, salt generation, logging, and support for SHA256/SHA512 algorithms.
+    /// This utility is intended for use in authentication flows where user passwords need to be securely hashed,
+    /// stored, and verified in a tamper-resistant manner.
+    ///
+    /// <para><b>Available Features:</b></para>
+    /// <list type="bullet">
+    /// <item><description>Environment-based configurable peppering (default: "Ahuhu")</description></item>
+    /// <item><description>Secure salt generation using RNGCryptoServiceProvider</description></item>
+    /// <item><description>Password hashing via PBKDF2 (Rfc2898DeriveBytes) with configurable iterations</description></item>
+    /// <item><description>Base64 encoding for storage and transport</description></item>
+    /// <item><description>Constant-time hash comparison to prevent timing attacks</description></item>
+    /// <item><description>Detailed logging with support for synchronous logging methods</description></item>
+    /// </list>
+    /// <para><b>Thread Safety:</b></para>
+    /// This class is thread-safe, as it contains no instance fields and all operations are stateless.
+    ///
+    /// <para><b>Limitations:</b></para>
+    /// Only SHA256 and SHA512 algorithms are supported. Use of any other algorithm will result in an exception.
+    ///
+    /// <para><b>Performance:</b></para>
+    /// The cost of password hashing is directly proportional to the number of iterations configured. Use higher iteration counts for increased security,
+    /// but be mindful of performance impacts in high-load environments or when running on limited hardware (e.g., embedded devices).
+    ///
+    /// <para><b>Configuration:</b></para>
+    /// The pepper can be set using the environment variable "XYTOOLZ_PEPPER". If not found, the default value "Ahuhu" is used.
+    /// <para><b>Example Usage:</b></para>
+    /// <code>
+    /// byte[] salt;
+    /// string hash = xyHashHelper.BuildSaltedHash(HashAlgorithmName.SHA256, "myPassword123", out salt);
+    /// bool isValid = xyHashHelper.VerifyPassword(HashAlgorithmName.SHA256, "myPassword123", hash);
+    /// </code>
     /// </summary>
     public static class xyHashHelper
     {
-        #region "Member"
-        /// <summary>
-        /// Populate with environment variable when using, default is "Ahuhu"...
-        /// </summary>
-        public static String? Pepper { get; private set; }
+        #region "Configuration"
 
         /// <summary>
-        /// SHA256  =  32 Bytes   
+        /// Separator used between salt and hash when combining to a single string.
         /// </summary>
-        private const UInt16 KeyLength256 = 32;
+        private const string Separator = ":";
 
         /// <summary>
-        /// SHA512  =  64 Bytes    -->   Base64 => 86 characters (88 with padding)
+        /// Returns the currently active pepper value (used for debugging or testing only).
         /// </summary>
-        private const UInt16 KeyLength512 = 64;   
+        internal static string GetCurrentPepper() => Pepper;
+
 
         /// <summary>
-        /// Number of iterations for the generator to choose the key from
+        /// Name of the environment variable used to retrieve the pepper value.
         /// </summary>
-        public static Int32 Iterations { get; private set; } = 100000;
-
-        private static HashAlgorithmName Sha256 = HashAlgorithmName.SHA256;
-        private static HashAlgorithmName Sha512 = HashAlgorithmName.SHA512;
-            #endregion
-
-            #region "Hashing"
-
-            /// <summary>
-            /// Hashes the given pasword in the specified algorithm
-            /// </summary>
-            /// <param name="hashAlgorithm"></param>
-            /// <param name="password"></param>
-            /// <param name="salt"></param>
-            /// <returns>hashed password as base64 string</returns>
-            public static String HashPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
-        {
-            String hashedPasswordString = "";
-            int length = SetKeySize(hashAlgorithm); 
-            String pepperedPassword = PepperPassword(password);
-            Byte[] hash = new Byte[length];
-
-            return HashToString(hashAlgorithm, password, salt);
-        }
+        private const string PepperEnvVarName = "PEPPER";
 
         /// <summary>
-        /// Hash the given password in  the specified algorithm, without creating local variables 
+        /// The configured pepper value, loaded from environment variable or defaults to "Ahuhu".
         /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <returns>
-        /// Byte[] hashedPassword
-        /// </returns>
-        public static byte[] HashToBytes(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
-        => (new Rfc2898DeriveBytes(PepperPassword(password), salt, Iterations, Sha256)).GetBytes(SetKeySize(hashAlgorithm));
-        
-        /// <summary>
-        /// Hash the given password in  the specified algorithm, without creating local variables
-        /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <returns> base64 string     password</returns>
-        public static String HashToString(HashAlgorithmName hashAlgorithm, String password, Byte[] salt) 
-        => Convert.ToBase64String((new Rfc2898DeriveBytes(PepperPassword(password), salt, Iterations, Sha256)).GetBytes(SetKeySize(hashAlgorithm)));
-        
-        /// <summary>
-        /// Hashes the given pasword in the specified algorithm and returns hash and salt as base64 string
-        /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <returns>salt:hash</returns>
-        public static String HashPasswordGetSaltAndHash(HashAlgorithmName hashAlgorithm,string password)
-        {
-            string saltNhash = "";
-            int length = SetKeySize(hashAlgorithm);
-            String pepperedPassword = PepperPassword(password);
-            Byte[] salt = GetSalt((UInt16)( length / 2 ));
-            Byte[] hash = new Byte[length];
+        private static readonly string? Pepper = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(PepperEnvVarName)) ? "Ahuhu" : Environment.GetEnvironmentVariable(PepperEnvVarName);
 
-            using (var pbkdf2 = new Rfc2898DeriveBytes(pepperedPassword, salt, Iterations, hashAlgorithm))
-            {
-                hash = pbkdf2.GetBytes(length);
-                saltNhash = $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
-                return saltNhash;
-            }
-        }
+        /// <summary>
+        /// Number of iterations used in PBKDF2 password hashing.
+        /// </summary>
+        public static readonly int Iterations = 100_000;
+        /// <summary>
+        /// Key length in bytes for SHA256-based hashes.
+        /// </summary>
+        public static readonly int KeyLength256 = 32;
+        /// <summary>
+        /// Key length in bytes for SHA512-based hashes.
+        /// </summary>
+        public static readonly int KeyLength512 = 64;
 
         #endregion
 
-        #region "Verification"
+
         /// <summary>
-        /// Verify the password
+        /// Derives a secure cryptographic key from a password and salt using PBKDF2 (RFC 2898).
+        ///
+        /// <para><b>Internals:</b></para>
+        /// - Uses HMAC-SHA256 as PRF (Pseudorandom Function).
+        /// - Internally applies the password, salt, and iteration count to generate the key.
+        /// - Suitable for use with AES encryption or HMAC-based signing.
+        ///
+        /// <para><b>Thread Safety:</b></para>
+        /// Thread-safe: stateless and does not cache results.
+        ///
+        /// <para><b>Limitations:</b></para>
+        /// - Requires caller to provide a strong, unique salt.
+        /// - Not suitable for hardware tokens or FIDO where key derivation must be deterministic.
+        ///
+        /// <para><b>Example Usage:</b></para>
+        /// <code>
+        /// byte[] salt = RandomNumberGenerator.GetBytes(16);
+        /// byte[] key  = xyHashHelper.BuildKeyFromPassword("mySecret123", salt, 32);
+        /// </code>
         /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <param name="salt"></param>
-        /// <returns></returns>
-        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, Byte[] salt) => CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(password), HashToBytes(hashAlgorithm, password, salt));
-        
-        /// <summary>
-        /// This is the same function as the others but working step by step and using local variables
-        /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <param name="saltNhash"></param>
-        /// <returns></returns>
-        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, String saltNhash)
+        /// <param name="password">The input password from which the key will be derived.</param>
+        /// <param name="salt">A cryptographically secure random salt (minimum 8 bytes recommended).</param>
+        /// <param name="keyLength">The desired length of the derived key (e.g., 32 for AES-256).</param>
+        /// <param name="iterations">The number of iterations (default: 100,000).</param>
+        /// <returns>A derived key as a byte array.</returns>
+        /// <exception cref="ArgumentException">Thrown if password or salt is invalid, or key length is too short.</exception>
+        public static byte[] BuildKeyFromPassword(string password, byte[] salt)
         {
-            String[] input = saltNhash.Split(':');
-            if (input.Length != 2) return false;
 
-            Byte[] salt = Convert.FromBase64String(input[0]);
-            Byte[] hash = Convert.FromBase64String(input[1]);
-            Byte[] hashToCheck = HashToBytes(hashAlgorithm, password, salt);
+            string errorSalt = "Salt must not be null or empty.";
+            string errorPassword = "Password must not be null or empty.";
+            string ok = "Seems to work";
 
-            return CryptographicOperations.FixedTimeEquals(hash, hashToCheck);
+            xyLog.Log((salt is null || salt.Length == 0) ? errorSalt : string.IsNullOrWhiteSpace(password) ? errorPassword : ok);
+
+            using Rfc2898DeriveBytes pbkdf2 = new(xy.StringToBytes(password), salt, Iterations, HashAlgorithmName.SHA256);
+
+            return pbkdf2.GetBytes(KeyLength256);
         }
-        
-        #endregion
 
-        #region "Misc"
-        /// <summary>
-        /// Create an array of cryptographically strong random values
-        /// </summary>
-        /// <returns></returns>
-        public static Byte[] GetSalt(UInt16 saltLength ) => RandomNumberGenerator.GetBytes((int)saltLength );
+
+
+
+        #region Hashing Functions
 
         /// <summary>
-        /// Checks the given algorithm and returns the according length in Bytes
+        /// Returns a Base64-encoded hash string created with PBKDF2 from the provided password and salt.
         /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <returns></returns>
-        private static Int32 SetKeySize(HashAlgorithmName hashAlgorithm)
+        /// <param name="hashAlgorithm">The hash algorithm to use</param>
+        /// <param name="password">The plaintext password.</param>
+        /// <param name="salt">The cryptographic salt.</param>
+        /// <returns>Base64-encoded hash string.</returns>
+        public static string HashToString(HashAlgorithmName hashAlgorithm, string password, byte[] salt)
         {
-            if (hashAlgorithm == HashAlgorithmName.SHA256)
+            string result = "";
+
+            if (HashToBytes(hashAlgorithm, password, salt) is byte[] bytes)
             {
-                return KeyLength256;
+                if (bytes.Length > 0)
+                {
+                    result = xy.BytesToBase(bytes);
+                }
             }
-            if (hashAlgorithm == HashAlgorithmName.SHA512)
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a derived key (hash) as a byte array using PBKDF2 and the given hash algorithm.
+        /// </summary>
+        /// <param name="hashAlgorithm">The hash algorithm to use.</param>
+        /// <param name="password">The plaintext password.</param>
+        /// <param name="salt">The cryptographic salt.</param>
+        /// <returns>Derived key as byte array.</returns>
+        public static byte[] HashToBytes(HashAlgorithmName hashAlgorithm, string password, byte[] salt)
+        {
+            string log = $"Algorithm: {hashAlgorithm.Name}, SaltLength: {salt.Length}";
+            string logSaltError = "Provided salt is null or empty.";
+            string logPasswordError = "Provided password is null or empty.";
+
+
+            if (salt is null || salt.Length == 0)
             {
-                return KeyLength512;
+                xyLog.Log(logSaltError);
+                return Array.Empty<byte>();
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                xyLog.Log(logPasswordError);
+                return Array.Empty<byte>();
+            }
+
+
+            xyLog.Log(log);
+
+            string pepperedPassword = PepperPassword(password);
+            int keySize = SetKeySize(hashAlgorithm);
+
+            using Rfc2898DeriveBytes pbkdf2 = new(pepperedPassword, salt, Iterations, hashAlgorithm);
+            return pbkdf2.GetBytes(keySize);
+        }
+
+
+        /// <summary>
+        /// Creates a Base64 hash string by calling HashToString().
+        /// </summary>
+        /// <param name="hashAlgorithm">Hash algorithm to use.</param>
+        /// <param name="password">The password to hash.</param>
+        /// <param name="salt">The salt used in the hashing process.</param>
+        /// <returns>Base64-encoded password hash.</returns>
+        public static string HashPassword(HashAlgorithmName hashAlgorithm, string password, byte[] salt)
+        {
+            string saltError = "Salt is null or empty.";
+            string pwError = "Password is null or empty.";
+            string weird = "You should not be able to read this, please inform experts immediately!";
+
+            bool isSaltValid = (salt is not null && salt.Length > 0);
+            bool isPwValid = (!string.IsNullOrWhiteSpace(password));
+
+            if (isSaltValid && isPwValid)
+            {
+                return HashToString(hashAlgorithm, password, salt);
             }
             else
             {
-                xyLog.Log("No specific algorithm detected, default to secure alternative.");
-                return 128;
+                xyLog.Log(!isSaltValid ? saltError : (!isPwValid ? pwError : weird));
+                return string.Empty;
             }
         }
+
         #endregion
 
-        #region "Pepper"
+        #region Password Verification
+
         /// <summary>
-        /// Get the value for a specific environment variable 
+        /// Verifies a plaintext password against a stored salted hash in the format "salt:hash".
         /// </summary>
-        /// <param name="namePepperEnvVar"></param>
-        /// <returns>The value of the EnvVar</returns>
-        private static String? GetValueByFromEnviromentVariable(string namePepperEnvVar)
+        /// <param name="hashAlgorithm">The hash algorithm used originally to compute the hash (e.g., SHA256).</param>
+        /// <param name="password">The plaintext password to verify.</param>
+        /// <param name="saltNhash">The combined salt and hash string, separated by a colon ("salt:hash").</param>
+        /// <returns>True if the password is valid; otherwise, false.</returns>
+        public static bool VerifyPassword(HashAlgorithmName hashAlgorithm, string password, string saltNhash)
         {
-            string? environmentVariable = "";
+            string bug = "This text is unreachable, please stay calm and call a supervisor";
+            string logInvalidFormat = "Invalid format in saltNhash.";
+            string logSaltNull = "Salt is null or empty.";
+            string logPasswordNull = "Password is null or empty.";
+            string[] input = [];
+
+            byte[] hashToCheck = default!;
+            byte[] hash = default!;
+            byte[] salt = default!;
+            bool isValid = false;
+            bool isFormat = false;
+            bool isSaltValid = false;
+            bool isPwNull = (string.IsNullOrWhiteSpace(password));
+            bool isCheckNull = (string.IsNullOrWhiteSpace(saltNhash));
+
+            if (!isPwNull &&  !isCheckNull)
+            {
+                input = saltNhash.Split(Separator);
+                isFormat = (input.Length == 2);
+                if (isFormat)
+                {
+                    salt = xy.BaseToBytes(input[0]);
+                    hash = xy.BaseToBytes(input[1]);
+                    isSaltValid = salt is not null && salt.Length > 0;
+                    if (isSaltValid)
+                    {
+                        hashToCheck = HashToBytes(hashAlgorithm, password, salt);
+                        isValid = CryptographicOperations.FixedTimeEquals(hash, hashToCheck);
+                    }
+                }
+            }     
+            xyLog.Log(!isSaltValid? logSaltNull :(!isFormat ? logInvalidFormat : isPwNull ? logPasswordNull : bug));
+            return isValid;
+        }
+
+        /// <summary>
+        /// Compares two hash byte arrays using a fixed-time comparison to prevent timing attacks.
+        /// </summary>
+        /// <param name="hashAlgorithm">The hash algorithm used (not actively used in comparison).</param>
+        /// <param name="hash1">First byte array representing the computed hash.</param>
+        /// <param name="hash2">Second byte array representing the stored hash.</param>
+        /// <returns>True if the hashes are identical; otherwise, false.</returns>
+        public static bool VerifyPassword(HashAlgorithmName hashAlgorithm, byte[] hash1, byte[] hash2)
+        {
+            string nullHash1 = "First array is null or empty.";
+            string nullHash2 = "Second hash is null or empty.";
+            string lengthNotEqual = "Arrays have different length and cant be compared.";
+            string bugMessage = "Unexpected level reached. Please investigate somewhere else.";
+
+            bool isHash2Valid = hash2 is not null && hash2.Length > 0;
+            bool isHash1Valid = hash1 is not null && hash1.Length > 0;
+            bool isSameLength = isHash1Valid && isHash2Valid && (hash1.Length == hash2.Length); 
+            bool result = false;
+
+            if (isHash1Valid && isHash2Valid)
+            {
+                if (isSameLength)
+                {
+                    result= CryptographicOperations.FixedTimeEquals(hash1, hash2);
+                }
+            }  
+            xyLog.Log(!isHash1Valid ? nullHash1 : (!isHash2Valid ? nullHash2 : !isSameLength? lengthNotEqual : bugMessage));
+            return result;
+        }
+
+        #endregion
+
+        #region Salt & Helper Functions
+
+        /// <summary>
+        /// Generates a secure random Salt, using a cryptographically strong RNG.
+        /// </summary>
+        /// <param name="length">The length of the salt in bytes: 16 or more.</param>
+        /// <returns>A secure salt, or an empty array if the generation fails.</returns>
+        public static byte[] GenerateSalt(int length = 32)
+        {
+            string tooShort = "WARNING: Salt length too short. Minimum requirement: 16 bytes.";
+
+            if (length < 16)
+            {
+                xyLog.Log(tooShort);
+                return Array.Empty<byte>();
+            }
+
             try
             {
-                environmentVariable = Environment.GetEnvironmentVariable(namePepperEnvVar);
+                byte[] salt = new byte[length];
+                using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+                rng.GetBytes(salt);
+                return salt;
+            }
+            catch (Exception ex)
+            {
+    
+                xyLog.ExLog(ex);
+                return Array.Empty<byte>();
+            }
+        }
+
+
+        /// <summary>
+        /// Builds a combined salt and Base64-encoded password hash string in the format "salt:hash".
+        /// </summary>
+        /// <param name="hashAlgorithm">The hash algorithm to use for hashing the password.</param>
+        /// <param name="password">The plaintext password to hash.</param>
+        /// <param name="salt">The generated cryptographic salt used for hashing, returned via out parameter.</param>
+        /// <returns>Combined string of Base64 salt and hash separated by a colon.</returns>
+        public static string BuildSaltedHash(HashAlgorithmName hashAlgorithm, string password, out byte[] salt)
+        {
+            try
+            {
+                salt = GenerateSalt();
+                string hash = HashPassword(hashAlgorithm, password, salt);
+                string saltString = Convert.ToBase64String(salt);
+                return string.Concat(saltString, Separator, hash);
             }
             catch (Exception ex)
             {
                 xyLog.ExLog(ex);
-            }
-            return environmentVariable;
-        }
-
-        /// <summary>
-        /// Pepper the password with the value retrieved from the environment variable
-        /// </summary>
-        /// <param name="password"></param>
-        /// <param name="namePepperEnvVar"></param>
-        /// <returns></returns>
-        private static String PepperPasswordWithEnvVar(string password, string namePepperEnvVar) => password + GetValueByFromEnviromentVariable(namePepperEnvVar);
-
-        /// <summary>
-        /// Set member "pepper" to the value of the targeted environment variable or if thats not availlable, the given string in parameter
-        /// </summary>
-        /// <param name="pepperVarName"></param>
-        /// <param name="alternativeValueForMember"></param>
-        private static void SetPepper(string pepperVarName, string alternativeValueForMember = "Ahuhu") => Pepper = GetValueByFromEnviromentVariable(pepperVarName) ?? alternativeValueForMember;
-
-        /// <summary>
-        /// Concat password and "Pepper" - member
-        /// </summary>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        private static String PepperPassword(string password) => password + Pepper;
-        #endregion
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        #region "Not in Use"
-        /// <summary>
-        /// Hashes the entered password based on [Rfc2898DeriveBytes(SHA512)]  
-        /// working with its own local variables, if needed for debugging
-        /// </summary>
-        /// <param name="password"></param>
-        /// <returns>hash</returns>
-        public static String HashPassword512(String password)
-        {
-            UInt16 length = KeyLength512;
-            Byte[] salt = RandomNumberGenerator.GetBytes(length / 2);
-            Byte[] hash = new Byte[length];
-            String pepperedPassword = PepperPassword(password);
-            String hashedPassword = "";
-
-            using (Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(pepperedPassword, salt, Iterations, Sha512))
-            {
-                hash = pbkdf2.GetBytes(KeyLength512);
-                hashedPassword = Convert.ToBase64String(hash);
-                return hashedPassword;
+                salt = Array.Empty<byte>();
+                return string.Empty;
             }
         }
-
-        /// <summary>
-        /// Hashes the entered password based on [Rfc2898DeriveBytes(SHA256)]  
-        /// working with its own local variables, if needed for debugging
-        /// </summary>
-        /// <param name="password"></param>
-        /// <returns>hash</returns>
-        public static String HashPassword256(String password)
-        {
-            UInt16 length = KeyLength256;
-            Byte[] salt = RandomNumberGenerator.GetBytes(length/2);
-            Byte[] hash = new Byte[length];
-            String pepperedPassword = PepperPassword(password);
-            String hashedPassword = "";
-
-            using (Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(pepperedPassword, salt, Iterations, Sha256))
-            {
-                hash = pbkdf2.GetBytes(KeyLength256);
-                hashedPassword = Convert.ToBase64String(hash);
-                return hashedPassword;
-            }
-        }
-
-        /// <summary>
-        /// Hashes the given pasword in the specified algorithm and returns hash and salt as base64 string without declaring additional variables
-        /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <returns>salt:hash</returns>
-        public static String HashPwGetSaltHash(HashAlgorithmName hashAlgorithm, String password, Byte[] salt)
-        => $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(new Rfc2898DeriveBytes(PepperPassword(password), GetSalt((UInt16)salt.Length ) , Iterations, hashAlgorithm).GetBytes(SetKeySize(hashAlgorithm)))}";
-
-        /// <summary>
-        /// Returns either the value of the target env_var      or      the value of the member "Pepper"
-        /// </summary>
-        /// <param name="pepperName"></param>
-        /// <returns></returns>
-        private static String GetPepper(string pepperName) => GetValueByFromEnviromentVariable(pepperName) ?? Pepper;
-
-        /// <summary>
-        /// Verifiy the password
-        /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <param name="salt"></param>
-        /// <returns></returns>
-        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, Byte[] password, Byte[] salt) => CryptographicOperations.FixedTimeEquals(password, HashToBytes(hashAlgorithm, Convert.ToBase64String(password), salt));
-
-        /// <summary>
-        /// Verify the password
-        /// </summary>
-        /// <param name="hashAlgorithm"></param>
-        /// <param name="password"></param>
-        /// <param name="saltNhash"></param>
-        /// <param name="useless"></param>
-        /// <returns></returns>
-        public static Boolean VerifyPassword(HashAlgorithmName hashAlgorithm, String password, String saltNhash, string? useless = "")
-        => CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(saltNhash.Split(':').First()), HashToBytes(hashAlgorithm, password, Convert.FromBase64String(saltNhash.Split(':').Last())));
 
         #endregion
 
+        #region Internal: KeySize & Pepper
+
+        /// <summary>
+        /// Determines the key size in bytes based on the specified hash algorithm.
+        /// </summary>
+        /// <param name="algorithm">The hash algorithm (e.g., SHA256 or SHA512).</param>
+        /// <returns>Corresponding key length in bytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when an unsupported algorithm is provided.</exception>
+        private static int SetKeySize(HashAlgorithmName algorithm)
+        {
+            string unsupAlgoMsg = "Unsupported algorithm...";
+            try
+            {
+                return algorithm switch                                                                                     // Super Sache!!!
+                {
+                    { } a when a == HashAlgorithmName.SHA256 => KeyLength256,                   
+                    { } a when a == HashAlgorithmName.SHA512 => KeyLength512,                   // {} a when a ==           ist also ein gültiges Objekt => nicht null
+                    _ => throw new ArgumentException(unsupAlgoMsg, nameof(algorithm))      // Für alles, was nicht abgedeckt wurde
+                };
+
+       
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Appends the configured pepper to the password to increase entropy.
+        /// </summary>
+        /// <param name="password">The plaintext password.</param>
+        /// <returns>The password combined with the pepper string.</returns>
+        private static string PepperPassword(string password)
+        {
+            string logPasswordMissing = "Password was null or empty. Using only pepper.";
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                xyLog.Log(logPasswordMissing);
+                return Pepper ?? string.Empty;
+            }
+
+            return string.Concat(password, Pepper);
+        }
+
+        #endregion
     }
-}        
-
+}

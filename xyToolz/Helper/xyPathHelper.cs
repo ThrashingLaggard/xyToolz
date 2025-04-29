@@ -6,40 +6,48 @@ using System.Threading.Tasks;
 
 namespace xyToolz.Helper
 {
-      public static class xyPathHelper
-      {
-            #if ANDROID
+    public static class xyPathHelper
+    {
+#if ANDROID
                   public static string BasePath { get; } = Android.App.Application.Context.FilesDir.AbsolutePath;
-            #else
-            public static string BasePath { get; } = AppContext.BaseDirectory;
-            #endif
-            public static string Combine( params string [ ] paths ) 
-            {
-            #if ANDROID
+#else
+        public static string BasePath { get; } = AppContext.BaseDirectory;
+#endif
+        public static string Combine(params string[] paths)
+        {
+#if ANDROID
                   return Path.Combine(BasePath, Path.Combine(paths));
-            #else
-                  return Path.Combine(paths.Prepend(BasePath).ToArray( ));
-            #endif
-            }
-           
+#else
+            return Path.Combine(paths.Prepend(BasePath).ToArray());
+#endif
+        }
 
-            public static string EnsureDirectory(params string[] subPaths)
+
+        public static string? EnsureDirectory(params string[] subPaths)
+        {
+            string fullPath = Combine(subPaths);
+            try
             {
-                  string fullPath = Combine(subPaths);
-                  if (!Directory.Exists(fullPath))
-                  {
-                        Directory.CreateDirectory(fullPath);
-                  }
-                  return fullPath;
+                if (!Directory.Exists(fullPath))
+                {
+                    Directory.CreateDirectory(fullPath);
+                }
+                return fullPath;
             }
+            catch(Exception ex)
+            {
+                xyLog.ExLog(ex);
+            }
+            return null;
+        }
 
             public static void EnsureParentDirectoryExists(string filePath)
+        {
+            string? dir = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
             {
-                  string? dir = Path.GetDirectoryName(filePath);
-                  if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                  {
-                        Directory.CreateDirectory(dir);
-                  }
+                Directory.CreateDirectory(dir);
             }
-      }
+        }
+    }
 }
