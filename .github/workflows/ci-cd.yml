@@ -1,0 +1,37 @@
+name: CI/CD for xyToolz
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore xyToolz.sln
+
+    - name: Build solution
+      run: dotnet build xyToolz.sln --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test xyToolz.sln --configuration Release --no-build --verbosity normal
+
+    - name: Pack NuGet package
+      run: dotnet pack xyToolz.sln --configuration Release --no-build -o out
+
+    - name: Push NuGet package
+      run: dotnet nuget push ./out/*.nupkg --api-key ${{ secrets.XYTOOLZ_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
