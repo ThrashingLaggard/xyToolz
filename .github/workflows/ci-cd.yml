@@ -22,9 +22,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore xyToolz/xyToolz.csproj  # Restore NuGet packages
 
-    - name: Format code
-      run: dotnet format  # Automatically format code according to .editorconfig
-
     - name: Generate new version from commits
       id: versioning
       run: |
