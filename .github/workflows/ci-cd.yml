@@ -16,7 +16,7 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore xyToolz.sln
+      run: dotnet restore source/xyToolz/xyToolz.csproj
 
     - name: BuildToolz
       run: dotnet build source/xyToolz/xyToolz.csproj --configuration Release --no-restore
