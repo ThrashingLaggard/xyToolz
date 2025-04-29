@@ -1,105 +1,54 @@
-﻿#### xyHashHelper.cs
+﻿
+---
 
-Der `xyHashHelper` bietet robuste und sichere Methoden zum Hashen, Vergleichen und Abspeichern von Passwörtern, Salts und kryptografischen Schlüsseln.
+## Modules
 
-## 📌 Features
-
-- 🔐 Salted Hashing via PBKDF2 (Rfc2898DeriveBytes)
-- 🔑 Dynamische Salt-Generierung mit Secure RNG
-- 🌶️ Optionale Pepper-Absicherung via Umgebungsvariable `PEPPER`
-- 🧮 Unterstützt SHA256 und SHA512
-- 🔁 Sichere Passwortverifikation mit `FixedTimeEquals`
-- 🧪 Umfangreiches Logging
-- 📦 Kompatibel mit AES-Key-Derivation (z. B. für Verschlüsselung)
-
-## 🔧 Konfiguration
-
-| Option           | Beschreibung                                  | Default     |
-|------------------|-----------------------------------------------|-------------|
-| `PEPPER`         | Umgebungsvariable für zusätzliche Entropie    | `"Ahuhu"`   |
-| `Iterations`     | Wiederholungen in PBKDF2                      | `100_000`   |
-| `KeyLength256`   | Keylänge für AES-256 / SHA256                 | `32 Bytes`  |
-| `KeyLength512`   | Keylänge für SHA512                           | `64 Bytes`  |
-
-## 📌 Methodenübersicht
-
-| Methode                          | Zweck                                        |
-|----------------------------------|----------------------------------------------|
-| `BuildSaltedHash()`             | Erstellt neuen Salt + Hash im Format `salt:hash` |
-| `VerifyPassword()`              | Vergleicht Password gegen Salt+Hash          |
-| `BuildKeyFromPassword()`        | Generiert AES-Schlüssel aus Passwort + Salt  |
-| `GenerateSalt()`                | Erstellt sicheren Salt in gewünschter Länge  |
-| `HashToBytes()` / `HashToString()` | Raw-Hash oder Base64-Hash erzeugen        |
-| `TryVerifyPassword()` *(neu)*   | Sicherer Passwort-Vergleich mit `out bool`   |
-
-## 🧪 Beispiel
-``csharp
-// Hash erstellen
-string password = "MeinSicheresPasswort123!";
-string saltedHash = xyHashHelper.BuildSaltedHash(HashAlgorithmName.SHA256, password, out byte[] salt);
-
-// Passwort prüfen
-bool isCorrect = xyHashHelper.VerifyPassword(HashAlgorithmName.SHA256, password, saltedHash);
-
-
-
-
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-#### xyRsa
-
-`xyRsa` is a reusable, fully static utility class designed for secure handling of **JWT (JSON Web Tokens)** using **RSA encryption** in .NET-based Web APIs or desktop applications.  
-It enables easy generation, validation, and management of JWTs with **public/private key cryptography**, aligned with modern security practices.
+- **xyToolz**: Base library with all reusable helpers (e.g., `xyFiles`, `xyLog`, `xyJson`, `xyRsa`)
+- **xyPorts**: Networking tools to handle TCP/UDP ports, listeners and connections
+- **xyAndroid**: Android-specific utilities like permissions, foreground service handling
+- **xyAvalonia**: Frontend console for debugging output and simple GUI interactions
+- **xyToolz_Exec**: CLI runner for executing and testing helpers interactively
 
 ---
 
-## 🔐 Features
+## Key Namespaces
 
-- ✅ **JWT Creation** using `RS256` and `SecurityTokenDescriptor`
-- ✅ **JWT Validation** with configurable lifetime and signature checks
-- 🔑 **Public/Private Key Loading** from PEM-formatted strings
-- 📦 **Export Public Key** as PEM
-- 🏷️ **Issuer & Audience configuration**
-- 📜 Full logging of success, failure, and exceptions via `xyLog`
+### `xyToolz`
+
+- `xyFiles`, `xyDirUtils` — File and folder operations
+- `xyJson` — Read/write/serialize JSON
+- `xyLog`, `xyLogFormatter`, `xyLogArchiver` — Central logging system
+- `xyDataProtector`, `xyRsa`, `xyHashHelper` — Crypto & data security
+- `xyConversion`, `xyColQol`, `xyCard`, `xyPathHelper` — Various helper utilities
+
+### `xyPorts`
+
+- `xyPortChecker`, `xyPortManager` — Check port usage, kill processes
+- `xyTcpClient`, `xyTcpListener`, `xyTcpPort` — TCP tools
+- `xyUdpClient`, `xyUdpPort` — UDP tools
+
+### `xyAndroid`
+
+- `xyFilesAndroid`, `xyALog`, `xyForeGroundService`
+- `IStoragePermissionService` — Permission abstraction
+
+### `xyAvalonia`
+
+- `ConsoleTextBoxWriter`, `MainWindowViewModel` — Debugging frontend
 
 ---
 
-## 🧪 Example Usage
+## Usage Examples
 
-``csharp
-await xyRsa.LoadKeysAsync(publicPem, privatePem);
-await xyRsa.ConfigureAsync("MyApiIssuer", "MyAudience");
+```csharp
+// Logging
+xyLog.Log("Application started.");
 
-var token = await xyRsa.GenerateJwtAsync(new Dictionary<string, object>
-{
-    { "sub", "user123" },
-    { "role", "admin" }
-}, TimeSpan.FromHours(1));
+// Read JSON from file
+var obj = xyJson.ReadFromFile<MyConfig>("config.json");
 
-var principal = await xyRsa.ValidateJwtAsync(token);
-string pem = await xyRsa.GetPublicKeyAsPemAsync();
+// Encrypt a string with RSA
+string encrypted = xyRsa.Encrypt("Hello", publicKey);
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#### Class: xyFiles
-
-### Purpose
-Provides a cross-platform, static utility class for file and directory operations such as reading, writing, renaming, and deleting.
-
-### Features
-- Directory management: EnsureDirectory, CheckForDirectories
-- File metadata & inspection: Inventory, InventoryNames
-- File I/O: ReadLinesAsync, SaveToFile, LoadFileAsync
-- File manipulation: RenameFileAsync, DeleteFile
-- Binary support: SaveBytesToFileAsync, LoadBytesFromFile
-
-### Thread Safety
-All methods are static and stateless, ensuring thread safety by design.
-
-### Platform Compatibility
-Special handling for Android via conditional compilation (`#if ANDROID`).
-
-### Example
-``csharp
-var lines = await xyFiles.ReadLinesAsync("settings.txt");
+// List open TCP ports
+var openPorts = new xyPortChecker().GetOpenPorts();
