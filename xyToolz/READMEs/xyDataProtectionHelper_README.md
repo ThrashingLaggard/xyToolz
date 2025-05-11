@@ -1,20 +1,9 @@
 
 # xyDataProtectionHelper
 
-Die `xyDataProtectionHelper`-Klasse bietet Hilfsmethoden zur sicheren symmetrischen Verschlüsselung und Entschlüsselung von Daten mittels AES (Advanced Encryption Standard). Sie stellt sowohl generische Methoden für komplexe Objekte als auch Utility-Methoden für einfache Zeichenketten dar.
+Ver-& Entschlüsseln von Daten per Windows DPAPI.
 
----
-
-## 🛡 Features
-
-- **AES CBC + PKCS7 Padding**
-- **Asynchrone Methoden**
-- **IV wird automatisch generiert und am Ergebnis angehängt**
-- **Key-Ableitung über `xyHashHelper`**
-- **Generische Objekte werden automatisch als JSON serialisiert und wieder deserialisiert**
-- **Volle Unterstützung für Logging (auch bei Fehlern)**
-
----
+--
 
 ## 🔒 Sicherheit & Einschränkungen
 
@@ -26,13 +15,13 @@ Die `xyDataProtectionHelper`-Klasse bietet Hilfsmethoden zur sicheren symmetrisc
 
 ## 📘 Methodenübersicht
 
-### EncryptAsync\<T\>
+### EncryptAsync<T>
 ```csharp
 Task<byte[]?> EncryptAsync<T>(T obj, string password, byte[] salt)
 ```
 Serialisiert ein beliebiges Objekt zu JSON, verschlüsselt es und gibt das Ergebnis als [IV][CipherText] zurück.
 
-### DecryptAsync\<T\>
+### DecryptAsync<T>
 ```csharp
 Task<T?> DecryptAsync<T>(byte[] encryptedData, string password, byte[] salt)
 ```

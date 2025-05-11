@@ -1,7 +1,8 @@
 # Class Documentation: `xyFiles`
 
 ## Overview
-`xyFiles` is a static utility class that provides cross-platform file and directory handling features for .NET applications. It is designed to simplify common I/O tasks such as reading, writing, renaming, validating, and deleting files or directories.
+Static utility class that provides cross-platform file and directory handling features and qol stuff for .NET applications. 
+Its designed to simplify common I/O tasks such as reading, writing, renaming, validating, and deleting files or directories.
 
 ---
 
