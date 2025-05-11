@@ -1,105 +1,76 @@
-﻿#### xyHashHelper.cs
+﻿
+# xyToolz Utility Library
 
-Der `xyHashHelper` bietet robuste und sichere Methoden zum Hashen, Vergleichen und Abspeichern von Passwörtern, Salts und kryptografischen Schlüsseln.
+xyToolz is a modular and highly reusable utility library designed for .NET applications. It provides a wide range of helper functions and classes to streamline everyday development tasks, improve code readability, maintainability, and enhance overall productivity.
 
-## 📌 Features
+## Features and Classes Overview
 
-- 🔐 Salted Hashing via PBKDF2 (Rfc2898DeriveBytes)
-- 🔑 Dynamische Salt-Generierung mit Secure RNG
-- 🌶️ Optionale Pepper-Absicherung via Umgebungsvariable `PEPPER`
-- 🧮 Unterstützt SHA256 und SHA512
-- 🔁 Sichere Passwortverifikation mit `FixedTimeEquals`
-- 🧪 Umfangreiches Logging
-- 📦 Kompatibel mit AES-Key-Derivation (z. B. für Verschlüsselung)
+### General Utilities
+- xy: Centralized helper methods used across the xyToolz library.
+- xyColQol: Quality-of-life enhancements for collections.
+- xyConversion: Utility methods for conversion between number systems.
 
-## 🔧 Konfiguration
+### File and Directory Handling
+- xyFiles: Simplifies file operations like reading, writing, and managing files.
+- xyDirUtils: Streamlines directory-related operations and management.
+- xyPath: Helps manage file and directory paths.
 
-| Option           | Beschreibung                                  | Default     |
-|------------------|-----------------------------------------------|-------------|
-| `PEPPER`         | Umgebungsvariable für zusätzliche Entropie    | `"Ahuhu"`   |
-| `Iterations`     | Wiederholungen in PBKDF2                      | `100_000`   |
-| `KeyLength256`   | Keylänge für AES-256 / SHA256                 | `32 Bytes`  |
-| `KeyLength512`   | Keylänge für SHA512                           | `64 Bytes`  |
+### Logging
+- xyLog: Core logging class supporting structured and async logging.
+- xyLogFormatter: Provides formatting capabilities for log messages.
+- xyLogTargets: Defines various logging targets (file, console, etc.).
+- xyLogArchiver: Manages archival and rotation of log files.
 
-## 📌 Methodenübersicht
+### Security and Cryptography
+- xyHasher: Provides hashing methods, ideal for password hashing and data verification.
+- xyRsa: Facilitates RSA encryption and decryption.
+- xyDataProtector: Uses Windows DPAPI for encryption and secure data handling.
 
-| Methode                          | Zweck                                        |
-|----------------------------------|----------------------------------------------|
-| `BuildSaltedHash()`             | Erstellt neuen Salt + Hash im Format `salt:hash` |
-| `VerifyPassword()`              | Vergleicht Password gegen Salt+Hash          |
-| `BuildKeyFromPassword()`        | Generiert AES-Schlüssel aus Passwort + Salt  |
-| `GenerateSalt()`                | Erstellt sicheren Salt in gewünschter Länge  |
-| `HashToBytes()` / `HashToString()` | Raw-Hash oder Base64-Hash erzeugen        |
-| `TryVerifyPassword()` *(neu)*   | Sicherer Passwort-Vergleich mit `out bool`   |
+### JSON Handling
+- xyJson: JSON serialization and deserialization helper.
 
-## 🧪 Beispiel
-``csharp
-// Hash erstellen
-string password = "MeinSicheresPasswort123!";
-string saltedHash = xyHashHelper.BuildSaltedHash(HashAlgorithmName.SHA256, password, out byte[] salt);
+### PDF Handling
+- xyPdf: Tools for creating and manipulating PDF documents.
 
-// Passwort prüfen
-bool isCorrect = xyHashHelper.VerifyPassword(HashAlgorithmName.SHA256, password, saltedHash);
+### Web Automation
+- xyWebDriver: Simplifies automation tasks using Selenium WebDriver.
 
 
 
 
+## Installation
+
+Install via NuGet package manager:
+
+dotnet add package xyToolz
 
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#### xyRsa
 
-`xyRsa` is a reusable, fully static utility class designed for secure handling of **JWT (JSON Web Tokens)** using **RSA encryption** in .NET-based Web APIs or desktop applications.  
-It enables easy generation, validation, and management of JWTs with **public/private key cryptography**, aligned with modern security practices.
+## Usage Example
 
----
+Here's a quick example of using xyLog to log messages:
 
-## 🔐 Features
 
-- ✅ **JWT Creation** using `RS256` and `SecurityTokenDescriptor`
-- ✅ **JWT Validation** with configurable lifetime and signature checks
-- 🔑 **Public/Private Key Loading** from PEM-formatted strings
-- 📦 **Export Public Key** as PEM
-- 🏷️ **Issuer & Audience configuration**
-- 📜 Full logging of success, failure, and exceptions via `xyLog`
+using xyToolz;
 
----
+xyLog.Log("Application started.");
 
-## 🧪 Example Usage
-
-``csharp
-await xyRsa.LoadKeysAsync(publicPem, privatePem);
-await xyRsa.ConfigureAsync("MyApiIssuer", "MyAudience");
-
-var token = await xyRsa.GenerateJwtAsync(new Dictionary<string, object>
+try
 {
-    { "sub", "user123" },
-    { "role", "admin" }
-}, TimeSpan.FromHours(1));
+    // Code that might throw an exception
+}
+catch (Exception ex)
+{
+    xyLog.ExLog(ex);
+}
 
-var principal = await xyRsa.ValidateJwtAsync(token);
-string pem = await xyRsa.GetPublicKeyAsPemAsync();
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#### Class: xyFiles
+## Contributing
 
-### Purpose
-Provides a cross-platform, static utility class for file and directory operations such as reading, writing, renaming, and deleting.
+Feel free to contribute by submitting issues and pull requests. Ensure your code follows the existing style and conventions else I will rewrite it.
 
-### Features
-- Directory management: EnsureDirectory, CheckForDirectories
-- File metadata & inspection: Inventory, InventoryNames
-- File I/O: ReadLinesAsync, SaveToFile, LoadFileAsync
-- File manipulation: RenameFileAsync, DeleteFile
-- Binary support: SaveBytesToFileAsync, LoadBytesFromFile
+## License
 
-### Thread Safety
-All methods are static and stateless, ensuring thread safety by design.
+xyToolz is licensed under the GPL-3.0. See the LICENSE file for more details.
 
-### Platform Compatibility
-Special handling for Android via conditional compilation (`#if ANDROID`).
-
-### Example
-``csharp
-var lines = await xyFiles.ReadLinesAsync("settings.txt");
