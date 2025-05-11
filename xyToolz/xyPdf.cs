@@ -6,6 +6,9 @@ using PdfSharp.Pdf.IO;
 
 namespace xyToolz
 {
+    /// <summary>
+    /// QOL stuff for handling pdf files
+    /// </summary>
       public class xyPdf
       {
             // Es heißt WORKING-DÍRECTORY
@@ -399,112 +402,102 @@ namespace xyToolz
 
                   return targetDoc;
             }
-            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-            /// <summary>
-            /// Combines ALL Pdf files in the folder into one & names it after its pagecount
-            /// 
-            /// 
-            /// 
-            /// We are working from the applications debug folder so no long foldername needed:
-            /// string directory = "InputFilesHere\\"
-            /// 
-            /// 
-            /// </summary>
-            /// <param name="directory"></param>
-            /// <returns></returns>
-            //public static bool CombineAllInDirectory(string directory)
-            //{
-            //      int count = 0;
+        //==============================================================================
 
-            //      // Collects all the information
-            //      PdfDocument targetDoc = new PdfDocument();
-            //      targetDoc.Tag = Path.GetDirectoryName(directory);
-            //      targetDoc.PageLayout = PdfPageLayout.OneColumn;
+        // Combines ALL Pdf files in the folder into one & names it after its pagecount
+        //public static bool CombineAllInDirectory(string directory)
+        //{
+        //      int count = 0;
+
+        //      // Collects all the information
+        //      PdfDocument targetDoc = new PdfDocument();
+        //      targetDoc.Tag = Path.GetDirectoryName(directory);
+        //      targetDoc.PageLayout = PdfPageLayout.OneColumn;
 
 
-            //      //XFont font = new XFont("Verdana", 10, XFontStyle.Bold);
-            //      XStringFormat format = new XStringFormat();
+        //      //XFont font = new XFont("Verdana", 10, XFontStyle.Bold);
+        //      XStringFormat format = new XStringFormat();
 
-            //      format.Alignment = XStringAlignment.Center;
-            //      format.LineAlignment = XLineAlignment.Far;
+        //      format.Alignment = XStringAlignment.Center;
+        //      format.LineAlignment = XLineAlignment.Far;
 
-            //      try
-            //      {
-            //            // Reads all PDF from this folder into an array
-            //            string[] arr_allFiles = Directory.GetFiles(directory, "*.pdf", SearchOption.TopDirectoryOnly);
+        //      try
+        //      {
+        //            // Reads all PDF from this folder into an array
+        //            string[] arr_allFiles = Directory.GetFiles(directory, "*.pdf", SearchOption.TopDirectoryOnly);
 
-            //            // iterates through every page of every file, copys it into the target file & counts the pages
-            //            foreach (string file in arr_allFiles)
-            //            {
-            //                  PdfDocument source = PdfReader.Open(file, PdfDocumentOpenMode.Import);
-            //                  count += source.Pages.Count;
+        //            // iterates through every page of every file, copys it into the target file & counts the pages
+        //            foreach (string file in arr_allFiles)
+        //            {
+        //                  PdfDocument source = PdfReader.Open(file, PdfDocumentOpenMode.Import);
+        //                  count += source.Pages.Count;
 
-            //                  for (int x = 0; x < count; x++)
-            //                  {
-            //                        targetDoc.AddPage(source.Pages[x]);
-            //                  }
-            //            }
-            //            // Save the files with their page count for better overview
-            //            targetDoc.Save($"Output\\{count}.pdf");
-            //            return true;
-            //      }
-            //      catch
-            //      {
-            //            Console.WriteLine("Something went wrong with your input");
-            //            return false;
-            //      }
-            //}
-            int lol;
-            //private string PDFCombine()
-            //{
-            //      string[] AllePDFDateien;
+        //                  for (int x = 0; x < count; x++)
+        //                  {
+        //                        targetDoc.AddPage(source.Pages[x]);
+        //                  }
+        //            }
+        //            // Save the files with their page count for better overview
+        //            targetDoc.Save($"Output\\{count}.pdf");
+        //            return true;
+        //      }
+        //      catch
+        //      {
+        //            Console.WriteLine("Something went wrong with your input");
+        //            return false;
+        //      }
+        //}
 
-            //      PdfPage page;
-            //      PdfDocument inputDocument = new PdfDocument();
-            //      PdfDocument outputDocument = new PdfDocument();
+        //private string PDFCombine()
+        //{
+        //      string[] AllePDFDateien;
 
-
-            //      // Einstellungen für die Ausgabedatei
-            //      // Seiten ausrichtung (One Column = Untereinander)
-            //      outputDocument.PageLayout = PdfPageLayout.OneColumn;
+        //      PdfPage page;
+        //      PdfDocument inputDocument = new PdfDocument();
+        //      PdfDocument outputDocument = new PdfDocument();
 
 
-            //      //XFont font = new XFont("Verdana", 10, XFontStyle.Bold);
-            //      XStringFormat format = new XStringFormat();
+        //      // Einstellungen für die Ausgabedatei
+        //      // Seiten ausrichtung (One Column = Untereinander)
+        //      outputDocument.PageLayout = PdfPageLayout.OneColumn;
 
 
-            //      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //      //XFont font = new XFont("Verdana", 10, XFontStyle.Bold);
+        //      XStringFormat format = new XStringFormat();
 
-            //      format.Alignment = XStringAlignment.Center;
-            //      format.LineAlignment = XLineAlignment.Far;
-            //      // Alle PDF Datei aus dem Ordner in dem das Programm liegt!
-            //      AllePDFDateien = Directory.GetFiles("\\InputFilesHere", "*.pdf", SearchOption.AllDirectories);
+
+        //      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //      format.Alignment = XStringAlignment.Center;
+        //      format.LineAlignment = XLineAlignment.Far;
+        //      // Alle PDF Datei aus dem Ordner in dem das Programm liegt!
+        //      AllePDFDateien = Directory.GetFiles("\\InputFilesHere", "*.pdf", SearchOption.AllDirectories);
 
 
 
-            //      foreach (string datei in AllePDFDateien)
-            //      {
-            //            if (datei.Contains("_Zusammenfassung_Tagesabschluesse"))
-            //                  continue;
+        //      foreach (string datei in AllePDFDateien)
+        //      {
+        //            if (datei.Contains("_Zusammenfassung_Tagesabschluesse"))
+        //                  continue;
 
-            //            inputDocument = PdfReader.Open(datei, PdfDocumentOpenMode.Import);
-            //            int count = inputDocument.PageCount;
+        //            inputDocument = PdfReader.Open(datei, PdfDocumentOpenMode.Import);
+        //            int count = inputDocument.PageCount;
 
-            //            for (int idx = 0; idx < count; idx++)
-            //            {
-            //                  page = inputDocument.PageCount > idx ? inputDocument.Pages[idx] : new PdfPage();
-            //                  page = outputDocument.AddPage(page);
-            //            }
-            //      }
+        //            for (int idx = 0; idx < count; idx++)
+        //            {
+        //                  page = inputDocument.PageCount > idx ? inputDocument.Pages[idx] : new PdfPage();
+        //                  page = outputDocument.AddPage(page);
+        //            }
+        //      }
 
-            //      string filename = $"\\Output\\{DateTime.Now.AddDays(-1).ToShortDateString()}.pdf";
-            //      outputDocument.Save(filename);
+        //      string filename = $"\\Output\\{DateTime.Now.AddDays(-1).ToShortDateString()}.pdf";
+        //      outputDocument.Save(filename);
 
-            //      return filename;
-            //}
+        //      return filename;
+        //}
 
-      }
+    }
 }
 
 

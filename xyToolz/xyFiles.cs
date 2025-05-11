@@ -25,7 +25,7 @@ namespace xyToolz
     /// <list type="bullet">
     ///   <item><description>Directory management (EnsureDirectory, CheckForDirectories)</description></item>
     ///   <item><description>File path validation (EnsurePathExistsAsync)</description></item>
-    ///   <item><description>File metadata & manipulation (Inventory, InventoryNames, RenameFileAsync)</description></item>
+    ///   <item><description>File metadata manipulation (Inventory, InventoryNames, RenameFileAsync)</description></item>
     ///   <item><description>File content handling (ReadLinesAsync, SaveToFile, LoadFileAsync, DeleteFile)</description></item>
     /// </list>
     ///
