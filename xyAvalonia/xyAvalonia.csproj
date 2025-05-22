@@ -34,10 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\xyToolz\xyToolz.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Views\DebugConsole.axaml.cs">
       <DependentUpon>DebugConsole.axaml</DependentUpon>
     </Compile>
