@@ -236,7 +236,7 @@ namespace xyToolz
                     File.AppendAllText(_exLogFilePath, exceptionDetails);
                     Console.WriteLine(exceptionDetails);
                     Console.Out.Flush();
-                    LogMessageSent?.Invoke(exceptionDetails, callerName);
+                    ExLogMessageSent?.Invoke(exceptionDetails, callerName);
                     return true;
                 }
                 catch (Exception innerEx)

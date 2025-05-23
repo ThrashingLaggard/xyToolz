@@ -3,7 +3,7 @@
         xmlns:vm="using:xyAvalonia.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="150"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="250"
         x:Class="xyAvalonia.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"

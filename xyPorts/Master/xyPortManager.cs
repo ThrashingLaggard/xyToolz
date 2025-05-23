@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using xyPorts.Basix;
 using xyPorts.TCP;
 using xyPorts.UDP;
+using xyToolz;
 
 namespace xyPorts.Master
 {
@@ -36,8 +37,8 @@ namespace xyPorts.Master
         /// <param name="port"></param>
         public static void ClosePort(int port)
         {
-            // Führen Sie den netstat-Befehl aus und lesen Sie die Ausgabe
-            var process = new Process
+           
+            Process process = new()
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -51,19 +52,19 @@ namespace xyPorts.Master
 
             process.Start();
 
-            using (var reader = new StreamReader(process.StandardOutput.BaseStream))
+            using (StreamReader reader = new (process.StandardOutput.BaseStream))
             {
                 string output = reader.ReadToEnd();
-                sLog.Log(output);
+                xyLog.Log(output);
                 process.WaitForExit();
 
-                // Suchen Sie nach der Zeile, die den Port enthält
+                
                 var lines = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 var portLine = lines.FirstOrDefault(line => line.Contains($":{port}"));
 
                 if (portLine != null)
                 {
-                    // Extrahieren Sie die PID aus der Zeile
+                   
                     var parts = portLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     int pid = int.Parse(parts.Last()); // PID ist das letzte Element in der Zeile
 

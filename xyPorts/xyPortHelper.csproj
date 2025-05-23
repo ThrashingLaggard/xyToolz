@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+	  <PackageVersion>1.0.1</PackageVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -14,6 +15,9 @@
             open and close ports and connections
             send messages via TCP or UDP
 	</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <PackageReadmeFile>README_xyPorts_COMPLETE.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +26,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\xyToolz\xyToolz.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README_xyPorts_COMPLETE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

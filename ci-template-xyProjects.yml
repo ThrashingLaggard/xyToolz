@@ -1,0 +1,100 @@
+name: CI/CD for <ProjectName>
+
+# Trigger: Run this workflow on every push to the "master" branch
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest  # Use GitHub-hosted Ubuntu runner
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4  # Step 1: Clone the GitHub repository onto the runner
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4  # Step 2: Install the .NET 8 SDK
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore <ProjectName>.csproj  # Step 3: Restore project dependencies from NuGet
+
+    - name: Generate new version from commit message
+      id: versioning
+      run: |
+        # Step 4: Determine new version based on commit message content
+
+        # Read the current version from the .csproj file
+        current_version=$(grep -oPm1 "(?<=<PackageVersion>)[^<]+" <ProjectName>.csproj)
+        echo "Current version: $current_version"
+
+        # Get the last commit message to decide the version bump
+        commits=$(git log -1 --pretty=%B)
+        echo "Last commit message: $commits"
+
+        # Split the current version into major, minor, patch
+        major=$(echo $current_version | cut -d. -f1)
+        minor=$(echo $current_version | cut -d. -f2)
+        patch=$(echo $current_version | cut -d. -f3)
+
+        # Bump the version based on commit message keywords
+        if echo "$commits" | grep -iq "BREAKING CHANGE"; then
+          major=$((major + 1))
+          minor=0
+          patch=0
+        elif echo "$commits" | grep -iq "^feat"; then
+          minor=$((minor + 1))
+          patch=0
+        elif echo "$commits" | grep -iq "^fix"; then
+          patch=$((patch + 1))
+        else
+          echo "No version keyword found. Keeping current version."
+        fi
+
+        # Set and export the new version for use in later steps
+        new_version="$major.$minor.$patch"
+        echo "New version: $new_version"
+        echo "version=$new_version" >> $GITHUB_ENV
+
+    - name: Update .csproj with new version
+      run: |
+        # Step 5: Update the <PackageVersion> inside the .csproj file with the newly determined version
+        sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/" <ProjectName>.csproj
+
+    - name: Build project
+      run: dotnet build <ProjectName>.csproj --configuration Release --no-restore  # Step 6: Build the project in Release mode
+
+    - name: Run tests
+      run: dotnet test <ProjectName>.csproj --no-build --verbosity normal  # Step 7: Run all unit tests
+
+    - name: Pack NuGet package
+      run: dotnet pack <ProjectName>.csproj --configuration Release --no-build -o out  # Step 8: Create a NuGet package (.nupkg)
+
+    - name: Check if version already exists on NuGet
+      id: check_version
+      run: |
+        # Step 9: Check if the version already exists on NuGet.org to avoid duplicate uploads
+        version=${{ env.version }}
+        exists=$(curl -sL https://api.nuget.org/v3-flatcontainer/<nuget-id>/$version/<nuget-id>.$version.nupkg)
+        if [ -n "$exists" ]; then
+          echo "Version $version already exists. Skipping publish."
+          echo "skip_publish=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "skip_publish=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Push to NuGet
+      if: steps.check_version.outputs.skip_publish == 'false'  # Only publish if version does not already exist
+      run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.<YOUR_SECRET_KEY> }} --skip-duplicate
+
+    - name: Create GitHub Release
+      if: steps.check_version.outputs.skip_publish == 'false'  # Only create a GitHub release if publishing was successful
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ env.version }}  # Use the new version as the GitHub tag
+        name: Release ${{ env.version }}  # Name the release after the new version
+        draft: false
+        prerelease: false

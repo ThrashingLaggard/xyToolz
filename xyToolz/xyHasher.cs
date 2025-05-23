@@ -39,7 +39,7 @@ namespace xyToolz.Helper
     /// bool isValid = xyHashHelper.VerifyPassword(HashAlgorithmName.SHA256, "myPassword123", hash);
     /// </code>
     /// </summary>
-    public static class xyHashHelper
+    public static class xyHasher
     {
         #region "Configuration"
 

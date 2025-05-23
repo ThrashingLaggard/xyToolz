@@ -7,6 +7,9 @@ using static xyToolz.xy;
 
 namespace xyToolz
 {
+        /// <summary>
+        /// Hier könnte ihre Werbung stehen!
+        /// </summary>
       public static class xyConversion
       {
             private static string endergebnis = "", endausgabe = "";

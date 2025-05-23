@@ -201,6 +201,19 @@ namespace xyToolz
             }
         }
 
+
+        public static async Task Start(string processName)
+        {
+            await TryCatch(async () =>
+            {
+                if (Process.Start(processName) is Process proc)
+                {
+                    return await Task.FromResult<object>(proc);
+                }
+                return Task.CompletedTask;
+            });
+        }
+
         #endregion
 
         #region QOL – String Utilities
@@ -316,7 +329,7 @@ namespace xyToolz
         /// </summary>
         public static void Editor()
         {
-            Process.Start("notepad.exe");
+            Start("notepad.exe");
         }
 
         /// <summary>

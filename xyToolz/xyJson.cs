@@ -413,16 +413,12 @@ namespace xyToolz
         /// <returns>Value of the key as string, or empty if not found.</returns>
         public static async Task<string> GetStringFromJsonFile(string filePath, string key)
         {
-            string keyReadSuccessMessage = $"Successfully read key '{key}' from '{filePath}'.";
-            string keyReadFailMessage = $"Key '{key}' not found or file '{filePath}' unreadable.";
-            var token = await GetJTokenFromKey(filePath, key);
-            if (token is not null)
+            JToken? token = await GetJTokenFromKey(filePath, key);
+            if(token is not null)
             {
-                await xyLog.AsxLog(keyReadSuccessMessage);
                 return token.ToString();
             }
-            await xyLog.AsxLog(keyReadFailMessage);
-            return string.Empty;
+            return "";
         }
 
         #endregion

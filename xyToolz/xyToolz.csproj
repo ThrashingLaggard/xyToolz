@@ -3,22 +3,35 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<PackageVersion>1.0.37</PackageVersion>
 		<Nullable>enable</Nullable>
 		<SignAssembly>False</SignAssembly>
 		<Title>xyToolZ</Title>
 		<Company></Company>
-		<Authors>Hansi Bremstein</Authors>
+		<Authors>ThrashingLaggard</Authors>
 		<Description>
 			Little toolz to save some precious seconds with my doggo.
+			Providing helper classes and utilities for common development tasks, including:
+			file handling, 
+			logging, 
+			encryption, 
+			JSON processing,
+			PDF manipulation, 
+			browser automation,
+			and other QOL stuff
+
 
 		</Description>
 		<Copyright>Do with this, as you please. Go home to your dog   </Copyright>
-		<PackageTags>tools,pdf,qol,files,small,stuff,</PackageTags>
+		<PackageTags>tools,pdf,qol,files,small,stuff,dpapi,hashing,rsa</PackageTags>
 		<PackAsTool>False</PackAsTool>
 		<NeutralLanguage>en-GB</NeutralLanguage>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<OutputType>Library</OutputType>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageReadmeFile></PackageReadmeFile>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -28,6 +41,8 @@
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.1.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="PDFsharp" Version="6.1.1" />
+		<PackageReference Include="Selenium.Support" Version="4.32.0" />
+		<PackageReference Include="Selenium.WebDriver" Version="4.32.0" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.8" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
 		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
@@ -35,11 +50,25 @@
 		<PackageReference Include="System.Text.Json" Version="9.0.2" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="ReadMe.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
 
 
 
 
 </Project>
+
+
+
+
+
+
+<!--Android implementation stuff.... not sure if its needed in the future-->
 
 <!--
 	<PropertyGroup>
