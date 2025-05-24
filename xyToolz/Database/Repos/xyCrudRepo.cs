@@ -10,6 +10,11 @@ using xyToolz.Database.Interfaces;
 
 namespace xyToolz.Database.Repos
 {
+    /// <summary>
+    /// Generic Repository for extended CRUD using EF Core
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="context"></param>
     public class xyCrudRepo<T>(DbContext context) : IExtendedCrud<T> where T : class
     {
         /// <summary>
@@ -156,28 +161,6 @@ namespace xyToolz.Database.Repos
             return inventory;
         }
 
-
-        /// <summary>
-        /// Return a EntityEntry instance for the given id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public  async Task<EntityEntry> GetEntryByID(int id, [CallerMemberName] string? callerName = null)
-        {
-            EntityEntry entity = default!;
-            dynamic? target = await  Read(id);
-
-            try
-            {
-                entity = _context.Entry(target);
-            }
-            catch (Exception ex)
-            {
-                await xyLog.AsxExLog(ex);
-            }
-            return entity!;
-        }
-
         /// <summary>
         /// Select which and how many elements to return
         /// </summary>
@@ -222,16 +205,32 @@ namespace xyToolz.Database.Repos
             return paginatedList;
         }
 
-
-
-
-
-
-
         #endregion
 
 
+        #region "EF Core"
+        /// <summary>
+        /// Return a EntityEntry instance for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public  async Task<EntityEntry> GetEntryByID(int id, [CallerMemberName] string? callerName = null)
+        {
+            EntityEntry entity = default!;
+            dynamic? target = await  Read(id);
 
+            try
+            {
+                entity = _context.Entry(target);
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+            }
+            return entity!;
+        }
+
+        #endregion
 
 
     }
