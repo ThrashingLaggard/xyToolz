@@ -94,6 +94,9 @@ namespace xyToolz
                 return Array.Empty<byte>();
             }
         }
+
+
+
         public static async Task<byte[]> ProtectString(string data) => await ProtectAsync(data);
         public static async Task<byte[]> ProtectBytes(byte[] data) => await ProtectAsync(data);
 
@@ -152,6 +155,8 @@ namespace xyToolz
                 return false;
             }
         }
+
+
         public static async Task<bool> SaveProtectedToFileAsync<T>(T obj, string subfolder = "HyperSecret", string filename = "secret.md")
         {
             if( xyPath.Combine(subfolder, filename) is string fullPath && fullPath.Length > 3)    // Mucho intelligento
@@ -162,7 +167,7 @@ namespace xyToolz
         }
 
         /// <summary>
-        /// Loads and decrypts an object from a protected file.
+        /// Loads and decrypts an object from a protected file. 
         /// </summary>
         public static async Task<T?> LoadProtectedFromFileAsync<T>( string filename = "secret.bin")
         {
