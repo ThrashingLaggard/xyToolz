@@ -1,0 +1,199 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using xyToolz.Database.Interfaces;
+
+namespace xyToolz.Database.Repos
+{
+    public class CrudRepository<T>(DbContext context) : IExtendedCrud<T> where T : class
+    {
+        /// <summary>
+        /// Black magic to service incoming DB contexts
+        /// </summary>
+        private readonly dynamic _context = context;
+
+        #region "CRUD"
+        /// <summary>
+        /// Create a new entry in the database using the given data
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> Create(T entity, [CallerMemberName] string? callerName = null)
+        {
+            bool isCreated = false;
+            string invalidParam = "Please enter valid data for the creation!";
+            string created = "Created and added the entry for the given data";
+
+            if (entity == null || entity.Equals(""))
+            {
+                isCreated = false;
+                await xyLog.AsxLog(invalidParam);
+            }
+            else
+            {
+                try
+                {
+                    if (_context.Add(entity) is EntityEntry entityEntry)
+                    {
+                        await _context.SaveChangesAsync();
+                        await xyLog.AsxLog(created);
+                        isCreated = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await xyLog.AsxExLog(ex);
+                }
+            }
+            return isCreated; 
+        }
+
+        /// <summary>
+        /// Get the corresponding instance for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<T?> Read(int id, [CallerMemberName] string? callerName = null)
+        {
+            object[] param = { id };
+            dynamic? target = default!;
+            string nothingFound = $"Couldnt find the corresponding entries for the ID {id}";
+
+            try
+            {
+                target = await _context.FindAsync<T>(param);
+                if (target is null)
+                {
+                    await xyLog.AsxLog(nothingFound);
+                }
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+            }
+            return target!;
+        }
+
+        /// <summary>
+        /// Updating the target entry
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<bool> Update(T entity, [CallerMemberName] string? callerName = null)
+        {
+            bool isUpdated = false;
+
+            if (entity is null)
+            {
+                return isUpdated;
+            }
+            try
+            {
+                _context.Update(entity);
+                await _context.SaveChangesAsync();
+                isUpdated = true;
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+            }
+            return isUpdated;
+        }
+
+        /// <summary>
+        /// Removing an entry from the database
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<bool> Delete(T entity, [CallerMemberName] string? callerName = null)
+        {
+            string success = $"Entry with was removed";
+            bool isDeleted = false;
+
+            try
+            {
+                _context.Remove(entity);
+                await _context.SaveChangesAsync();
+                isDeleted = true;
+            }
+            catch (Exception ex)
+            {
+                xyLog.ExLog(ex);
+            }
+            await xyLog.AsxLog(success);
+            return isDeleted;
+        }
+
+        #endregion
+
+        #region "Extensions"
+        /// <summary>
+        /// Return an IEnumerable filled with the content of the target table
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<T?>> GetAll([CallerMemberName] string? callerName = null)
+        {
+            string noEntrys = "No elements in list, please inform experts immedeately!";
+            IEnumerable<T> inventory = [];
+
+            try
+            {
+                inventory = await _context.Set<T>().ToListAsync();
+
+                if (!inventory.Any())
+                {
+                   await xyLog.AsxLog(noEntrys);
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+            }
+            return inventory;
+        }
+
+
+        /// <summary>
+        /// Return a EntityEntry instance for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public  async Task<EntityEntry> GetEntryByID(int id, [CallerMemberName] string? callerName = null)
+        {
+            EntityEntry entity = default!;
+            dynamic? target = await  Read(id);
+
+            try
+            {
+                entity = _context.Entry(target);
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+            }
+            return entity!;
+        }
+        
+        
+        public Task<IEnumerable<T>> Pageineering(int page, int pageSize, [CallerMemberName] string? callerName = null)
+        {
+            throw new NotImplementedException();
+        }
+        
+        
+        
+        
+        
+        
+        #endregion
+
+
+
+
+
+    }
+}

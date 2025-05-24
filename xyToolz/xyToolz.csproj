@@ -57,10 +57,6 @@
 	  </None>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Database\Services\" />
-	</ItemGroup>
-
 
 
 

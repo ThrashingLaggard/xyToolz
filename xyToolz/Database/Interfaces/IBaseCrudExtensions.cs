@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace xyToolz.Database.Interfaces
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<IEnumerable<T?>> GetAll();
+        Task<IEnumerable<T?>> GetAll([CallerMemberName] string? callerName = null);
         
         /// <summary>
         /// Filter the entries to be shown
@@ -31,6 +32,6 @@ namespace xyToolz.Database.Interfaces
         /// <param name="page"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        Task<IEnumerable<T>> Pageineering(int page, int pageSize);
+        Task<IEnumerable<T>> Pageineering(int page, int pageSize, [CallerMemberName] string? callerName = null);
     }
 }

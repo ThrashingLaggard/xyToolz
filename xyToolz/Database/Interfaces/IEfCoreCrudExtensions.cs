@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Runtime.CompilerServices;
 
 namespace xyToolz.Database.Interfaces
 {
@@ -8,6 +9,6 @@ namespace xyToolz.Database.Interfaces
     /// <typeparam name="T"></typeparam>
     public interface IEfCoreCrudExtensions<T> where T : class
     {
-        Task<EntityEntry> GetEntryByID(int id);
+        Task<EntityEntry> GetEntryByID(int id, [CallerMemberName] string? callerName = null);
     }
 }
