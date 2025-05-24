@@ -23,7 +23,7 @@ namespace xyToolz.Database.Interfaces
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<IEnumerable<T?>> GetAll<T>();
+        Task<IEnumerable<T?>> GetAll();
         
         /// <summary>
         /// Filter the entries to be shown
