@@ -177,18 +177,57 @@ namespace xyToolz.Database.Repos
             }
             return entity!;
         }
-        
-        
-        public Task<IEnumerable<T>> Pageineering(int page, int pageSize, [CallerMemberName] string? callerName = null)
-        {
-            throw new NotImplementedException();
+
+        /// <summary>
+        /// Select which and how many elements to return
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="callerName"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<T>> Pageineering(int page, int pageSize, [CallerMemberName] string? callerName = null)
+        { 
+            IEnumerable<T> paginatedList = Enumerable.Empty<T>();
+            string noEntries = "No entries found for the specified page.";
+            string wrongParams = "Page and pageSize must be greater than 0.";
+
+
+            if (page < 1 || pageSize < 1)
+            {
+                await xyLog.AsxExLog( new ArgumentException(wrongParams));
+            }
+
+            try
+            {
+                // Calculate the number of items to skip
+                int skip = (page - 1) * pageSize;
+
+                // Get the total count of items
+                int totalCount = await _context.Set<T>().CountAsync();
+
+                // Fetch the paginated data
+                paginatedList = await _context.Set<T>().Skip(skip) .Take(pageSize).ToListAsync();
+                    
+
+                // If still empty
+                if (!paginatedList.Any())
+                {
+                    await xyLog.AsxLog(noEntries);
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+            }
+            return paginatedList;
         }
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
         #endregion
 
 
