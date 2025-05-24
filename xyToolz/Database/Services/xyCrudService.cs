@@ -14,13 +14,13 @@ namespace xyToolz.Database.Services
     /// The logic surrounding the CrudRepository
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class CrudService<T>(CrudRepository<T> crudRepository) : IExtendedCrud<T> where T : class
+    public class xyCrudService<T>(xyCrudRepo<T> crudRepository) : IExtendedCrud<T> where T : class
     {
 
         /// <summary>
         /// Providing access to the target DB
         /// </summary>
-        private readonly CrudRepository<T> _crudRepository = crudRepository;
+        private readonly xyCrudRepo<T> _crudRepository = crudRepository;
        
         #region "CRUD"
         /// <summary>

@@ -10,7 +10,7 @@ using xyToolz.Database.Interfaces;
 
 namespace xyToolz.Database.Repos
 {
-    public class CrudRepository<T>(DbContext context) : IExtendedCrud<T> where T : class
+    public class xyCrudRepo<T>(DbContext context) : IExtendedCrud<T> where T : class
     {
         /// <summary>
         /// Black magic to service incoming DB contexts

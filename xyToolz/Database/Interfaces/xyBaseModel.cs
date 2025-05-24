@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 namespace xyToolz.Database.Basix
 {
     /// <summary>
-    /// Providing basic properties for data - models
+    /// Providing basic properties and methods for models:
+    /// 
+    /// ID, Name, Description, Comment
+    /// 
+    /// ToString() => Name
+    /// 
+    /// 
     /// </summary>
-    public abstract class IBaseModel
+    public abstract class xyBaseModel
     {
         /// <summary>
         /// Index
