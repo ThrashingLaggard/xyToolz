@@ -459,6 +459,7 @@ namespace xyToolz
 
 
         #endregion
+        
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// <summary>
         /// Returns the first line, last line, and full joined content from a text file.

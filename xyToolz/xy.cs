@@ -112,8 +112,14 @@ namespace xyToolz
         /// </summary>
         public static object TryCatch(Func<object> method)
         {
-            try { return method(); }
-            catch (Exception ex) { xyLog.ExLog(ex); return null!; }
+            try 
+            {
+                return method();
+            }
+            catch (Exception ex) 
+            {
+                xyLog.ExLog(ex); return null!;
+            }
         }
 
         /// <summary>
@@ -202,17 +208,6 @@ namespace xyToolz
         }
 
 
-        public static async Task Start(string processName)
-        {
-            await TryCatch(async () =>
-            {
-                if (Process.Start(processName) is Process proc)
-                {
-                    return await Task.FromResult<object>(proc);
-                }
-                return Task.CompletedTask;
-            });
-        }
 
         #endregion
 
@@ -226,12 +221,12 @@ namespace xyToolz
         /// <returns>The repeated string.</returns>
         public static string Repeat(string text, ushort count)
         {
-            StringBuilder sb = new();
+            StringBuilder sb_Repeater = new();
             for (int i = 0; i < count; i++)
             {
-                sb.Append(text);
+                sb_Repeater.Append(text);
             }
-            return sb.ToString();
+            return sb_Repeater.ToString();
         }
 
         /// <summary>
@@ -241,9 +236,10 @@ namespace xyToolz
         /// <returns>The reversed string.</returns>
         public static string Reverse(string input)
         {
-            char[] chars = input.ToCharArray();
-            Array.Reverse(chars);
-            return new string(chars);
+            char[] arr_InputChars = input.ToCharArray();
+            Array.Reverse(arr_InputChars);
+            string output =new string(arr_InputChars);
+            return output; 
         }
 
         /// <summary>
@@ -255,6 +251,24 @@ namespace xyToolz
         #endregion
 
         #region System Utilities & Experiments
+
+
+
+
+        public static async Task Start(string processName)
+        {
+            await TryCatch(async () =>
+            {
+                if (Process.Start(processName) is Process proc)
+                {
+                    return await Task.FromResult<object>(proc);
+                }
+                return Task.CompletedTask;
+            });
+        }
+
+
+
 
         /// <summary>
         /// Asynchronously opens a file or folder in the system’s default file explorer.
@@ -354,7 +368,7 @@ namespace xyToolz
         /// A recursive method that tests edge-case control flow with arbitrary branching using goto.
         /// </summary>
         /// <param name="high_number">A large number used to trigger different flow paths.</param>
-        /// <returns>Diagnostic message string (not used meaningfully).</returns>
+        /// <returns>Diagnostic message string (very important!!!!).</returns>
         public static string Crash(UInt128 high_number)
         {
             UInt128 a = 0;
