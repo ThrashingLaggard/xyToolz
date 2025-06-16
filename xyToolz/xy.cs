@@ -252,9 +252,6 @@ namespace xyToolz
 
         #region System Utilities & Experiments
 
-
-
-
         public static async Task Start(string processName)
         {
             await TryCatch(async () =>
@@ -276,7 +273,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="fullPath">Absolute path to the file or directory.</param>
         /// <returns>True if opened successfully; otherwise, false.</returns>
-        public static async Task<bool> OpenAsync(string fullPath)
+        public static async Task<bool> Open(string fullPath)
         {
             string invalidPathMsg = "The given path was null or empty.";
             string notFoundMsg = "Target does not exist:";

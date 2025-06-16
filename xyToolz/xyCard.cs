@@ -3,6 +3,11 @@ using PdfSharp.Pdf;
 
 namespace xyToolz
 {
+    /// <summary>
+    /// Symbolizing an indexing Card for learning or ....
+    /// 
+    /// Needs to be implemented fully
+    /// </summary>
     internal class xyCard
     {
         static PdfDocument card = new PdfDocument();
@@ -32,23 +37,6 @@ namespace xyToolz
             this.options = options;
             this.layout = layout;
         }
-    }
-
-    internal class yxCard
-    {
-        PdfDocument frontSide = new PdfDocument();
-        PdfDocument backSide = new PdfDocument();
-        PdfPageLayout layout;
-
-        PdfDocumentInformation info;
-        PdfDocumentSettings settings;
-        PdfDocumentOptions options;
-
-        yxCard() 
-        {
-        
-        }
-
     }
 
 }

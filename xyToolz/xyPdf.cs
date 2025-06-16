@@ -64,7 +64,7 @@ namespace xyToolz
             }
 
             /// <summary>
-            /// Copies pages from a source document to a target document.
+            /// Copies pages from a source document to a target document and appends them.
             /// </summary>
             private static void CopyPagesToTarget(PdfDocument sourceDoc, PdfDocument targetDoc)
             {
@@ -82,13 +82,13 @@ namespace xyToolz
             public static bool NameAllFiles(List<PdfDocument> pdfs)
             {
                   double x = 1.0;
-                  int ganzzahl = 0;
                   try
                   {
                         foreach (PdfDocument test in pdfs)
                         {
                               if (test.Info.Title == string.Empty)
                               {
+                                // Why is this here???
                                     if ((x - (int)x) == 0)
                                     {
                                           test.Info.Title = $"{x}";
