@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using xyToolz.Helper;
 using xyToolz.Helper.Interfaces;
+using xyToolz.Helper.Logging;
 using static xyToolz.xyDataProtector;
 
 namespace xyToolz

@@ -2,6 +2,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using xyToolz.Helper.Logging;
 
 namespace xyToolz.Helper
 {

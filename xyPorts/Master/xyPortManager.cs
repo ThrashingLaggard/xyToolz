@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using xyPorts.Basix;
 using xyPorts.TCP;
 using xyPorts.UDP;
-using xyToolz;
+using xyToolz.Helper.Logging;
 
 namespace xyPorts.Master
 {

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using xyToolz.Helper.Interfaces;
+using xyToolz.Helper.Logging;
 
 namespace xyToolz
 {
@@ -41,7 +42,7 @@ namespace xyToolz
     /// <para><b>Related:</b></para>
     /// <see cref="System.Text.Json"/>
     /// <see cref="Newtonsoft.Json.Linq.JObject"/>
-    /// <see cref="xyToolz.Logging.xyLog"/>
+    /// <see cref="Helper.Logging.xyLog"/>
     /// </summary>
     public class xyJson
     {

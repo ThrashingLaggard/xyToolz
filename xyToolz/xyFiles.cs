@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using xyToolz.Helper;
 using xyToolz.Helper.Interfaces;
+using xyToolz.Helper.Logging;
+
 
 #if ANDROID
 using Android.Content;

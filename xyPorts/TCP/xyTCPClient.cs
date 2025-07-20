@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using xyPorts.UDP;
 using xyToolz;
+using xyToolz.Helper.Logging;
 
 namespace xyPorts.TCP
 {

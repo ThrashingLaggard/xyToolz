@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
-using xyToolz.Helper.Logging;
-
-namespace xyToolz
+namespace xyToolz.Helper.Logging
 {
 
     /// <summary>
@@ -93,9 +91,9 @@ namespace xyToolz
         private static readonly string _logFilePath = "logs/app.log";
         private static readonly string _exLogFilePath = "logs/exceptions.log";
         private static readonly long _maxLogFileSize = 10485760;
-        private static readonly Object _threadSafetyLock = new object();
+        private static readonly object _threadSafetyLock = new object();
         private static xyLogArchiver _archiver = new(_maxLogFileSize);
-        private static Boolean IsLoggingToSystemConsole = true;
+        private static bool IsLoggingToSystemConsole = true;
         private static IEnumerable<xyLogTargets> _eTargets = new List<xyLogTargets>();
 
         /// <summary>
@@ -103,7 +101,7 @@ namespace xyToolz
         /// </summary>
         /// <param name="logTargets">List of target identifiers as UInt16</param>
         /// <returns>Enumerable of xyLogTargets</returns>
-        internal static IEnumerable<xyLogTargets> SetLogTargets(UInt16[] logTargets)
+        internal static IEnumerable<xyLogTargets> SetLogTargets(ushort[] logTargets)
         {
             if (logTargets.Length < 1) return new xyLogTargets[] { 0 };
             xyLogTargets[] targets = new xyLogTargets[logTargets.Length];
@@ -281,7 +279,7 @@ namespace xyToolz
                 Log(go);
                 var result = action();
 
-                if (result == null || (result is IEnumerable<object> enumerable && !enumerable.Any()))
+                if (result == null || result is IEnumerable<object> enumerable && !enumerable.Any())
                 {
                     Log(no);
                 }
@@ -327,7 +325,7 @@ namespace xyToolz
                 await AsxLog(go);
                 var result = action();
 
-                if (result == null || (result is IEnumerable<object> enumerable && !enumerable.Any()))
+                if (result == null || result is IEnumerable<object> enumerable && !enumerable.Any())
                 {
                     await AsxLog(no);
                 }

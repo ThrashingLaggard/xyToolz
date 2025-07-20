@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using xyToolz.Database.Interfaces;
+using xyToolz.Helper.Logging;
 
 namespace xyToolz.Database.Repos
 {

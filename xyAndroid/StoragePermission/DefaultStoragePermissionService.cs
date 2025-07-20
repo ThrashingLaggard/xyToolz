@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Xamarin.Essentials;
-using xyToolz;
-
+using xyToolz.Helper.Logging;
 
 namespace xyAndroid.StoragePermission
 {
