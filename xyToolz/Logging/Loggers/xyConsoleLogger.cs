@@ -9,16 +9,16 @@ using xyToolz.Logging.Interfaces;
 
 namespace xyToolz.Logging.Loggers
 {
-    public class xyBaseLogger : ILogging
+    public class xyConsoleLogger : ILogging
     {
 
         private readonly ILogFormatter _formatter;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="xyBaseLogger"/> class with the specified log formatter.
+        /// Initializes a new instance of the <see cref="xyConsoleLogger"/> class with the specified log formatter.
         /// </summary>
         /// <param name="formatter_">The log formatter used to format log messages. Cant be null! />.</param>
-        public xyBaseLogger( ILogFormatter formatter_)
+        public xyConsoleLogger( ILogFormatter formatter_)
         {
             _formatter = formatter_;
         }
@@ -56,11 +56,6 @@ namespace xyToolz.Logging.Loggers
         /// </summary>
         /// <remarks>The exact format of the returned string is determined by the underlying formatter
         /// implementation.</remarks>
-        /// <param name="message">The main message to be logged. This value cannot be null or empty.</param>
-        /// <param name="callerName">The name of the caller, typically used to identify the source of the log message.  This parameter is
-        /// optional and can be null.</param>
-        /// <param name="level">The log level associated with the message, such as Debug, Info, or Error.  This parameter is optional and
-        /// can be null.</param>
         /// <returns>A formatted string that includes the provided message, and optionally the caller name and log level.</returns>
         public string FormatMsg(string message, string? callerName = null, LogLevel? level = null)
         {
