@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace xyToolz.Logging.Interfaces
 {
-    public interface ILogFormatter
+    public interface ILogFormatter<T>
     {
-        string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null);
+        string FormatMessageForLogging(T message, string? callerName = null, LogLevel? level = null);
         string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null);
     }
 }

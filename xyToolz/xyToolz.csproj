@@ -57,10 +57,6 @@
 	  </None>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Logging\Models\" />
-	</ItemGroup>
-
 
 
 

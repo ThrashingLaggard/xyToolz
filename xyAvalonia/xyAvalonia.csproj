@@ -31,6 +31,7 @@
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.13.0" />
+    <PackageReference Include="xyToolz" Version="1.0.38" />
   </ItemGroup>
 
   <ItemGroup>
