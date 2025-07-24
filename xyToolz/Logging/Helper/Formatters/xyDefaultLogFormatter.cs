@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using xyToolz.Logging.Interfaces;
 
-namespace xyToolz.Logging.Helper
+namespace xyToolz.Logging.Helper.Formatters
 {
   /// <summary>
   /// Provides default formatting for log messages and exception details.
   /// </summary>
-    public class xyDefaultLogFormatter<T> : ILogFormatter<T>
+    public class xyDefaultLogFormatter : IMessageFormatter, IExceptionFormatter
     {
         /// <summary>
         /// Formats detailed information about an exception into a string for logging purposes.
@@ -64,10 +64,9 @@ namespace xyToolz.Logging.Helper
     /// <param name="callerName">The name of the caller or source of the log message. If null or empty, a default value of " / " is used.</param>
     /// <param name="level">The log level associated with the message. If null, the default log level of "Information" is used.</param>
     /// <returns>A formatted string containing the timestamp, log level, caller information, and the log message.</returns>
-        public string FormatMessageForLogging(T message, string? callerName = null, LogLevel? level = null)
+        public string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)
         {
-            {                
-                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
 
                 string logLevel = level?.ToString() ?? "Information";
 
@@ -76,7 +75,6 @@ namespace xyToolz.Logging.Helper
                 string formattedMessage = $"[{timestamp}] [{logLevel}] [{callerName}] {message}";
 
                 return formattedMessage;
-            }
         }
     }
 }

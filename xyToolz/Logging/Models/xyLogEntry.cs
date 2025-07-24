@@ -13,7 +13,7 @@ namespace xyToolz.Logging.Models
         /// <summary>
         /// For easy administration
         /// </summary>
-        public required uint ID { get; init; }
+        public uint ID { get; set; }
 
         /// <summary>
         /// Add interesting information
@@ -45,7 +45,21 @@ namespace xyToolz.Logging.Models
         /// </summary>
         public required string Message { get; init; }
 
+        /// <summary>
+        /// The exception connected to the log
+        /// </summary>
+        public Exception Exception { get; set; }
 
+
+
+        public xyLogEntry(string source_, LogLevel level_, string message_, Exception? exception_ = null)
+        {
+            Timestamp = DateTime.Now;
+            Source = source_;
+            Level = level_;
+            Message = message_;
+            Exception = exception_ ?? default!;
+        }
 
     }
 }

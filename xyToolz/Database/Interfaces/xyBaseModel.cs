@@ -43,11 +43,12 @@ namespace xyToolz.Database.Basix
         /// <returns></returns>
         public override string ToString() => $"{Name}";
 
-
-
-
-
         // , [CallerMemberName] string? callerName = null
 
     }
+    public interface xyBasicModel
+    {
+        
+    }
+
 }

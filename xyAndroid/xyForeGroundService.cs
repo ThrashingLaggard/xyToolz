@@ -4,6 +4,7 @@ using Android.Content.PM;
 using Android.OS;
 
 using AndroidX.Core.App;
+using xyToolz;
 using xyToolz.Helper.Logging;
 
 namespace xyAndroid

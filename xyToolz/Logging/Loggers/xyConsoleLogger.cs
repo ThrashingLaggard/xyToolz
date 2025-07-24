@@ -9,18 +9,24 @@ using xyToolz.Logging.Interfaces;
 
 namespace xyToolz.Logging.Loggers
 {
-    public class xyConsoleLogger : ILogging
+    public class xyConsoleLogger<T> : ILogging
     {
+    //                                                                                                                                                              TODO: Add methods o digest xyLogEntrys
+        private readonly IMessageFormatter _msgFormatter;
+        private readonly IExceptionFormatter _excFormatter;
+        private readonly IEntityFormatter<T> _entFormatter;
 
-        private readonly ILogFormatter _formatter;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="xyConsoleLogger"/> class with the specified log formatter.
         /// </summary>
-        /// <param name="formatter_">The log formatter used to format log messages. Cant be null! />.</param>
-        public xyConsoleLogger( ILogFormatter formatter_)
+        /// <param name="msgFormatter_">The log formatter used to format log messages. Cant be null! />.</param>
+        public xyConsoleLogger( IMessageFormatter msgFormatter_, IExceptionFormatter excFormatter_, IEntityFormatter<T> entFormatter_)
         {
-            _formatter = formatter_;
+            _msgFormatter = msgFormatter_;
+            _excFormatter = excFormatter_;
+            _entFormatter = entFormatter_;
         }
 
 
@@ -57,9 +63,9 @@ namespace xyToolz.Logging.Loggers
         /// <remarks>The exact format of the returned string is determined by the underlying formatter
         /// implementation.</remarks>
         /// <returns>A formatted string that includes the provided message, and optionally the caller name and log level.</returns>
-        public string FormatMsg(string message, string? callerName = null, LogLevel? level = null)
+        private string FormatMsg(string message, string? callerName = null, LogLevel? level = null)
         {
-            return _formatter.FormatMessageForLogging(message, callerName, level);
+            return _msgFormatter.FormatMessageForLogging(message, callerName, level);
         }
 
         /// <summary>
@@ -67,10 +73,13 @@ namespace xyToolz.Logging.Loggers
         /// </summary>
         private string FormatEx(Exception ex, LogLevel level, string? callerName = null)
         {
-            return _formatter.FormatExceptionDetails(ex, level, callerName);
+            return _excFormatter.FormatExceptionDetails(ex, level, callerName);
         }
 
-
+        private string FormatEntity(T entry_, string? callerName = null, LogLevel? level = null)
+        {
+            return _entFormatter.FormatEntityForLogging(entry_, callerName, level);
+        }
 
 
     }

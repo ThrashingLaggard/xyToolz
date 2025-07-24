@@ -8,18 +8,17 @@ using System.Threading.Tasks;
 using xyToolz.Logging.Interfaces;
 using xyToolz.Logging.Models;
 
-namespace xyToolz.Logging.Helper
+namespace xyToolz.Logging.Helper.Formatters
 {
-    public class xyLogEntryFormatter<T> : ILogFormatter<T>
+    public class xyLogEntryFormatter<T> : IEntityFormatter<T>
     {
-
-        public string FormatMessageForLogging(T entry_, string? callerName = null, LogLevel? level = null)
+        public string FormatEntityForLogging(T entry_, string? callerName = null, LogLevel? level = null)
         {
-            if(entry_ is xyLogEntry logEntry)
+            if (entry_ is xyLogEntry logEntry)
             {
                 string message = logEntry.Message;
                 string timestamp = Stopwatch.GetTimestamp().ToString();
-                    
+
 
                 string logLevel = level?.ToString() ?? "Information";
 
@@ -27,22 +26,12 @@ namespace xyToolz.Logging.Helper
 
                 string formattedMessage = $"[{timestamp}] [{logLevel}] [{callerName}] {message}";
 
-
-
                 return formattedMessage;
             }
             else
             {
-                return "";
+                return "No valid instance of xyLogEntry was given!";
             }
-
-
-        }
-      
-        
-        public string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null)
-        {
-            throw new NotImplementedException();
         }
     }
 }

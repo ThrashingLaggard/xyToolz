@@ -24,14 +24,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
+    <PackageReference Include="xyToolz" Version="1.0.38" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\xyAvalonia\xyAvalonia.csproj" />
-    <ProjectReference Include="..\xyToolz\xyToolz.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="xyToolz">
-      <HintPath>..\xyToolz\bin\Debug\net8.0\xyToolz.dll</HintPath>
-    </Reference>
+
   </ItemGroup>
 </Project>
