@@ -8,7 +8,7 @@ using xyToolz.Logging.Interfaces;
 
 namespace xyToolz.Logging.Helper.Formatters
 {
-    internal class xyMessageFormatter : IMessageFormatter
+    public class xyMessageFormatter : IMessageFormatter
     {
         public string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)
         {
