@@ -18,17 +18,42 @@ namespace xyToolz.Logging.Loggers
 
 
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="xyConsoleLogger"/> class with the specified log formatter.
-        /// </summary>
-        /// <param name="msgFormatter_">The log formatter used to format log messages. Cant be null! />.</param>
-        public xyConsoleLogger( IMessageFormatter msgFormatter_, IExceptionFormatter excFormatter_, IEntityFormatter<T> entFormatter_)
+       /// <summary>
+       /// 
+       /// </summary>
+       /// <param name="msgFormatter_"></param>
+       /// <param name="excFormatter_"></param>
+       /// <param name="entFormatter_"></param>
+        public xyConsoleLogger( IMessageFormatter msgFormatter_ =null!, IExceptionFormatter excFormatter_ = null!, IEntityFormatter<T> entFormatter_ = null!)
         {
-            _msgFormatter = msgFormatter_;
-            _excFormatter = excFormatter_;
+            _msgFormatter = msgFormatter_?? null!;
+            _excFormatter = excFormatter_?? null!;
+            _entFormatter = entFormatter_?? null!;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entFormatter_"></param>
+        public xyConsoleLogger( IEntityFormatter<T> entFormatter_)
+        {
             _entFormatter = entFormatter_;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="excFormatter_"></param>
+        public xyConsoleLogger(IExceptionFormatter excFormatter_)
+        {
+            _excFormatter = excFormatter_;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="msgFormatter_"></param>
+        public xyConsoleLogger(IMessageFormatter msgFormatter_)
+        {
+            _msgFormatter = msgFormatter_;
+        }
 
         /// <summary>
         /// Logs the details of an exception at the specified log level.
