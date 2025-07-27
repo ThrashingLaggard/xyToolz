@@ -11,7 +11,7 @@ namespace xyToolz.Logging.Loggers
 {
     public class xyConsoleLogger<T> : ILogging
     {
-        // Almost irrelevant, but not utterly                                                                                                                                        TODO: Add methods o digest xyLogEntrys
+        // Almost irrelevant, but not utterly.                                                                                                                                      TODO: Add methods o digest xyLogEntrys
         private readonly IMessageFormatter? _msgFormatter;
         private readonly IExceptionFormatter? _excFormatter;
         private readonly IEntityFormatter<T>? _entFormatter;
