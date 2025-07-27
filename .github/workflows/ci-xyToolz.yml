@@ -1,14 +1,16 @@
 name: CI/CD for xyToolz
 
-# Trigger: Run this workflow on push to the "master" branch
+# Trigger: Push to the "master" branch to run this workflow 
 on:
   push:
     branches:
       - master
+
+
 permissions:
   contents: write
 jobs:
-  build-and-test:
+  build-and-changed:
     runs-on: ubuntu-latest  # GitHub-hosted Ubuntu Linux runner
 
     steps:
@@ -34,24 +36,53 @@ jobs:
         commits=$(git log -1 --pretty=%B)
         echo "Last commit message: $commits"
 
-        # Split current version into major.minor.patch
+        # Split current version into major. minor. patch
         major=$(echo $current_version | cut -d. -f1)
         minor=$(echo $current_version | cut -d. -f2)
         patch=$(echo $current_version | cut -d. -f3)
 
+      
         # Determine version bump based on commit message content
+        changed="false"
         if echo "$commits" | grep -iq "BREAKING CHANGE"; then
           major=$((major + 1))
           minor=0
           patch=0
-        elif echo "$commits" | grep -iq "^feat"; then
-          minor=$((minor + 1))
-          patch=0
-        elif echo "$commits" | grep -iq "^fix"; then
-          patch=$((patch + 1))
-        else
-          echo "No semantic version keyword found. Keeping current version."
+          changed="true"
+        elif echo "$commits" | grep -iqE "^(feat|fix):"; then
+          if echo "$commits" | grep -iq "^feat:"; then
+            minor=$((minor + 1))
+            patch=0
+            changed="true"
+          elif echo "$commits" | grep -iq "^fix:"; then
+            patch=$((patch + 1))
+            changed="true"
+          fi
         fi
+
+        # Try again...because fuck you too.
+        if [ "$changed" == "false" ]; then
+          commitsSingleLine=$(echo "$commits" | tr '\n' ' ')
+
+          if echo "$commitsSingleLine" | grep -iq "BREAKING CHANGE"; then
+            major=$((major + 1)); minor=0; patch=0
+            changed="true"
+          elif echo "$commitsSingleLine" | grep -iq "feat:"; then
+            minor=$((minor + 1)); patch=0
+            changed="true"
+          elif echo "$commitsSingleLine" | grep -iq "fix:"; then
+            patch=$((patch + 1))
+            changed="true"
+          fi
+        fi
+        
+        # Debug message
+        if [ "$changed" == "false" ]; then
+            echo "No semantic version keyword found. Keeping current version."
+        else
+          echo "Semantic version keyword found. Updating current version."
+        fi
+
 
         # Create new version string
         new_version="$major.$minor.$patch"
@@ -64,6 +95,22 @@ jobs:
       run: |
         # Replace <PackageVersion> tag in .csproj file with the new version
         sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/" xyToolz/xyToolz.csproj
+
+    - name: Commit updated version
+      run: | 
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        git pull origin master  
+        git add xyToolz/xyToolz.csproj
+        if git diff --cached --quiet; then
+          echo "Nothing to commit – skipping."
+        else
+          git commit -m "chore: bump version to ${{ env.version }}"
+          git push origin master
+          echo "Changes committed and pushed."
+        fi
+      continue-on-error: true
 
     - name: Build xyToolz
       run: dotnet build xyToolz/xyToolz.csproj --configuration Release --no-restore  # Build the project
@@ -92,8 +139,11 @@ jobs:
 
 
     - name: Push to NuGet
-      if: steps.check_version.outputs.skip_publish == 'false'  # Only push if version doesn't already exist
+      if: steps.check_version.outputs.skip_publish == 'false'  # Only push if version doesn't already exist              
       run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.XYTOOLZ_API_KEY }} --skip-duplicate
+
+
+
 
     - name: Create GitHub Release
       if: steps.check_version.outputs.skip_publish == 'false'  # Only create release for new versions
