@@ -40,9 +40,9 @@ namespace xyPorts.Master
            
             Process process = new()
             {
-                StartInfo = new ProcessStartInfo
+                StartInfo = new ProcessStartInfo                
                 {
-                    FileName = "netstat",
+                    FileName = "netstat",           
                     Arguments = "-ano",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
@@ -68,22 +68,22 @@ namespace xyPorts.Master
                     var parts = portLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     int pid = int.Parse(parts.Last()); // PID ist das letzte Element in der Zeile
 
-                    Console.WriteLine($"Port {port} wird von Prozess {pid} verwendet.");
+                    Console.WriteLine($"Port {port} is in use by process {pid}.");
 
                     try
                     {
                         Process proc = Process.GetProcessById(pid);
                         proc.Kill(); // Prozess beenden
-                        Console.WriteLine($"Prozess {pid} wurde beendet.");
+                        Console.WriteLine($"Process {pid} was ended.");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Fehler beim Beenden des Prozesses: {ex.Message}");
+                        Console.WriteLine($"An ERROR occured while thrying to close the process with the ID {pid}: {ex.Message}");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Port {port} ist nicht in Verwendung.");
+                    Console.WriteLine($"Port {port} is not in use.");
                 }
             }
         }

@@ -65,7 +65,7 @@ namespace xyToolz.Logging.Loggers
         /// <returns>A formatted string that includes the provided message, and optionally the caller name and log level.</returns>
         private string FormatMsg(string message, string? callerName = null, LogLevel? level = null)
         {
-            return _msgFormatter.FormatMessageForLogging(message, callerName, level);
+            return _msgFormatter.FormatMessageForLogging(message, callerName, level);           // Should create entity
         }
 
         /// <summary>
@@ -73,9 +73,16 @@ namespace xyToolz.Logging.Loggers
         /// </summary>
         private string FormatEx(Exception ex, LogLevel level, string? callerName = null)
         {
-            return _excFormatter.FormatExceptionDetails(ex, level, callerName);
+            return _excFormatter.FormatExceptionDetails(ex, level, callerName);                         // Should create entity
         }
 
+        /// <summary>
+        /// Format a log entity into a message
+        /// </summary>
+        /// <param name="entry_"></param>
+        /// <param name="callerName"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
         private string FormatEntity(T entry_, string? callerName = null, LogLevel? level = null)
         {
             return _entFormatter.FormatEntityForLogging(entry_, callerName, level);
