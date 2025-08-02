@@ -216,11 +216,24 @@ namespace xyToolz.Logging.Helper
         /// <param name="name"></param>
         /// <returns></returns>
         public string EntryNotRemoved([MaybeNull] string? name = null) => name == null ? $"Failed to remove target from DB-Context!" : $"Failed to remove {name} from DB-Context!";
+
+        /// <summary>
+        /// Context saved the changes
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string ContextSaved([MaybeNull] string? name = null) => name == null ? $"Target DB-Context was saved successfully!" : $"{name} was saved successfully!";
+        /// <summary>
+        /// Context didnt save
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string ContextNotSaved([MaybeNull] string? name = null) => name == null ? $"Failed to save the changes intarget DB-Context!" : $"Failed to save the changes in {name}!";
         #endregion
 
 
         #region "Key & Token Handling"
-        
+
         /// <summary>
         /// No key found
         /// </summary>
