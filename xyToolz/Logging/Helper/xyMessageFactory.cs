@@ -48,6 +48,7 @@ namespace xyToolz.Logging.Helper
         /// <param name="paramName"></param>
         /// <returns></returns>
         public string ParameterIsNull(string? paramName = null) => paramName == null ? "Input data is NULL! Please check your input!" : $"{paramName} is NULL! Please check your input!";
+        
         /// <summary>
         /// Invalid ID
         /// </summary>
