@@ -230,13 +230,20 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string ContextSaved([MaybeNull] string? name = null) => name == null ? $"Target DB-Context was saved successfully!" : $"{name} was saved successfully!";
+        public string ContextSaved() => $"Target DB-Context was saved successfully!";
+        /// <summary>
+        /// Context saved ... changes
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public string ContextSaved(string name, int count) => $" All {count} changes in {name} have been saved successfully!";
         /// <summary>
         /// Context didnt save
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string ContextNotSaved([MaybeNull] string? name = null) => name == null ? $"Failed to save the changes intarget DB-Context!" : $"Failed to save the changes in {name}!";
+        public string ContextNotSaved([MaybeNull] string? name = null) => name == null ? $"Failed to save the changes in target DB-Context!" : $"Failed to save the changes in {name}!";
         #endregion
 
 
