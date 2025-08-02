@@ -149,6 +149,7 @@ namespace xyToolz.Logging.Models
             info.AddValue(nameof(Exception), Exception?.ToString()); // Optional: Sie können auch die Exception-Details speichern
         }
 
+
         /// <summary>
         /// Get relevant information for the streaming context
         /// </summary>
