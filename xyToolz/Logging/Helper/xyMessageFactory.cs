@@ -164,14 +164,26 @@ namespace xyToolz.Logging.Helper
         /// <param name="contextName"></param>
         /// <returns></returns>
         public string EntryCreatedAndAdded(string? contextName = null) => contextName == null ? "Successfully created and added the entry to the DB-Context!": $"Successfully created and added the entry to the {contextName}!";
-        
+
         /// <summary>
         /// No entry found
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public string EntryNotFound(string ID) => $"Couldnt find the corresponding entrie for the ID {ID}";
-        
+        public string EntryNotFound(object ID) => $"Couldnt find the corresponding entrie for the ID {ID}";
+                ///// <summary>
+        ///// No entry found
+        ///// </summary>
+        ///// <param name="ID"></param>
+        ///// <returns></returns>
+        //public string EntryNotFound(string ID) => $"Couldnt find the corresponding entrie for the ID {ID}";
+        ///// <summary>
+        ///// No entry found
+        ///// </summary>
+        ///// <param name="ID"></param>
+        ///// <returns></returns>
+        //public string EntryNotFound(int ID) => $"Couldnt find the corresponding entrie for the ID {ID}";
+
         /// <summary>
         /// Entry was updated
         /// </summary>
