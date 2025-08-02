@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using xyToolz.Logging.Interfaces;
+using xyToolz.Logging.Models;
 
 namespace xyToolz.Logging.Loggers
 {
@@ -14,7 +15,7 @@ namespace xyToolz.Logging.Loggers
         // Almost irrelevant, but not utterly.                                                                                                                                      TODO: Add methods o digest xyLogEntrys
         private readonly IMessageFormatter? _msgFormatter;
         private readonly IExceptionFormatter? _excFormatter;
-        private readonly IEntityFormatter<T>? _entFormatter;
+        private readonly IDefaultEntityFormatter<T>? _entFormatter;
 
 
 
@@ -24,7 +25,7 @@ namespace xyToolz.Logging.Loggers
        /// <param name="msgFormatter_"></param>
        /// <param name="excFormatter_"></param>
        /// <param name="entFormatter_"></param>
-        public xyConsoleLogger( IMessageFormatter msgFormatter_ =null!, IExceptionFormatter excFormatter_ = null!, IEntityFormatter<T> entFormatter_ = null!)
+        public xyConsoleLogger( IMessageFormatter msgFormatter_ =null!, IExceptionFormatter excFormatter_ = null!, IDefaultEntityFormatter<T> entFormatter_ = null!)
         {
             _msgFormatter = msgFormatter_?? null!;
             _excFormatter = excFormatter_?? null!;
@@ -34,7 +35,7 @@ namespace xyToolz.Logging.Loggers
         /// 
         /// </summary>
         /// <param name="entFormatter_"></param>
-        public xyConsoleLogger( IEntityFormatter<T> entFormatter_)
+        public xyConsoleLogger( IDefaultEntityFormatter<T> entFormatter_)
         {
             _entFormatter = entFormatter_;
         }
@@ -108,11 +109,15 @@ namespace xyToolz.Logging.Loggers
         /// <param name="callerName"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        private string FormatEntity(T entry_, string? callerName = null, LogLevel? level = null)
+        public string FormatFromEntity(T entry_, string? callerName = null, LogLevel? level = null)
         {
             return _entFormatter.UnpackAndFormatFromEntity(entry_, callerName, level);
         }
 
+        public xyLogEntry FormatIntoEntity()
+        {
+            return _entFormatter.PackAmd
+        }
 
     }
 }

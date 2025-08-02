@@ -35,6 +35,7 @@ namespace xyToolz.Logging.Helper.Formatters
             sb_Builder.AppendLine($"Source: {ex.Source}");
             sb_Builder.AppendLine($"TargetSite: {ex.TargetSite}");
             sb_Builder.AppendLine($"StackTrace: {ex.StackTrace}");
+            sb_Builder.AppendLine($"HResult: {ex.HResult}");
             sb_Builder.AppendLine($"Message: {ex.Message}");
            
             if (ex.Data != null && ex.Data.Count > 0)
