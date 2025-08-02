@@ -110,7 +110,7 @@ namespace xyToolz.Logging.Loggers
         /// <returns></returns>
         private string FormatEntity(T entry_, string? callerName = null, LogLevel? level = null)
         {
-            return _entFormatter.FormatEntityForLogging(entry_, callerName, level);
+            return _entFormatter.UnpackAndFormatFromEntity(entry_, callerName, level);
         }
 
 

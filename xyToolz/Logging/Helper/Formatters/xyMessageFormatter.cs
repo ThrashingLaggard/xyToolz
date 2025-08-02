@@ -18,7 +18,7 @@ namespace xyToolz.Logging.Helper.Formatters
 
             callerName = string.IsNullOrEmpty(callerName) ? " / " : callerName;
 
-            string formattedMessage = $"[{timestamp}] [{logLevel}] [{callerName}] {message}";
+            string formattedMessage = $"[{timestamp}] [{logLevel}] [{callerName}] \n{message}";
 
             return formattedMessage;
         }

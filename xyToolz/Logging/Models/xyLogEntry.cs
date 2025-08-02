@@ -3,12 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using System.Runtime.Serialization;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
+
 
 namespace xyToolz.Logging.Models
 {
-    public class xyLogEntry
+    /// <summary>
+    /// Bundled information for a log message
+    /// </summary>
+    public class xyLogEntry : ISerializable
     {
         /// <summary>
         /// For easy administration
@@ -48,7 +54,7 @@ namespace xyToolz.Logging.Models
         /// <summary>
         /// The exception connected to the log
         /// </summary>
-        public Exception Exception { get; set; }
+        public Exception? Exception { get; set; }
 
 
 
@@ -59,6 +65,126 @@ namespace xyToolz.Logging.Models
             Level = level_;
             Message = message_;
             Exception = exception_ ?? default!;
+        }
+
+        /// <summary>
+        /// Serialize per System.Text.Json
+        /// </summary>
+        /// <returns></returns>
+        public string ToJson() => JsonSerializer.Serialize(this);
+
+        /// <summary>
+        /// Deserialize a json string into an instance of xyLogEntry
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public xyLogEntry FromJson(string json) 
+        {
+            if( JsonSerializer.Deserialize<xyLogEntry>(json) is xyLogEntry entry)
+            {
+                return entry;
+            }
+            else return new xyLogEntry("", LogLevel.Error, "")
+            {
+                Source = "xyLogEntry.FromJson()",
+                Message = "Deserialization from JSON failed!",
+                Timestamp = DateTime.Now,
+            };
+        }
+       
+       
+        /// <summary>
+        /// Serialize per System.Xml.Serialization
+        /// </summary>
+        /// <returns></returns>
+        public string ToXml()
+        {
+            XmlSerializer serializer = new(typeof(xyLogEntry));
+            using StringWriter writer = new();
+            serializer.Serialize(writer, this);
+            return writer.ToString();
+        }
+
+        /// <summary>
+        /// Deserialize a xml string into an instance of xyLogEntry
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public xyLogEntry FromXml(string xml)
+        {
+            XmlSerializer deserializer = new(typeof(xyLogEntry));
+            using StringReader reader = new(xml);
+            if (deserializer.Deserialize(reader) is xyLogEntry entry) return entry;
+            else return new xyLogEntry("", LogLevel.Error,"") 
+            { 
+                Source = "xyLogEntry.FromXml()",
+                Message = "Deserialization from xml failed!",
+                Timestamp = DateTime.Now, 
+            } ;
+        }
+
+
+        /// <summary>
+        /// Method from ISerializable
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="context"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            // Überprüfen, ob die info-Instanz null ist
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
+
+            // Fügen Sie die Eigenschaften zur SerializationInfo hinzu
+            info.AddValue(nameof(ID), ID);
+            info.AddValue(nameof(Description), Description);
+            info.AddValue(nameof(Comment), Comment);
+            info.AddValue(nameof(Timestamp), Timestamp);
+            info.AddValue(nameof(Source), Source);
+            info.AddValue(nameof(Level), Level);
+            info.AddValue(nameof(Message), Message);
+            info.AddValue(nameof(Exception), Exception?.ToString()); // Optional: Sie können auch die Exception-Details speichern
+        }
+
+        /// <summary>
+        /// Get relevant information for the streaming context
+        /// </summary>
+        /// <param name="context"></param>
+        public void ReadAllStreamingContextInfo(StreamingContext context)
+        {
+            // Auslesen des State
+            Console.WriteLine($"StreamingContext State: {context.State}");
+
+            // Überprüfen, ob der Context zusätzliche Informationen enthält
+            if (context.Context != null)
+            {
+                Console.WriteLine($"Additional Context Information Type: {context.Context.GetType()}");
+                Console.WriteLine($"Additional Context Information: {context.Context}");
+
+                // Wenn der Context ein anderes Objekt ist, können Sie die Eigenschaften dynamisch auslesen
+                var properties = context.Context.GetType().GetProperties();
+                foreach (var property in properties)
+                {
+                    var value = property.GetValue(context.Context);
+                    Console.WriteLine($"{property.Name}: {value}");
+                }
+                //// Beispiel für benutzerdefinierte Informationen
+                //if (context.Context is xyContext customContext)
+                //{
+                //    Console.WriteLine($"UserId: {customContext.UserId}");
+                //    Console.WriteLine($"SessionId: {customContext.SessionId}");
+                //}
+                //else
+                //{
+                //}
+            }
+            else
+            {
+                Console.WriteLine("No additional context information available.");
+            }
         }
 
     }

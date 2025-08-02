@@ -8,8 +8,18 @@ using xyToolz.Logging.Interfaces;
 
 namespace xyToolz.Logging.Helper.Formatters
 {
+    /// <summary>
+    /// Format exceptions for structured logging
+    /// </summary>
     public class xyExceptionFormatter : IExceptionFormatter
     {
+        /// <summary>
+        /// Read all relevant details from the exception
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="level"></param>
+        /// <param name="callerName"></param>
+        /// <returns></returns>
         public string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null)
         {
             StringBuilder sb_Builder = new();
@@ -20,8 +30,9 @@ namespace xyToolz.Logging.Helper.Formatters
             sb_Builder.AppendLine($"Source: {ex.Source}");
             sb_Builder.AppendLine($"TargetSite: {ex.TargetSite}");
             sb_Builder.AppendLine($"StackTrace: {ex.StackTrace}");
+            sb_Builder.AppendLine($"HResult: {ex.HResult}");
             sb_Builder.AppendLine($"Message: {ex.Message}");
-
+            
             if (ex.Data != null && ex.Data.Count > 0)
             {
                 sb_Builder.AppendLine("Custom Data:");

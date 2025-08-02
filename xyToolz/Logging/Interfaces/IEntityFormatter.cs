@@ -4,6 +4,6 @@ namespace xyToolz.Logging.Interfaces
 {
     public interface IEntityFormatter<T>
     {
-        string FormatEntityForLogging(T entry_, string? callerName = null, LogLevel? level = null);
+        string UnpackAndFormatFromEntity(T entry_, string? callerName = null, LogLevel? level = null);
     }
 }
