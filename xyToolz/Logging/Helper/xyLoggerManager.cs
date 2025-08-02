@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using xyToolz.List;
+using xyToolz.Logging.Helper.Formatters;
 using xyToolz.Logging.Interfaces;
 
 namespace xyToolz.Logging.Helper
@@ -16,7 +17,11 @@ namespace xyToolz.Logging.Helper
     /// </summary>
     public class xyLoggerManager
     {
+        /// <summary>
+        /// Add useful information
+        /// </summary>
         public string Description { get; set; } = "Your advertisements here!";
+
         public ushort Count { get; private set; }
         
         private readonly IEnumerable<ILogging> _loggers;
@@ -30,16 +35,42 @@ namespace xyToolz.Logging.Helper
         }
 
         /// <summary>
-        /// Registers a new logger to the logging system.
+        /// Registers (a) new logger(s) to the logging system.
         /// </summary>
-        /// <remarks>This method adds the specified logger to the internal collection of loggers.  The
+        /// <remarks>This method adds the specified logger(s) to the internal collection of loggers.  The
         /// registered logger will be used for logging operations performed by the system.</remarks>
-        /// <param name="logger">The logger instance to be registered. Cannot be null.</param>
-        public void RegisterLogger(ILogging logger)
+        /// <param name="loggers">The logger instance(s) to be registered. Cannot be null.</param>
+        public void RegisterLogger(params ILogging[] loggers)
         {
-            _loggers.Append(logger);
-            Count++;
+            foreach (ILogging logger  in loggers)
+            {
+                if (logger is null)
+                {
+                    string output = OutputMissingLogger(logger);     
+                    Console.WriteLine(output);
+                }
+                else
+                {
+                    _loggers.Append(logger);
+                    Count++;
+                }
+            }
         }
+
+        private string OutputMissingLogger(ILogging logger)
+        {
+            xyDefaultLogFormatter formatter = new();
+
+            string output = $"{logger} is null!";
+            string formatted = formatter.FormatMessageForLogging(output);
+            string exception = formatter.FormatExceptionDetails(new ArgumentNullException(nameof(logger)), LogLevel.Error);
+            
+            output = formatted + "\n" + exception;
+
+            return output;
+        }
+
+
 
         /// <summary>
         /// Unregisters the specified logger from the logging system.
