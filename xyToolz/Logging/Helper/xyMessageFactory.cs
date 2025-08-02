@@ -7,6 +7,7 @@ namespace xyToolz.Logging.Helper
     /// 
     /// The methods return strings for easy digestion
     /// 
+    /// Really nice, lol
     /// </summary>
     public class xyMessageFactory
     {
