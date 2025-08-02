@@ -232,7 +232,7 @@ namespace xyToolz.Logging.Helper
         /// <returns></returns>
         public string ContextSaved() => $"Target DB-Context was saved successfully!";
         /// <summary>
-        /// Context saved ... changes
+        /// Context saved [...] changes
         /// </summary>
         /// <param name="name"></param>
         /// <param name="count"></param>
