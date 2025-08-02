@@ -35,13 +35,19 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public string ValidParameter(string? paramName = null) => paramName == null ? $"Data from parameter is valid! ": $"{paramName} is valid";
+        public string ParameterValid(string? paramName = null) => paramName == null ? $"Data from parameter is valid! ": $"{paramName} is valid";
         /// <summary>
         /// Parameter is incorrect
         /// </summary>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public string InvalidParameter(string? paramName = null) => paramName == null? "Invalid data! Please check your input!": $"{paramName} is INVALID! Please check your input!";
+        public string ParameterInvalid(string? paramName = null) => paramName == null? "Invalid data! Please check your input!": $"{paramName} is INVALID! Please check your input!";
+        /// <summary>
+        /// Parameter is null
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <returns></returns>
+        public string ParameterIsNull(string? paramName = null) => paramName == null ? "Input data is NULL! Please check your input!" : $"{paramName} is NULL! Please check your input!";
         /// <summary>
         /// Invalid ID
         /// </summary>
