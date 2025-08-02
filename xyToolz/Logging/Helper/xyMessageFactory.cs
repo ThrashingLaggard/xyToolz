@@ -138,6 +138,7 @@ namespace xyToolz.Logging.Helper
 
 
         #region "EF-CORE CRUD"
+
         /// <summary>
         /// List with context entries
         /// </summary>
@@ -148,6 +149,7 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <returns></returns>
         public string EntryEmptyList() => "No relevant entries found in the context, this list is empty!";
+
 
         /// <summary>
         /// Created entry
@@ -160,6 +162,7 @@ namespace xyToolz.Logging.Helper
         /// <returns></returns>
         public string EntryNotCreated() => "Failed to create the target! Please check your input!";
        
+
         /// <summary>
         /// Entry added to context
         /// </summary>
@@ -171,6 +174,7 @@ namespace xyToolz.Logging.Helper
         /// <param name="contextName"></param>
         /// <returns></returns>
         public string EntryCreatedAndAdded(string? contextName = null) => contextName == null ? "Successfully created and added the entry to the DB-Context!": $"Successfully created and added the entry to the {contextName}!";
+
 
         /// <summary>
         /// No entry found
@@ -191,6 +195,7 @@ namespace xyToolz.Logging.Helper
         ///// <returns></returns>
         //public string EntryNotFound(int ID) => $"Couldnt find the corresponding entrie for the ID {ID}";
 
+
         /// <summary>
         /// Entry was updated
         /// </summary>
@@ -204,6 +209,7 @@ namespace xyToolz.Logging.Helper
         /// <returns></returns>
         public string EntryNotUpdated([MaybeNull] string? name = null) => name == null ? $"Error! Entry in DB-Context was not updated!" : $"{name} was not updated in the context!";
         
+
         /// <summary>
         /// Removed entry  from context
         /// </summary>
@@ -216,6 +222,7 @@ namespace xyToolz.Logging.Helper
         /// <param name="name"></param>
         /// <returns></returns>
         public string EntryNotRemoved([MaybeNull] string? name = null) => name == null ? $"Failed to remove target from DB-Context!" : $"Failed to remove {name} from DB-Context!";
+
 
         /// <summary>
         /// Context saved the changes
