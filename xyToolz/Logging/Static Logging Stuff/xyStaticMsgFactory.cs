@@ -10,7 +10,7 @@ namespace xyToolz.Helper.Logging
     /// <summary>
     ///  Providing reusable samples for logging
     /// </summary>
-    public static class xyStaticMsgFactory
+    public static class xyStaticMsgFactory 
     {
 
 

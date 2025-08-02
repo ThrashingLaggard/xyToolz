@@ -12,6 +12,7 @@ namespace xyToolz.Logging.Helper
     public class xyMessageFactory
     {
         #region "Debug"
+
         #region "Misc"
 
         /// <summary>
@@ -27,10 +28,15 @@ namespace xyToolz.Logging.Helper
         /// <param name="nameOfTheKey"></param>
         /// <returns></returns>
         public string ConnectionStringNotFound(string? nameOfTheKey = null) => $"No connection string found for {nameOfTheKey}, unable to connect to the target database!!!";
+
         #endregion
 
 
+
+
+
         #region "Parameter"
+
         /// <summary>
         /// Parameter is OK
         /// </summary>
@@ -71,10 +77,15 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <returns></returns>
             public string WrongPassword() => "Entered password is wrong, please input correct password!";
+
         #endregion
         
         
+
+
+
         #region "CRUD"
+
         /// <summary>
         /// Created target -> ID
         /// </summary>
@@ -136,6 +147,9 @@ namespace xyToolz.Logging.Helper
         public string NotDeleted([MaybeNull] int? ID = null) => ID == null ? $"Error! Target was not deleted from the database" : $"Error! The target with the ID {ID} was NOT deleted from the database";
 
         #endregion
+
+
+
 
 
         #region "EF-CORE CRUD"
@@ -244,11 +258,20 @@ namespace xyToolz.Logging.Helper
         /// <param name="name"></param>
         /// <returns></returns>
         public string ContextNotSaved([MaybeNull] string? name = null) => name == null ? $"Failed to save the changes in target DB-Context!" : $"Failed to save the changes in {name}!";
+
         #endregion
 
 
-        #region "Key & Token Handling"
 
+
+
+        #region "Key & Token Handling"
+        /// <summary>
+        /// Key found
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public string KeyFound(string? key = null) => key == null ? "Target key found!" : $"{key} was found!";
         /// <summary>
         /// No key found
         /// </summary>
@@ -256,13 +279,18 @@ namespace xyToolz.Logging.Helper
         public string KeyNotFound(string? key = null) =>key == null?  "Target key was not found!": $"{key} not found!";
 
         /// <summary>
+        /// Token generated 
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public string TokenGenerated(string? token = null) =>  token ==null? $"Token was generated successfully" : $"Token generated:{token}";
+        /// <summary>
         /// Token generation failed
         /// </summary>
         /// <returns></returns>
         public string TokenNotGenerated() => "Critical Failure in the token generation process!"; 
+        
         #endregion
-
-
 
         #endregion
 
