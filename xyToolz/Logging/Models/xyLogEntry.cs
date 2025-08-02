@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 
@@ -14,7 +9,7 @@ namespace xyToolz.Logging.Models
     /// <summary>
     /// Bundled information for a log message
     /// </summary>
-    public class xyLogEntry : ISerializable
+    public class xyLogEntry(string source_, LogLevel level_, string message_, DateTime timestamp_, Exception? exception_ = null) : ISerializable
     {
         /// <summary>
         /// For easy administration
@@ -34,38 +29,29 @@ namespace xyToolz.Logging.Models
         /// <summary>
         /// Time of logging
         /// </summary>
-        public required DateTime Timestamp { get; init; } 
+        public required DateTime Timestamp { get; init; } = timestamp_;
 
         /// <summary>
         /// Where it was logged --> callername
         /// </summary>
-        public required string Source { get; init; }
+        public required string Source { get; init; } = source_;
 
         /// <summary>
         /// The level of "severity"
         /// </summary>
-        public LogLevel Level { get; set; } = LogLevel.Debug;
+        public LogLevel Level { get; set; } = level_;
 
         /// <summary>
         /// The logging message
         /// </summary>
-        public required string Message { get; init; }
+        public required string Message { get; init; } = message_;
 
         /// <summary>
         /// The exception connected to the log
         /// </summary>
-        public Exception? Exception { get; set; }
+        public Exception? Exception { get; set; } = exception_ ?? default!;
 
 
-
-        public xyLogEntry(string source_, LogLevel level_, string message_, Exception? exception_ = null)
-        {
-            Timestamp = DateTime.Now;
-            Source = source_;
-            Level = level_;
-            Message = message_;
-            Exception = exception_ ?? default!;
-        }
 
         /// <summary>
         /// Serialize per System.Text.Json
@@ -84,11 +70,11 @@ namespace xyToolz.Logging.Models
             {
                 return entry;
             }
-            else return new xyLogEntry("", LogLevel.Error, "")
+            else return new xyLogEntry("", LogLevel.Error, "", DateTime.Now)
             {
                 Source = "xyLogEntry.FromJson()",
                 Message = "Deserialization from JSON failed!",
-                Timestamp = DateTime.Now,
+                Timestamp = DateTime.Now
             };
         }
        
@@ -115,7 +101,7 @@ namespace xyToolz.Logging.Models
             XmlSerializer deserializer = new(typeof(xyLogEntry));
             using StringReader reader = new(xml);
             if (deserializer.Deserialize(reader) is xyLogEntry entry) return entry;
-            else return new xyLogEntry("", LogLevel.Error,"") 
+            else return new xyLogEntry("", LogLevel.Error,"", DateTime.Now) 
             { 
                 Source = "xyLogEntry.FromXml()",
                 Message = "Deserialization from xml failed!",

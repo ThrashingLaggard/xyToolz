@@ -19,17 +19,23 @@ namespace xyPorts.Master
         /// <summary>
         /// Provides basic information about and some operations for ports 
         /// </summary>
-        public xyPort xyPort { get; set; }
+        public xyPort _port { get; set; }
+
+        /// <summary>
+        /// Provides methods for checking the status of ports
+        /// </summary>
+        public xyPortChecker _checker { get; set; }
 
         /// <summary>
         /// provides basic information about and some operations for TCP ports
         /// </summary>
-        internal xyTcpPort xyTcpPort { get; set; }
+        public xyTcpPort _tcpPort { get; set; }
 
         /// <summary>
         /// provides basic information about and some operations for UDP ports
         /// </summary>
-        internal xyUdpPort xyUdpPort { get; set; }
+        public xyUdpPort _udpPort { get; set; }
+
 
         /// <summary>
         /// Close the target port by killing the process using it

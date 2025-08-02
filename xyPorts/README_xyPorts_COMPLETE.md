@@ -43,6 +43,16 @@ xyPorts/
 
 ## Available Classes
 
+### Namespace: `xyPorts.Master`
+
+- **`xyPortManager`**  
+  Top-level class to manage and control ports.  
+  Holds instances of `xyPort`, `xyTcpPort`, and `xyUdpPort`.  
+  Provides `ClosePort(int port)` to kill the process using the port.
+
+---
+
+
 ### Namespace: `xyPorts.Basix`
 
 - **`xyPort`**  
@@ -86,15 +96,6 @@ xyPorts/
   - `ConnectUDP(string ip, ushort port, string message)`  
   - `ReceiveDataUDP(...)`  
   - `ClosePortUdp(...)`  
-
----
-
-### Namespace: `xyPorts.Master`
-
-- **`xyPortManager`**  
-  Top-level class to manage and control ports.  
-  Holds instances of `xyPort`, `xyTcpPort`, and `xyUdpPort`.  
-  Provides `ClosePort(int port)` to kill the process using the port.
 
 ---
 

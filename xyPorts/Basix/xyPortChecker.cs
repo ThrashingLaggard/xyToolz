@@ -15,6 +15,7 @@ namespace xyPorts.Basix
         /// <returns></returns>
         public IPGlobalProperties GetIpgProps() => IPGlobalProperties.GetIPGlobalProperties();
 
+
         /// <summary>
         /// Get all active TCP connections
         /// </summary>
@@ -50,6 +51,7 @@ namespace xyPorts.Basix
             lst_ActiveTCPs.Sort();
             return lst_ActiveTCPs;
         }
+
 
         /// <summary>
         /// Get all active UDP listeners
