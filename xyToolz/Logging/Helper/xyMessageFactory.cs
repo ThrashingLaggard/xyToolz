@@ -31,7 +31,9 @@ namespace xyToolz.Logging.Helper
 
         #endregion
 
-
+        #region "Serialization"
+        // todo: fill in
+        #endregion
 
 
 
@@ -266,6 +268,7 @@ namespace xyToolz.Logging.Helper
 
 
         #region "Key & Token Handling"
+        
         /// <summary>
         /// Key found
         /// </summary>

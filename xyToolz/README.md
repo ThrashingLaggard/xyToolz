@@ -185,25 +185,7 @@ xyLog.ExLog(new Exception("Something failed"));
 
 ---
 
-### 🧠 `xyConversion`
 
-Utility class for common type and string conversions.
-
-#### 📌 Features
-
-- Safe `ToInt`, `ToDouble`, `ToBool`, etc.
-- Culture-invariant handling
-- Nullable-friendly parsing
-- Fallback/default value support
-
-#### 🧪 Example
-
-```csharp
-int result = xyConversion.ToInt("1234", fallback: 0);
-bool ok = xyConversion.ToBool("true");
-```
-
----
 
 ### 🧾 `xyJson`
 
