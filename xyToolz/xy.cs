@@ -241,7 +241,7 @@ namespace xyToolz
         {
             char[] arr_InputChars = input.ToCharArray();
             Array.Reverse(arr_InputChars);
-            string output =new string(arr_InputChars);
+            string output =new (arr_InputChars);
             return output; 
         }
 

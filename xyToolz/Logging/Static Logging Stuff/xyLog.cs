@@ -52,6 +52,7 @@ namespace xyToolz.Helper.Logging
     /// }
     /// </code>
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<Because i said so!>")]
     public static class xyLog
     {
         /// <summary>
@@ -84,8 +85,8 @@ namespace xyToolz.Helper.Logging
         private static readonly string _logFilePath = "logs/app.log";
         private static readonly string _exLogFilePath = "logs/exceptions.log";
         private static readonly long _maxLogFileSize = 10485760;
-        private static readonly object _threadSafetyLock = new object();
-        private static xyLogArchiver _archiver = new(_maxLogFileSize);
+        private static readonly object _threadSafetyLock = new ();
+        private readonly static xyLogArchiver _archiver = new(_maxLogFileSize);
         // private static IEnumerable<xyLogTargets> _eTargets = new List<xyLogTargets>();
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace xyToolz.Helper.Logging
         /// <returns>Enumerable of xyLogTargets</returns>
         internal static IEnumerable<xyLogTargets> SetLogTargets(ushort[] logTargets)
         {
-            if (logTargets.Length < 1) return new xyLogTargets[] { 0 };
+            if (logTargets.Length < 1) return [] ;
             xyLogTargets[] targets = new xyLogTargets[logTargets.Length];
 
             for (int i = 0; i < logTargets.Length; i++)
