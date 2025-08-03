@@ -130,9 +130,10 @@ namespace xyToolz
             string addMessage = $"Added key '{key}' to '{path}'.";
             string errorMessage = $"Failed to update key '{key}' in file '{path}'.";
 
-            if(_override is not null)
+            if(_override is not null && value is not null)
             {
-                 await _override?.AddOrUpdateEntry(path, key, value as string);
+                 await _override?.AddOrUpdateEntry(path, key, value.ToString())!;
+
                 return;
             }
             try
@@ -172,7 +173,7 @@ namespace xyToolz
         {
             try
             {
-                dynamic stream = await xyFiles.GetStreamFromFileAsync(filePath);
+                dynamic? stream = await xyFiles.GetStreamFromFileAsync(filePath);
                 if (stream == null) return null;
                 return await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(stream, defaultJsonOptions);
             }
@@ -208,13 +209,16 @@ namespace xyToolz
         public static async Task<byte[]?> DeserializeKeyToBytes(string filePath, string key)
         {
             string errorMessage = $"Key '{key}' could not be decoded to bytes from '{filePath}'.";
-            string? base64 = await TryDeserializeKey<string>(filePath, key);
-            byte[]? decoded = xy.BaseToBytes(base64);
-            if (decoded == null)
+            if (await TryDeserializeKey<string>(filePath, key) is string base64)
             {
-                await xyLog.AsxLog(errorMessage);
+                byte[]? decoded = xy.BaseToBytes(base64);
+                if (decoded == null)
+                {
+                    await xyLog.AsxLog(errorMessage);
+                }
+                return decoded;
             }
-            return decoded;
+            return [];
         }
 
 
@@ -328,12 +332,19 @@ namespace xyToolz
         {
             string errorMessage = $"Subkey '{subkey}' under '{key}' could not be decoded to bytes from '{filePath}'.";
             string? b64 = await TryDeserializeSubkey<string>(filePath, key, subkey);
-            byte[]? decoded = xy.BaseToBytes(b64);
-            if (decoded == null)
+
+            if (!string.IsNullOrEmpty(b64))
             {
-                await xyLog.AsxLog(errorMessage);
+                if( xy.BaseToBytes(b64) is byte[] decoded)
+                {
+                    return decoded;
+                }
+                else
+                {
+                    await xyLog.AsxLog(errorMessage);
+                }
             }
-            return decoded;
+            return [];
         }
 
 
@@ -487,7 +498,7 @@ namespace xyToolz
         public static void ResetOverride() => _override = null;
 
 
-        public static Task<string?> TestGetStringFromJsonFile(string path, string key) =>
+        public static Task<string> TestGetStringFromJsonFile(string path, string key) =>
             _override?.GetStringFromJsonFile(path, key) ?? GetStringFromJsonFile(path, key);
 
         public static Task TestAddOrUpdateEntry(string path, string key, string value) =>

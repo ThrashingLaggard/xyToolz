@@ -33,7 +33,7 @@ sealed class Program
     private static void RequestAdministratorPrivileges()
     {
         var exeName = Environment.ProcessPath;
-        var startInfo = new ProcessStartInfo(exeName)
+        var startInfo = new ProcessStartInfo(exeName!)
         {
             UseShellExecute = true,
             Verb = "runas"

@@ -132,7 +132,6 @@ namespace xyToolz
         /// This method does not log directly. It assumes responsibility lies with caller.
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="xyPath.EnsureDirectory(string)"/>
         /// </remarks>
         /// <param name="dir">The relative or absolute path to resolve.</param>
         /// <returns>The resolved and platform-correct directory path.</returns>
@@ -143,7 +142,7 @@ namespace xyToolz
             if (string.IsNullOrEmpty(path))
                 path = Path.Combine(Android.App.Application.Context.GetExternalFilesDir(null)!.AbsolutePath, dir);
 #else
-            string path = xyPath.EnsureDirectory(dir);
+            string path = xyPath.EnsureDirectory(dir)!;
 #endif
             return path;
         }
@@ -424,7 +423,6 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.File.ReadAllLinesAsync(string)"/>, <see cref="EnsurePathExistsAsync(string)"/>
         /// </remarks>
         /// <param name="filePath">The full path to the file to read.</param>
         /// <returns>A collection of lines as strings, or an empty collection if failed.</returns>
@@ -484,7 +482,6 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.MemoryStream"/>, <see cref="System.IO.File.ReadAllBytesAsync(string)"/>
         /// </remarks>
         /// <param name="filePath">The full file path to read.</param>
         /// <returns>A <see cref="Stream"/> containing the file content, or null on failure.</returns>
@@ -550,7 +547,6 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.File.WriteAllTextAsync(string, string)"/>
         /// </remarks>
         /// <param name="content">The string content to save.</param>
         /// <param name="filePath">The full path of the file. Defaults to "config.json".</param>
@@ -634,7 +630,6 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="SaveToFile(string, string)"/>, <see cref="xyPath.Combine(string, string)"/>
         /// </remarks>
         /// <param name="content">The content to be written to the file.</param>
         /// <param name="subfolder">Subdirectory where the file will be placed.</param>
@@ -721,7 +716,6 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.File.ReadAllTextAsync(string)"/>
         /// </remarks>
         /// <param name="fileName">The full file path to read.</param>
         /// <returns>The file content as string, or null on failure.</returns>
@@ -773,7 +767,6 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.File.ReadAllBytesAsync(string)"/>
         /// </remarks>
         /// <param name="fullPath">Full path to the file.</param>
         /// <returns>Byte array if successful; otherwise, null.</returns>

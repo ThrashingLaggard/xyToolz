@@ -10,26 +10,25 @@ namespace xyToolz.List
 {
 
 
-    //                                                                                                                                                                                                  Disclaimer: this is just an experiment for learning purposes
+    //                                                                                                                                                                                                  Disclaimer: this is just an experiment for learning purposes, please neither shout at me nor hit me 
 
 
 
 
 
     /// <summary>
-    /// Sits on the stack & can NOT go on the heap!
+    /// Sits on the stack and can NOT go on the heap!
     /// This can neither be used in async/await, iterators, interfaces nor in fields 
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public ref struct xyList<T>
     {
-        /// <summary>
-        /// This is a thread-safe resource pool that enables reusing instances of type T[].
-        /// Rent and return the buffers for better performance
-        /// </summary>
-        private ArrayPool<T>? _pool;
-
-
+        // <summary>
+        // This is a thread-safe resource pool that enables reusing instances of type T[].
+        // Rent and return the buffers for better performance
+        // </summary>
+        //privat e Arra yPoo l pool
+     
         /// <summary>
         /// Initializes a new instance of the <see cref="xyList{T}"/> class with the specified initial buffer and
         /// expansion factor.
@@ -45,20 +44,30 @@ namespace xyToolz.List
         {
             _viewPointerSpan = initialBuffer_;
         }
-
+        /// <summary>
+        /// Initialize a new instance of xyList with predefined capacity and expansion factor
+        /// </summary>
+        /// <param name="capacity_"></param>
+        /// <param name="expansionFactor_"></param>
         public xyList(uint capacity_, uint expansionFactor_ = 2) : this((uint) expansionFactor_)
         {
             _rentedBufferArrayFromPool = ArrayPool<T>.Shared.Rent((int)capacity_);
             _viewPointerSpan = _rentedBufferArrayFromPool.AsSpan();
         }
-
+        /// <summary>
+        /// Initialize a new instance of xyList with expansion factor
+        /// </summary>
+        /// <param name="expansionFactor_"></param>
         public xyList(uint expansionFactor_)
         {
             _factor = expansionFactor_;
             _count = 0;
         }
 
-        public string Description { get; set; }
+        /// <summary>
+        /// Add useful information
+        /// </summary>
+        public string Description { get; set; } = "My own little list like thingy";
         
         /// <summary>
         /// View/ Pointer
@@ -81,17 +90,14 @@ namespace xyToolz.List
         private int _count;
 
         /// <summary>
-        /// By how much do you want to multiply the size of reserved space in case of a resize
-        /// </summary>
-        private uint _factor;
-
-
-
-        /// <summary>
         /// Gets the number of elements currently contained in the collection.
         /// </summary>
         public int Count => _count;
 
+        /// <summary>
+        /// By how much do you want to multiply the size of reserved space in case of a resize
+        /// </summary>
+        private uint _factor;
         /// <summary>
         /// Gets the total number of elements that the underlying span can contain at MAX.
         /// </summary>
@@ -238,6 +244,7 @@ namespace xyToolz.List
 
                 // Delete the reference
                 _rentedBufferArrayFromPool = default!;
+
             }
         }
 

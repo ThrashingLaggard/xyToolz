@@ -63,7 +63,7 @@ namespace xyToolz.Helper
         /// <summary>
         /// The configured pepper value, loaded from environment variable or defaults to "Ahuhu".
         /// </summary>
-        private static readonly string? Pepper = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(PepperEnvVarName)) ? "Ahuhu" : Environment.GetEnvironmentVariable(PepperEnvVarName);
+        private static readonly string Pepper = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(PepperEnvVarName)) ? "Ahuhu" : Environment.GetEnvironmentVariable(PepperEnvVarName)!;
 
         /// <summary>
         /// Number of iterations used in PBKDF2 password hashing.
@@ -104,8 +104,6 @@ namespace xyToolz.Helper
         /// </summary>
         /// <param name="password">The input password from which the key will be derived.</param>
         /// <param name="salt">A cryptographically secure random salt (minimum 8 bytes recommended).</param>
-        /// <param name="keyLength">The desired length of the derived key (e.g., 32 for AES-256).</param>
-        /// <param name="iterations">The number of iterations (default: 100,000).</param>
         /// <returns>A derived key as a byte array.</returns>
         /// <exception cref="ArgumentException">Thrown if password or salt is invalid, or key length is too short.</exception>
         public static byte[] BuildKeyFromPassword(string password, byte[] salt)
@@ -117,7 +115,7 @@ namespace xyToolz.Helper
 
             xyLog.Log((salt is null || salt.Length == 0) ? errorSalt : string.IsNullOrWhiteSpace(password) ? errorPassword : ok);
 
-            using Rfc2898DeriveBytes pbkdf2 = new(xy.StringToBytes(password), salt, Iterations, HashAlgorithmName.SHA256);
+            using Rfc2898DeriveBytes pbkdf2 = new(xy.StringToBytes(password), salt!, Iterations, HashAlgorithmName.SHA256);
 
             return pbkdf2.GetBytes(KeyLength256);
         }
@@ -203,7 +201,7 @@ namespace xyToolz.Helper
 
             if (isSaltValid && isPwValid)
             {
-                return HashToString(hashAlgorithm, password, salt);
+                return HashToString(hashAlgorithm, password, salt!);
             }
             else
             {
@@ -251,7 +249,7 @@ namespace xyToolz.Helper
                     isSaltValid = salt is not null && salt.Length > 0;
                     if (isSaltValid)
                     {
-                        hashToCheck = HashToBytes(hashAlgorithm, password, salt);
+                        hashToCheck = HashToBytes(hashAlgorithm, password, salt!);
                         isValid = CryptographicOperations.FixedTimeEquals(hash, hashToCheck);
                     }
                 }
@@ -276,7 +274,7 @@ namespace xyToolz.Helper
 
             bool isHash2Valid = hash2 is not null && hash2.Length > 0;
             bool isHash1Valid = hash1 is not null && hash1.Length > 0;
-            bool isSameLength = isHash1Valid && isHash2Valid && (hash1.Length == hash2.Length); 
+            bool isSameLength = isHash1Valid && isHash2Valid && (hash1!.Length == hash2!.Length); 
             bool result = false;
 
             if (isHash1Valid && isHash2Valid)

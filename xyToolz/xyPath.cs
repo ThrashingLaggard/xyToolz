@@ -7,6 +7,7 @@ using xyToolz.Helper.Logging;
 
 namespace xyToolz.Helper
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<Because its my wish to do so!>")]
     public static class xyPath
     {
 #if ANDROID
@@ -14,6 +15,11 @@ namespace xyToolz.Helper
 #else
         public static string BasePath { get; } = AppContext.BaseDirectory;
 #endif
+        /// <summary>
+        /// Combine Paths
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
         public static string Combine(params string[] paths)
         {
 #if ANDROID
@@ -23,7 +29,11 @@ namespace xyToolz.Helper
 #endif
         }
 
-
+        /// <summary>
+        /// Make sure the target directory exists
+        /// </summary>
+        /// <param name="subPaths"></param>
+        /// <returns></returns>
         public static string? EnsureDirectory(params string[] subPaths)
         {
             string fullPath = Combine(subPaths);
@@ -35,14 +45,18 @@ namespace xyToolz.Helper
                 }
                 return fullPath;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 xyLog.ExLog(ex);
             }
             return null;
         }
 
-            public static void EnsureParentDirectoryExists(string filePath)
+        /// <summary>
+        /// Make sure the directory for the target path exists
+        /// </summary>
+        /// <param name="filePath"></param>
+        public static void EnsureParentDirectoryExists(string filePath)
         {
             string? dir = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))

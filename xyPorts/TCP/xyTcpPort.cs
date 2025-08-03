@@ -13,32 +13,41 @@ namespace xyPorts.TCP
         /// <summary>
         /// System.Net.Sockets.TcpListener
         /// </summary>
-        public TcpListener TcpListener { get; set; }
+        public TcpListener? TcpListener { get; set; }
 
         /// <summary>
         /// Providing basic TCP-listener and connection operations
         /// </summary>
-        public xyTcpListener xyTcpListener { get; set; }
+        public xyTcpListener? xyTcpListener { get; set; }
 
         /// <summary>
         /// System.net.Sockets.TcpClient
         /// </summary>
-        public TcpClient TcpClient { get; set; }
+        public TcpClient? TcpClient { get; set; }
 
 
         /// <summary>
         /// Providing basic TCP-client and message sending operations
         /// </summary>
-        public xyTcpClient xyTcpClient { get; set; }
+        public xyTcpClient? xyTcpClient { get; set; }
 
         /// <summary>
         ///  System.Net.NetworkInformation.TcpConnectionInformation
         /// </summary>
-        public TcpConnectionInformation ConnectionInformation { get; set; }
+        public TcpConnectionInformation? ConnectionInformation { get; set; }
 
         /// <summary>
         /// System.Net.NetworkInformation.TcpStatistics
         /// </summary>
-        public TcpStatistics Statistics { get; set; }
+        public TcpStatistics? Statistics { get; set; }
+
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
+        public xyTcpPort()
+        {
+            xyTcpListener xyListener = new();  
+            xyTcpClient xyClient = new();
+        }
     }
 }

@@ -143,7 +143,9 @@ namespace xyToolz.Logging.Models
         public void ReadAllStreamingContextInfo(StreamingContext context)
         {
             // Auslesen des State
+#pragma warning disable SYSLIB0050 // Typ oder Element ist veraltet
             Console.WriteLine($"StreamingContext State: {context.State}");
+#pragma warning restore SYSLIB0050 // Typ oder Element ist veraltet
 
             // Überprüfen, ob der Context zusätzliche Informationen enthält
             if (context.Context != null)

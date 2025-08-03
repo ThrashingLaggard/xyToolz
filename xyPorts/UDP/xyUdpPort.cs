@@ -27,11 +27,21 @@ namespace xyPorts.UDP
         /// <summary>
         /// System.Net.NetworkInformation.UdpStatistics
         /// </summary>
-        public UdpStatistics UdpStatistics { get; set; }
+        public UdpStatistics? UdpStatistics { get; set; }
 
         /// <summary>
         /// System.Net.Sockets.UdpReceiveResult
         /// </summary>
         public UdpReceiveResult UdpReceiveResult { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public xyUdpPort()
+        {
+            UdpClient = new();
+            xyUdpClient = new();
+            UdpReceiveResult = new();
+        }
     }
 }

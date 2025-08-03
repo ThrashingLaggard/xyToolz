@@ -33,21 +33,22 @@ namespace xyToolz
         {
             string net8_0 = Environment.CurrentDirectory; xyLog.Log(net8_0);
 
-            string debug = Directory.GetParent(net8_0).FullName; xyLog.Log(debug);
+            string debug = Directory.GetParent(net8_0)!.FullName; xyLog.Log(debug);
 
-            string bin = Directory.GetParent(debug).FullName; xyLog.Log(bin);
+            string bin = Directory.GetParent(debug)!.FullName; xyLog.Log(bin);
 
-            string appFolder = Directory.GetParent(bin).FullName; xyLog.Log(appFolder);
+            string appFolder = Directory.GetParent(bin)!.FullName; xyLog.Log(appFolder);
 
             return appFolder;
         }
 
         /// <summary>
-        /// Stellt sicher, dass der Unterordner existiert. Existiert er nicht, wird er erstellt.
+        /// Make sure that this  specific Subfolder exists
         /// </summary>
-        /// <param name="basePath">Der Basisordner, z. B. FileSystem.AppDataDirectory oder AppContext.BaseDirectory.</param>
-        /// <param name="subfolder">Der Name des gewünschten Unterordners.</param>
-        /// <returns>Der vollständige Pfad zum Unterordner.</returns>
+        /// <param name="basePath"></param>
+        /// <param name="subfolder"></param>
+        /// <param name="createIfNotExist"></param>
+        /// <returns></returns>
         public static string EnsureSubfolderExists(string basePath, string subfolder, bool createIfNotExist = true)
         {
             string folderPath = Path.Combine(basePath, subfolder);
@@ -99,7 +100,7 @@ namespace xyToolz
                 }
                 catch (Exception ex)
                 {
-                    // Optional: Fehler protokollieren oder weiter verarbeiten
+                    xyLog.ExLog(ex);
                     return false;
                 }
             }
@@ -180,9 +181,9 @@ namespace xyToolz
             {
                 try
                 {
-                    string parentPath = Directory.GetParent(currentFolderPath)?.FullName;
+                    string? parentPath = Directory.GetParent(currentFolderPath)?.FullName;
                     if (parentPath == null)
-                        return null;
+                    return null!;
 
                     string newFolderPath = Path.Combine(parentPath, newFolderName);
                     Directory.Move(currentFolderPath, newFolderPath);
@@ -193,7 +194,7 @@ namespace xyToolz
                     xyLog.ExLog(e);
                 }
             }
-            return null;
+            return null!;
         }
 
         /// <summary>
@@ -222,7 +223,7 @@ namespace xyToolz
                     xyLog.ExLog(e);
                 }
             }
-            return null;
+            return null!;
         }
 
         /// <summary>
@@ -376,7 +377,7 @@ namespace xyToolz
         /// <returns>
         /// Den eingerichteten FileSystemWatcher. Wichtig: Der Aufrufer ist dafür verantwortlich, den Watcher bei Nichtgebrauch wieder zu Dispose()en.
         /// </returns>
-        public static FileSystemWatcher MonitorFolder(string folderPath, string filter = "*.*", Action<object, FileSystemEventArgs> onChanged = null)
+        public static FileSystemWatcher MonitorFolder(string folderPath, string filter = "*.*", Action<object, FileSystemEventArgs>? onChanged = null)
         {
             try
             {
@@ -401,7 +402,7 @@ namespace xyToolz
             catch (Exception ex)
             {
                 xyLog.ExLog(ex);
-                return null;
+                return null!;
             }
         }
     

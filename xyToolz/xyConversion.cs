@@ -15,11 +15,18 @@ namespace xyToolz
             private static string endergebnis = "", endausgabe = "";
 
             // Wandelt jew Zahl ins gewünschte Zahlensystem um und gibt den Rechenweg aus
+            /// <summary>
+            /// Convert any number into any system
+            /// </summary>
+            /// <param name="_aktuelle_Basis"></param>
+            /// <param name="ausgangszahl"></param>
+            /// <param name="_basis_des_neuen_Zahlensystems"></param>
+            /// <returns></returns>
             public static string X_to_X(int _aktuelle_Basis, string ausgangszahl, int _basis_des_neuen_Zahlensystems)
             {
                   int _ergebnis = 0, _ergebnis_DEC = 0, _rest, _stelle_von_rechts = 0;
                   string eingabe = DeLetterer(ausgangszahl);
-                  int[] _zahlen_ = eingabe.Split(' ')?.Select(Int32.Parse)?.ToArray();
+                  int[] _zahlen_ = eingabe.Split(' ')?.Select(Int32.Parse)?.ToArray()!;
 
                   if (_aktuelle_Basis != 10)
                   {
@@ -91,6 +98,11 @@ namespace xyToolz
             }
 
             // entfernt ggf die Buchstaben aus dem String und ersetzt sie durch Zahlen
+            /// <summary>
+            /// Removes letters from the string and replaces them with numbers
+            /// </summary>
+            /// <param name="number_with_letters"></param>
+            /// <returns></returns>
             public static string DeLetterer(string number_with_letters)
             {
 
@@ -131,6 +143,11 @@ namespace xyToolz
                   return numbers;
             }
             //ersetzt alle Zahlen über 9 durch die jeweiligen Buchstaben --> Switch_Case kann Strings ittarieren?!
+            /// <summary>
+            /// Switches all the numbers > 9 with letters
+            /// </summary>
+            /// <param name="too_big_numbers"></param>
+            /// <returns></returns>
             public static string Letterer(string too_big_numbers)
             {
                   switch (too_big_numbers)
@@ -174,32 +191,38 @@ namespace xyToolz
 
 
             // Dezimalzahlen in andere Zahlensysteme konvertieren
-            public static string DEC_to_X(int ausgangszahl, int basis_des_neuen_Zahlensystems)
+            /// <summary>
+            /// Convert decimal to target system
+            /// </summary>
+            /// <param name="Number"></param>
+            /// <param name="baseOfTargetNumberSystem"></param>
+            /// <returns></returns>
+            public static string DEC_to_X(int Number, int baseOfTargetNumberSystem)
             {
                   int ergebnis, rest;
 
-                  if (ausgangszahl == 0)
+                  if (Number == 0)
                   {
-                        endergebnis += ausgangszahl % basis_des_neuen_Zahlensystems;
-                        Console.WriteLine("Ausgangszahl ist nutzlos: " + ausgangszahl);
+                        endergebnis += Number % baseOfTargetNumberSystem;
+                        Console.WriteLine("Ausgangszahl ist nutzlos: " + Number);
                         return endergebnis;
                   }
                   else
                   {
-                        rest = ausgangszahl % basis_des_neuen_Zahlensystems;
-                        ergebnis = ausgangszahl / basis_des_neuen_Zahlensystems;
+                        rest = Number % baseOfTargetNumberSystem;
+                        ergebnis = Number / baseOfTargetNumberSystem;
 
-                        Console.Write(ausgangszahl + " % " + basis_des_neuen_Zahlensystems + " = " + rest + "\t" + "\t");
-                        Console.WriteLine(ausgangszahl + " / " + basis_des_neuen_Zahlensystems + " = " + ergebnis);
+                        Console.Write(Number + " % " + baseOfTargetNumberSystem + " = " + rest + "\t" + "\t");
+                        Console.WriteLine(Number + " / " + baseOfTargetNumberSystem + " = " + ergebnis);
 
                         // beide Funktionen machen das gleiche!!! daher nur eine aktivieren 
                         //endergebnis  +=  Letterer (  (ausgangszahl % basis_des_neuen_Zahlensystems).ToString()); 
-                        endergebnis = Letterer("" + (ausgangszahl % basis_des_neuen_Zahlensystems));      // KEIN Leerzeichen zwischen den  -->""<-- !!!         
+                        endergebnis = Letterer("" + (Number % baseOfTargetNumberSystem));      // KEIN Leerzeichen zwischen den  -->""<-- !!!         
 
-                        ausgangszahl = ergebnis;
+                        Number = ergebnis;
 
                         // passt das Ende der Ausgabe an das gewählte Zahlensystem an
-                        switch (basis_des_neuen_Zahlensystems)
+                        switch (baseOfTargetNumberSystem)
                         {
                               case 2:
                                     {
@@ -227,16 +250,21 @@ namespace xyToolz
                                           break;
                                     }
                         }
-                        return DEC_to_X(ausgangszahl, basis_des_neuen_Zahlensystems);
+                        return DEC_to_X(Number, baseOfTargetNumberSystem);
                   }
             }
 
             // Hexadezimalzahlen in andere Zahlensysteme konvertieren
-            public static string HEX_to_DEC(string ausgangszahl)
+            /// <summary>
+            /// Convert Hexa to decimal
+            /// </summary>
+            /// <param name="number"></param>
+            /// <returns></returns>
+            public static string HEX_to_DEC(string number)
             {
                   int ergebnis = 0;
-                  string ausgabe = DeLetterer(ausgangszahl);
-                  int[] bst = ausgabe.Split(' ')?.Select(Int32.Parse)?.ToArray();
+                  string ausgabe = DeLetterer(number);
+                  int[] bst = ausgabe.Split(' ')?.Select(Int32.Parse)?.ToArray()!;
 
                   int expo = 0;
                   for (int i = bst.Length - 1; i >= 0; i--)             //zahlen[-1] *= 16^0;
@@ -255,27 +283,42 @@ namespace xyToolz
                   return endergebnis;
 
             }
-            public static string HEX_to_Oct(string ausgangszahl)
+            /// <summary>
+            /// Convert Hexa to octal
+            /// </summary>
+            /// <param name="number"></param>
+            /// <returns></returns>
+            public static string HEX_to_Oct(string number)
             {
-                  int temp = int.Parse(HEX_to_DEC(ausgangszahl));
+                  int temp = int.Parse(HEX_to_DEC(number));
                   string result = DEC_to_X(temp, 8);
 
                   Console.WriteLine(result);
                   return result;
             }
-            public static string HEX_to_Bin(string ausgangszahl)
+            /// <summary>
+            /// Convert Hexa to binary
+            /// </summary>
+            /// <param name="number"></param>
+            /// <returns></returns>
+            public static string HEX_to_Bin(string number)
             {
-                  int temp = int.Parse(HEX_to_DEC(ausgangszahl));
+                  int temp = int.Parse(HEX_to_DEC(number));
                   string result = DEC_to_X(temp, 2);
                   Console.WriteLine(result);
                   return result;
             }
 
             // Binärzahlen in andere Zahlensysteme konvertieren
-            public static string Bin_to_Dec(string ausgangszahl)
+            /// <summary>
+            /// Convert binary to decimal
+            /// </summary>
+            /// <param name="number"></param>
+            /// <returns></returns>
+            public static string Bin_to_Dec(string number)
             {
-                  string ausgabe = DeLetterer(ausgangszahl);
-                  int[] zahlen = ausgabe.Split(' ')?.Select(Int32.Parse)?.ToArray();
+                  string ausgabe = DeLetterer(number);
+                  int[] zahlen = ausgabe.Split(' ')?.Select(Int32.Parse)?.ToArray()!;
                   int ergebnis = 0;
                   int expo = 0;
 
@@ -295,18 +338,28 @@ namespace xyToolz
                   return endergebnis;
 
             }
-            public static string Bin_to_Hex(string ausgangszahl)
+            /// <summary>
+            /// Convert binary to hexadecimal
+            /// </summary>
+            /// <param name="number"></param>
+            /// <returns></returns>
+            public static string Bin_to_Hex(string number)
             {
-                  int zwischen_Ergebnis = int.Parse(Bin_to_Dec(ausgangszahl));
+                  int zwischen_Ergebnis = int.Parse(Bin_to_Dec(number));
 
                   string hex_Zeichen = DEC_to_X(zwischen_Ergebnis, 16);
 
                   Console.WriteLine(hex_Zeichen);
                   return "" + hex_Zeichen;
             }
-            public static string Bin_to_Oct(string ausgangszahl)
+            /// <summary>
+            /// Convert binary to octal
+            /// </summary>
+            /// <param name="number"></param>
+            /// <returns></returns>
+            public static string Bin_to_Oct(string number)
             {
-                  int temp = int.Parse(Bin_to_Dec(ausgangszahl));
+                  int temp = int.Parse(Bin_to_Dec(number));
                   string result = DEC_to_X(temp, 8);
                   Console.WriteLine(result);
                   return result;

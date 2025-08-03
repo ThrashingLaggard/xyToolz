@@ -58,7 +58,7 @@ namespace xyToolz
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public Dictionary<TKey, TValue> GetPropertyValuesForTarget<TKey, TValue, T>(T obj) where T : class where TKey:class
+        public Dictionary<TKey, TValue> GetPropertyValuesForTarget<TKey, TValue, T>(T obj) where T : class where TKey : class
         {
             PropertyInfo[] propertyInfos = GetPropertyInfosForTarget(obj);
 

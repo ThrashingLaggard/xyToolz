@@ -22,15 +22,15 @@ namespace xyToolz.Database.Interfaces
         /// <summary>
         /// Get all instances
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         Task<IEnumerable<T?>> GetAll([CallerMemberName] string? callerName = null);
-        
+
         /// <summary>
         /// Filter the entries to be shown
         /// </summary>
         /// <param name="page"></param>
         /// <param name="pageSize"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         Task<IEnumerable<T>> Pageineering(int page, int pageSize, [CallerMemberName] string? callerName = null);
     }

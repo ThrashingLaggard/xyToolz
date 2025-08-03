@@ -78,8 +78,19 @@ public partial class DebugConsole : Window
         Console.SetError(_consoleWriter);
 
     }
-     
-    public async Task ReadProgramOutput(string programPath)
+    public async Task WriteAsync(dynamic e)  
+    {
+        if (!string.IsNullOrEmpty(e.Data))
+        {
+            Exception exception = new(e.Data);
+            if (FormatExMsgForLogs(exception) is   string exContent)
+            {
+                await _consoleWriter.WriteAsync(exContent);
+            }
+        }
+    }
+
+    public Task ReadProgramOutput(string programPath)
     {
         
         Process process = new Process
@@ -94,34 +105,25 @@ public partial class DebugConsole : Window
             }
         };
 
-        if( (MainWindow)this.Owner is MainWindow mainWindow)
+        if( (MainWindow)this.Owner! is MainWindow mainWindow)
         {
-            mainWindow.Hide();
+          mainWindow.Hide();
         }
 
         process.OutputDataReceived += async (sender, e) => await _consoleWriter.WriteAsync(FormatMsgForLogs(e.Data!));
-        process.ErrorDataReceived += async (sender, e) => 
-         {
-             if (!string.IsNullOrEmpty(e.Data))
-             {
-                 Exception exception = new Exception(e.Data);
-                 if (FormatExMsgForLogs(exception) is   string exContent)
-                 {
-                    await _consoleWriter.WriteAsync(exContent);
-                     
-                 }
-             }
-         };
+        process.ErrorDataReceived += async (sender, e) => await WriteAsync(e);
+        
 
         process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
-        
+        return Task.CompletedTask;
         
         //mainWindow.Show();
     }
 
+    [Obsolete]
     private async Task WriteIntoFile(String outputText)
     {
         // Beispiel: Speichern in eine Textdatei
@@ -185,6 +187,7 @@ public partial class DebugConsole : Window
         //xyQOL.Crash(9999);
     }
 
+    [Obsolete]
     private void BtnExport_Click(Object sender, RoutedEventArgs e)
     {
         string? outputText = ConsoleOutput.Text;

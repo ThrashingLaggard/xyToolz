@@ -20,8 +20,11 @@ namespace xyAvalonia.Services
         {
             _output = output;
         }
-
-        public override void Write(string value)
+        /// <summary>
+        /// Write
+        /// </summary>
+        /// <param name="value"></param>
+        public override void Write(string? value)
         {
             Dispatcher.UIThread.Post
             (
@@ -32,8 +35,12 @@ namespace xyAvalonia.Services
                     }
             );
         }
-
-        public override async Task WriteAsync(string value)
+        /// <summary>
+        /// Write Async
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override async Task WriteAsync( string? value)
         {
             await Dispatcher.UIThread.InvokeAsync
             (
@@ -47,7 +54,7 @@ namespace xyAvalonia.Services
 
         private void UpdateCaretAndScroll()
         {
-            _output.CaretIndex = _output.Text.Length;
+            _output.CaretIndex = _output.Text!.Length;
             // Split the text into lines based on Environment.NewLine
             var lines = _output.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             int lineIndex = lines.Length - 1;

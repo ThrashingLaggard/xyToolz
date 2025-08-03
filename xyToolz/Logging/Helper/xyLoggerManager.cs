@@ -46,7 +46,7 @@ namespace xyToolz.Logging.Helper
             {
                 if (logger is null)
                 {
-                    string output = OutputMissingLogger(logger);     
+                    string output = OutputMissingLogger(logger!);     
                     Console.WriteLine(output);
                 }
                 else

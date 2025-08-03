@@ -15,7 +15,7 @@ namespace xyPorts.UDP
         /// <summary>
         /// Stores the ports and their corresponding UdpClient 
         /// </summary>
-        public static Dictionary<ushort, UdpClient> UdpPortMapping { get; set; }
+        public static Dictionary<ushort, UdpClient>? UdpPortMapping { get; set; }
 
         public xyUdpClient()
         {
@@ -41,7 +41,7 @@ namespace xyPorts.UDP
             {
                 xyLog.Log("Please enter a valid IP address");
             }
-            return endPoint;
+            return endPoint!;
         }
 
         public static void ConnectUDP(String ip_, UInt16 port_, String message_)
@@ -56,7 +56,7 @@ namespace xyPorts.UDP
                 using (UdpClient udpClient = new UdpClient())
                 {
                     // Add the UdpClient to the dictionary
-                    UdpPortMapping.Add(port_, udpClient);
+                    UdpPortMapping!.Add(port_, udpClient);
 
                     // Allow other applications to use the same port
                     udpClient.Client.ExclusiveAddressUse = false;
@@ -98,7 +98,7 @@ namespace xyPorts.UDP
                 IPEndPoint remoteIPEndpoint = new IPEndPoint(IPAddress.Any, port_);
 
                 UdpClient udpClient = udp_client_ ?? new UdpClient();
-                UdpPortMapping.Add(port_, udpClient);
+                UdpPortMapping!.Add(port_, udpClient);
                 udpClient.Client.Bind(remoteIPEndpoint);
                 var response = udpClient.Receive(ref remoteIPEndpoint);
                 responseData = Encoding.ASCII.GetString(response);
@@ -118,7 +118,7 @@ namespace xyPorts.UDP
         /// </summary>
         /// <param name="port_"></param>
         /// <returns> The System.Net....UdpClient </returns>
-        private static UdpClient GetClientForPort(UInt16 port_) => (UdpClient)UdpPortMapping.FirstOrDefault(x => x.Key.Equals(port_)).Value;
+        private static UdpClient GetClientForPort(UInt16 port_) => (UdpClient)UdpPortMapping!.FirstOrDefault(x => x.Key.Equals(port_)).Value;
 
 
 
@@ -137,7 +137,7 @@ namespace xyPorts.UDP
                 {
                     udpClient?.Close();
                     udpClient?.Dispose();
-                    UdpPortMapping.Remove(port_);
+                    UdpPortMapping?.Remove(port_);
                 }
                 xyLog.Log("Client was closed and disposed");
             }

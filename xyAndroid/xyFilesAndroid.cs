@@ -10,7 +10,7 @@ namespace xyAndroid
 
            
             /// <summary>
-            /// Bestimmt den Basisordner plattformabhängig & stellt Berechtigungen für Android sicher.
+            /// Bestimmt den Basisordner plattformabhängig und stellt Berechtigungen für Android sicher.
             /// </summary>
             private static async Task<string> GetBasePathAsync()
             {

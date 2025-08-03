@@ -43,12 +43,18 @@ namespace xyToolz
         public static void ResetOverride()
             => _override = null;
 
-        
+        /// <summary>
+        /// Unprotect and read the values from a key from a file
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static async Task<T?> UnprotectFromFileAsync<T>(string path, string key)
         {
             if (_override is not null)
             {
-               return await  _override?.UnprotectFromFileAsync<T>(path, key);
+               return await  _override?.UnprotectFromFileAsync<T>(path, key)!;
             }
             else
             {
@@ -95,10 +101,17 @@ namespace xyToolz
                 return Array.Empty<byte>();
             }
         }
-
-
-
+        /// <summary>
+        /// String wrapper for generic method
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static async Task<byte[]> ProtectString(string data) => await ProtectAsync(data);
+        /// <summary>
+        /// Byte wrapper for generic method
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static async Task<byte[]> ProtectBytes(byte[] data) => await ProtectAsync(data);
 
 
@@ -118,20 +131,35 @@ namespace xyToolz
                 T? result = JsonSerializer.Deserialize<T>(json);
 
                 await xyLog.AsxLog(success);
-                return result;
+                return result!;
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
                 await xyLog.AsxLog(fail);
-                return default;
+                return default!;
             }
         }
-
+        /// <summary>
+        /// String-Wrapper for generic method
+        /// </summary>
+        /// <param name="protectedData"></param>
+        /// <returns></returns>
         public static async Task<string> UnprotectStringAsync(byte[] protectedData) => await UnprotectAsync<string>(protectedData);
+        /// <summary>
+        /// Byte-Wrapper for generic method
+        /// </summary>
+        /// <param name="protectedData"></param>
+        /// <returns></returns>
         public static async Task<byte[]> UnprotectBytesAsync(byte[] protectedData) => await UnprotectAsync<byte[]>(protectedData);
 
-
+        /// <summary>
+        /// Save protected data to specific path
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static async Task<bool> SaveProtectedToFileAsync<T>(T obj, string filename = "secret.md")
         {
              string fail = "Cant save data to file.";
@@ -157,7 +185,14 @@ namespace xyToolz
             }
         }
 
-
+        /// <summary>
+        /// Save protected data to specific path
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <param name="subfolder"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static async Task<bool> SaveProtectedToFileAsync<T>(T obj, string subfolder = "HyperSecret", string filename = "secret.md")
         {
             if( xyPath.Combine(subfolder, filename) is string fullPath && fullPath.Length > 3)    // Mucho intelligento
@@ -197,6 +232,14 @@ namespace xyToolz
                 return default;
             }
         }
+       
+        /// <summary>
+        /// Loads and decrypts an object from a protected file. 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subfolder"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static async Task<T?> LoadProtectedFromFileAsync<T>(string subfolder = "UltraSecret", string filename = "secret.bin")
         {
                 if (xyPath.Combine(subfolder, filename)  is string path)
@@ -206,7 +249,12 @@ namespace xyToolz
             return default;
         }
 
-
+        /// <summary>
+        /// Protect a file with windows DPAPI
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public static async Task<bool> ProtectFileAsync<T>(string filePath)
         {
             IEnumerable<string> lines= await xyFiles.ReadLinesAsync(filePath);

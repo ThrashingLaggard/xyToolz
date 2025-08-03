@@ -16,7 +16,7 @@ namespace xyAndroid
             private string _notificationChannelID = "1000";
             private string _notificationChannelName = "notificator";
             private int _notificationlID = 1;
-            public Context Context { get; set; }
+            public Context? Context { get; set; }
 
             public xyForeGroundService( )
             {
@@ -54,10 +54,13 @@ namespace xyAndroid
                   return StartCommandResult.Sticky;
             }
 
-            public ComponentName GetCaller( Intent intent)
+            public ComponentName? GetCaller( Intent intent)
             {
-                  ComponentName compontentName = StartForegroundService(intent);
+                if(StartForegroundService(intent) is  ComponentName compontentName)
+                {
                   return compontentName;
+                }
+                return null;
             }
 
             /// <summary>
@@ -78,8 +81,10 @@ namespace xyAndroid
             /// <param name="notificationChannelName"></param>
             public NotificationChannel CreateNotificationChannel( NotificationManager notificationManager , string notificationChannelID , string notificationChannelName )
             {
-                  NotificationChannel? channel = new NotificationChannel(notificationChannelID , notificationChannelName , NotificationImportance.Max);
-                  notificationManager.CreateNotificationChannel(channel);
+
+            NotificationChannel? channel = new NotificationChannel(notificationChannelID , notificationChannelName , NotificationImportance.Max);
+
+            notificationManager.CreateNotificationChannel(channel);
                   return channel;
             }
 

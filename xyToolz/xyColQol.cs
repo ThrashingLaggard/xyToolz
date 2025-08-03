@@ -56,10 +56,10 @@ namespace xyToolz
             
 
             /// <summary>
-            /// Print the targets intestines on your favourite console
+            /// Print the targets intestines on your favourite console and splits them with a comma
             /// </summary>
             /// <param name="values"></param>
-            /// <returns></returns>
+            /// <returns>1, 2, 3, 4, 5</returns>
             public static string SplitSpill( IEnumerable values )
             {
                   string output = string.Empty;
@@ -70,8 +70,12 @@ namespace xyToolz
                   xyLog.Log(output);
                   return output;
             }
-
-            public static string Spill( IEnumerable values )
+        /// <summary>
+        /// Print the targets intestines on your favourite console
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns>12345</returns>
+        public static string Spill( IEnumerable values )
             {
                   string output = string.Empty;
                   foreach (object value in values)
@@ -107,7 +111,7 @@ namespace xyToolz
             }
 
             /// <summary>
-            /// Print the targets intestines on your favourite console with CARRIAGE RETURNS after every value
+            /// Print the targets intestines on your favourite console with comma and CARRIAGE RETURNS after every value
             /// </summary>
             /// <param name="values"></param>
             /// <returns></returns>
@@ -131,7 +135,7 @@ namespace xyToolz
 
 
             /// <summary>
-            /// Print the targets intestines on your favourite console with CARRIAGE RETURNS after every value
+            /// Print the targets intestines on your favourite console with comma and CARRIAGE RETURNS after every value
             /// </summary>
             /// <param name="values"></param>
             /// <returns></returns>

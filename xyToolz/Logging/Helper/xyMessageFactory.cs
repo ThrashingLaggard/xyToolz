@@ -11,6 +11,12 @@ namespace xyToolz.Logging.Helper
     /// </summary>
     public class xyMessageFactory
     {
+        /// <summary>
+        /// Add usefull information
+        /// </summary>
+        public string[]? Description { get; set; }
+
+
         #region "Debug"
 
         #region "Misc"
@@ -244,7 +250,6 @@ namespace xyToolz.Logging.Helper
         /// <summary>
         /// Context saved the changes
         /// </summary>
-        /// <param name="name"></param>
         /// <returns></returns>
         public string ContextSaved() => $"Target DB-Context was saved successfully!";
         /// <summary>

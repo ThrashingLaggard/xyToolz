@@ -37,12 +37,13 @@ namespace xyToolz.Logging.Helper.Formatters
                 string message = logEntry.Message;
                 Exception? exception = logEntry.Exception?? default;
 
-                string formattedExceptionInformation = new xyDefaultExceptionFormatter().FormatExceptionDetails(exception,level,callerName);
+                string formattedMessage = $"[{ID}{timestamp}] [{level+""}] [{source}] \n{description}\n{comment}\n{message}\n";
                 
-                //callerName = string.IsNullOrEmpty(callerName) ? " / " : callerName;
-
-                string formattedMessage = $"[{ID}{timestamp}] [{level+""}] [{source}] \n{description}\n{comment}\n{message}\n{formattedExceptionInformation}";
-
+                if(exception is not null)
+                {
+                    string formattedExceptionInformation = new xyDefaultExceptionFormatter().FormatExceptionDetails(exception,level,callerName);
+                    formattedMessage += formattedExceptionInformation;
+                }
                 return formattedMessage;
             }
             else

@@ -15,10 +15,10 @@ namespace xyToolz
         PdfPage backSide = new PdfPage(card);
 
         int Number;
-        PdfDocumentInformation info;
-        PdfDocumentSettings settings;
-        PdfDocumentOptions options;
-        PdfPageLayout layout;
+        PdfDocumentInformation? info;
+        PdfDocumentSettings? settings;
+        PdfDocumentOptions? options;
+        PdfPageLayout? layout;
 
         xyCard(PdfPage frontSide, PdfPage backSide, int num)
         {

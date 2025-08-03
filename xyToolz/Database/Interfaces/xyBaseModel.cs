@@ -20,22 +20,22 @@ namespace xyToolz.Database.Basix
         /// <summary>
         /// Index
         /// </summary>
-        public virtual uint ID { get; set; }
+        public virtual uint? ID { get; set; }
 
         /// <summary>
         /// Name the target
         /// </summary>
-        public virtual string Name { get; set; }
+        public virtual string? Name { get; set; }
 
         /// <summary>
         /// Add usefull information for the target
         /// </summary>
-        public virtual string Description { get; set; }
+        public virtual string? Description { get; set; }
         
         /// <summary>
         /// Comment or note for the object.
         /// </summary>
-        public virtual string Comment { get; set; }
+        public virtual string? Comment { get; set; }
 
         /// <summary>
         /// Returns the name property

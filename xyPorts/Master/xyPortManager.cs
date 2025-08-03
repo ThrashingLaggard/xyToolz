@@ -19,22 +19,22 @@ namespace xyPorts.Master
         /// <summary>
         /// Provides basic information about and some operations for ports 
         /// </summary>
-        public xyPort _port { get; set; }
+        public xyPort Port { get; set; } = new();
 
         /// <summary>
         /// Provides methods for checking the status of ports
         /// </summary>
-        public xyPortChecker _checker { get; set; }
+        public xyPortChecker Checker { get; set; } = new();
 
         /// <summary>
         /// provides basic information about and some operations for TCP ports
         /// </summary>
-        public xyTcpPort _tcpPort { get; set; }
+        public xyTcpPort TcpPort { get; set; } = new();
 
         /// <summary>
         /// provides basic information about and some operations for UDP ports
         /// </summary>
-        public xyUdpPort _udpPort { get; set; }
+        public xyUdpPort UdpPort { get; set; } = new();
 
 
         /// <summary>

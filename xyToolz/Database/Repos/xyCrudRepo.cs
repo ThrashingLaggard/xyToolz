@@ -27,6 +27,8 @@ namespace xyToolz.Database.Repos
         /// <summary>
         /// Create a new entry in the database using the given data
         /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public async Task<bool> Create(T entity, [CallerMemberName] string? callerName = null)
         {
@@ -62,6 +64,7 @@ namespace xyToolz.Database.Repos
         /// Get the corresponding instance for the given id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public async Task<T?> Read(int id, [CallerMemberName] string? callerName = null)
         {
@@ -88,6 +91,7 @@ namespace xyToolz.Database.Repos
         /// Updating the target entry
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public async Task<bool> Update(T entity, [CallerMemberName] string? callerName = null)
         {
@@ -114,6 +118,7 @@ namespace xyToolz.Database.Repos
         /// Removing an entry from the database
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public async Task<bool> Delete(T entity, [CallerMemberName] string? callerName = null)
         {
@@ -140,6 +145,7 @@ namespace xyToolz.Database.Repos
         /// <summary>
         /// Return an IEnumerable filled with the content of the target table
         /// </summary>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public async Task<IEnumerable<T?>> GetAll([CallerMemberName] string? callerName = null)
         {
@@ -214,8 +220,9 @@ namespace xyToolz.Database.Repos
         /// Return a EntityEntry instance for the given id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
-        public  async Task<EntityEntry> GetEntryByID(int id, [CallerMemberName] string? callerName = null)
+        public async Task<EntityEntry> GetEntryByID(int id, [CallerMemberName] string? callerName = null)
         {
             EntityEntry entity = default!;
             dynamic? target = await  Read(id);

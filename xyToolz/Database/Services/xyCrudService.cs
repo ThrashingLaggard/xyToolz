@@ -21,12 +21,13 @@ namespace xyToolz.Database.Services
         /// Providing access to the target DB
         /// </summary>
         private readonly xyCrudRepo<T> _crudRepository = crudRepository;
-       
+
         #region "CRUD"
         /// <summary>
         /// Gives a new entity to the CrudRepo 
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public Task<bool> Create(T entity, [CallerMemberName] string? callerName = null)
         {
@@ -48,6 +49,7 @@ namespace xyToolz.Database.Services
         /// Gives new data for the target entity to the CrudRepo 
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public Task<bool> Update(T entity, [CallerMemberName] string? callerName = null)
         {
@@ -59,6 +61,7 @@ namespace xyToolz.Database.Services
         /// Give the target to the CrudRepo to delete it
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public Task<bool> Delete(T entity, [CallerMemberName] string? callerName = null)
         {
@@ -71,6 +74,7 @@ namespace xyToolz.Database.Services
         /// <summary>
         /// Calls GetAll() from the CrudRepo
         /// </summary>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public Task<IEnumerable<T?>> GetAll([CallerMemberName] string? callerName = null)
         {
@@ -97,6 +101,7 @@ namespace xyToolz.Database.Services
         /// Get a EntityEntry for the given ID
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="callerName"></param>
         /// <returns></returns>
         public async Task<EntityEntry> GetEntryByID(int id, [CallerMemberName] string? callerName = null)
         { 

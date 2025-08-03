@@ -9,399 +9,406 @@ namespace xyToolz
     /// <summary>
     /// QOL stuff for handling pdf files
     /// </summary>
-      public class xyPdf
-      {
-            // Es heißt WORKING-DÍRECTORY
+    public class xyPdf
+    {
+        // Es heißt WORKING-DÍRECTORY
 
-            /// <summary>
-            /// creates an internal PDF_Document from the specified file  -  requires said file to be .pdf
-            /// </summary>
-            /// <param name="filepath"></param>
-            /// <returns></returns>
-            public static PdfDocument OpenDoc(string filepath)
+        /// <summary>
+        /// creates an internal PDF_Document from the specified file  -  requires said file to be .pdf
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
+        public static PdfDocument OpenDoc(string filepath)
+        {
+            PdfDocument new_File = new();
+            if (!File.Exists(filepath))
             {
-                  PdfDocument new_File = new();
-                  if (!File.Exists(filepath))
-                  {
-                        throw new FileNotFoundException($"File not found: {filepath}");
-                  }
-                  try
-                  {
-                        if (PdfReader.TestPdfFile(filepath) > 0)
+                throw new FileNotFoundException($"File not found: {filepath}");
+            }
+            try
+            {
+                if (PdfReader.TestPdfFile(filepath) > 0)
+                {
+                    new_File = PdfReader.Open(filepath);
+                    new_File.Info.Title = filepath;
+                }
+            }
+            catch (Exception e)
+            {
+                xyLog.ExLog(e);
+            }
+            return new_File;
+        }
+
+        /// <summary>
+        /// Saves the specified picture as a .pdf File after converting it with the according method.
+        /// 
+        /// 
+        /// returns a bool for now
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="newpath"></param>
+        /// <returns>bool</returns>
+        public static bool SaveThisPicAsPdf(string filepath, string newpath)
+        {
+            try
+            {
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
+                ConvertPictureToPdf(filepath).Save($"{newpath}.pdf");
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
+                return true;
+            }
+            catch (Exception e)
+            {
+                xyLog.ExLog(e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Copies pages from a source document to a target document and appends them.
+        /// </summary>
+        private static void CopyPagesToTarget(PdfDocument sourceDoc, PdfDocument targetDoc)
+        {
+            foreach (PdfPage page in sourceDoc.Pages)
+            {
+                targetDoc.AddPage(page);
+            }
+        }
+
+        /// <summary>
+        /// For ErrorPrevention gives the Files an info.title
+        /// </summary>
+        /// <param name="pdfs"></param>
+        /// <returns></returns>
+        public static bool NameAllFiles(List<PdfDocument> pdfs)
+        {
+            double x = 1.0;
+            try
+            {
+                foreach (PdfDocument test in pdfs)
+                {
+                    if (test.Info.Title == string.Empty)
+                    {
+                        // Why is this here???
+                        if ((x - (int)x) == 0)
                         {
-                              new_File = PdfReader.Open(filepath);
-                              new_File.Info.Title = filepath;
-                        }   
-                  }
-                  catch (Exception e) 
-                  {
-                        xyLog.ExLog(e);
-                  }
-                  return new_File;
-            }
-
-            /// <summary>
-            /// Saves the specified picture as a .pdf File after converting it with the according method.
-            /// 
-            /// 
-            /// returns a bool for now
-            /// </summary>
-            /// <param name="filepath"></param>
-            /// <param name="newpath"></param>
-            /// <returns>bool</returns>
-            public static bool SaveThisPicAsPdf(string filepath, string newpath)
-            {
-                  try
-                  {
-                        ConvertPictureToPdf(filepath).Save($"{newpath}.pdf");
-                        return true;
-                  }
-                  catch(Exception e)
-                  {
-                        xyLog.ExLog(e);
-                        return false;
-                  }
-            }
-
-            /// <summary>
-            /// Copies pages from a source document to a target document and appends them.
-            /// </summary>
-            private static void CopyPagesToTarget(PdfDocument sourceDoc, PdfDocument targetDoc)
-            {
-                  foreach (PdfPage page in sourceDoc.Pages)
-                  {
-                        targetDoc.AddPage(page);
-                  }
-            }
-
-            /// <summary>
-            /// For ErrorPrevention gives the Files an info.title
-            /// </summary>
-            /// <param name="pdfs"></param>
-            /// <returns></returns>
-            public static bool NameAllFiles(List<PdfDocument> pdfs)
-            {
-                  double x = 1.0;
-                  try
-                  {
-                        foreach (PdfDocument test in pdfs)
-                        {
-                              if (test.Info.Title == string.Empty)
-                              {
-                                // Why is this here???
-                                    if ((x - (int)x) == 0)
-                                    {
-                                          test.Info.Title = $"{x}";
-                                          test.Comment = $"{x}";
-                                          x += 0.5;
-                                    }
-                                    else
-                                    {
-
-                                          test.Info.Title = $"{x}";
-                                          test.Comment = $"{x}";
-                                          x += 0.5;
-                                    }
-                              }
+                            test.Info.Title = $"{x}";
+                            test.Comment = $"{x}";
+                            x += 0.5;
                         }
-                        return true;
-                  }
-                  catch
-                  {
-                        Console.WriteLine("Couldnt give every file a title, but at least we got " + x);
-                        return false;
-                  }
-
-            }
-
-         
-
-            public static PdfDocument CombineTwoPDF(PdfDocument first, PdfDocument second)
-            {
-                  PdfDocument firstDoc = PdfReader.Open(first.FullPath, PdfDocumentOpenMode.Import);
-                  PdfDocument secondDoc = PdfReader.Open(second.FullPath, PdfDocumentOpenMode.Import);
-
-                  PdfDocument targetDoc = new PdfDocument();
-
-                  foreach (PdfPage page in first.Pages)
-                  {
-                        targetDoc.AddPage(page);
-                  }
-                  foreach (PdfPage page in second.Pages)
-                  {
-                        targetDoc.AddPage(page);
-                  }
-                  string outputDirectory = "Output";
-                  if (!Directory.Exists(outputDirectory))
-                  {
-                        Directory.CreateDirectory(outputDirectory);
-                  }
-
-                  targetDoc.Save(Path.Combine(outputDirectory, $"{targetDoc.PageCount}.pdf"));
-                  PdfDocument pdf = targetDoc;
-                  targetDoc.Close();
-                  return pdf;
-            }
-
-
-            /// <summary>
-            /// Combine two PDF files and save their page count as name
-            /// </summary>
-            /// <returns></returns>
-            public static PdfDocument CombineTwoPDFs(PdfDocument first, PdfDocument second)
-            {
-                  PdfDocument targetDoc = new PdfDocument();
-                  PdfDocument firstDoc = PdfReader.Open(first.FullPath, PdfDocumentOpenMode.Import);
-                  PdfDocument secondDoc = PdfReader.Open(second.FullPath, PdfDocumentOpenMode.Import);
-
-                  foreach (PdfPage page in first.Pages)
-                  {
-                        targetDoc.AddPage(page);
-                  }
-                  foreach (PdfPage page in second.Pages)
-                  {
-                        targetDoc.AddPage(page);
-                  }
-
-                  string outputDirectory = "Output";
-                  if (!Directory.Exists(outputDirectory))
-                  {
-                        Directory.CreateDirectory(outputDirectory);
-                  }
-
-                  //targetDoc.Save(Path.Combine(outputDirectory, $"{targetDoc.PageCount}.pdf"));
-                  PdfDocument pdf = targetDoc;
-                  targetDoc.Close();
-                  return pdf;
-            }
-
-            /// <summary>
-            /// Takes ONE picture and converts it into an internal instance of a PdfSharp PdfDocument
-            /// </summary>
-            /// <param name="filepath"></param>
-            /// <returns>PdfDocument</returns>
-            public static PdfDocument ConvertPictureToPdf(string filepath)
-            {
-                  PdfPage fromPic = new PdfPage();
-                  PdfDocument document = new PdfDocument();
-                  document.AddPage(fromPic);
-                  fromPic.Orientation = PageOrientation.Landscape;
-
-                  XImage xImage = XImage.FromFile(filepath);
-
-                  // Calculate the scaling factor to fit the image on the page while preserving the aspect ratio
-                  double imageRatio = (double)xImage.PixelWidth / xImage.PixelHeight;
-                  double pageRatio = (double)fromPic.Width / fromPic.Height;
-
-                  double width, height;
-
-                  // Determine dimensions to fit image within page
-                  if (imageRatio > pageRatio)
-                  {
-                        // Image is wider than page aspect ratio; fit width
-                        width = fromPic.Width;
-                        height = fromPic.Width / imageRatio;
-                  }
-                  else
-                  {
-                        // Image is taller than page aspect ratio; fit height
-                        height = fromPic.Height;
-                        width = fromPic.Height * imageRatio;
-                  }
-
-                  // Calculate position to center the image on the page
-                  double xPosition = (fromPic.Width - width) / 2;
-                  double yPosition = (fromPic.Height - height) / 2;
-
-                  XGraphics graphicsElement = XGraphics.FromPdfPage(fromPic);
-                  XRect rect = new XRect(xPosition, yPosition, width, height);
-                  graphicsElement.DrawImage(xImage, rect);
-                  //document.Info.Title = filepath.Replace(Path.GetExtension(filepath), ".pdf"); // Set output path as .pdf
-                  return document;
-            }
-
-            /// <summary>
-            /// Two pics combined in one doc, but without saving it as file
-            /// </summary>
-            /// <param name="first_path"></param>
-            /// <param name="other_path"></param>
-            /// <returns></returns>
-            public static PdfDocument ConvertPictureToPdf(string first_path, string other_path)
-            {
-                  PdfDocument document = new PdfDocument();
-                  PdfPage firstPic = new PdfPage(document);
-                  PdfPage secondPic = new PdfPage(document);
-
-                  firstPic.Orientation = PageOrientation.Landscape;
-                  secondPic.Orientation = firstPic.Orientation;
-
-                  XImage xImage = XImage.FromFile(first_path);
-                  XImage yImage = XImage.FromFile(other_path);
-
-                  // Calculate the scaling factor to fit the image on the page while preserving the aspect ratio
-                  double imageRatio = (double)xImage.PixelWidth / xImage.PixelHeight;
-                  double pageRatio = (double)firstPic.Width / firstPic.Height;
-
-                  double width, height;
-
-                  // Determine dimensions to fit image within page
-                  if (imageRatio > pageRatio)
-                  {
-                        // Image is wider than page aspect ratio; fit width
-                        width = firstPic.Width;
-                        height = firstPic.Width / imageRatio;
-                  }
-                  else
-                  {
-                        // Image is taller than page aspect ratio; fit height
-                        height = firstPic.Height;
-                        width = firstPic.Height * imageRatio;
-                  }
-
-                  // Calculate position to center the image on the page
-                  double xPosition = (firstPic.Width - width) / 2;
-                  double yPosition = (firstPic.Height - height) / 2;
-
-                  XGraphics graphicsElement = XGraphics.FromPdfPage(firstPic);
-                  XGraphics graphicElement = XGraphics.FromPdfPage(secondPic);
-                  XRect rect = new XRect(xPosition, yPosition, width, height);
-                  graphicsElement.DrawImage(xImage, rect);
-                  graphicElement.DrawImage(yImage, rect);
-               
-                  return document;
-            }
-            public static bool MassConvertToPdf(string directory)
-            {
-                  List<PdfDocument> lst_files = new List<PdfDocument>();
-
-                  if (Directory.Exists(directory))
-                  {
-                        string[] allPics = Directory.GetFiles(directory);
-
-                        foreach (string pic in allPics)
+                        else
                         {
-                              lst_files.Add(ConvertPictureToPdf(pic));
+
+                            test.Info.Title = $"{x}";
+                            test.Comment = $"{x}";
+                            x += 0.5;
                         }
-                        NameAllFiles(lst_files);
-
-                        foreach (PdfDocument doc in lst_files)
-                        {
-                              doc.Save($"__Output__\\{doc.Info.Title}.pdf");
-                              Console.WriteLine(doc.Info.Title);
-                        }
-                        return true;
-                  }
-                  else return false;
+                    }
+                }
+                return true;
             }
-
-
-
-
-
-
-            /// <summary>
-            /// Iterates through the selected directory and combines two documents following each other according to name
-            /// </summary>
-            /// <param name="Ahuhu"></param>
-            public static List<PdfDocument> CombineAllIntoBundles(string directory)
+            catch
             {
-                  List<PdfDocument> lst_AllFiles = new List<PdfDocument>();
-                  List<PdfDocument> lst_Questions = new List<PdfDocument>();
-                  List<PdfDocument> lst_Answers = new List<PdfDocument>();
-                  List<PdfDocument> lst_joined = new List<PdfDocument>();
-
-                  string[] arr = Directory.GetFiles(directory, "*.pdf", SearchOption.TopDirectoryOnly);
-
-                  //Array.Sort(arr, (x, y) => string.Compare(Path.GetFileName(x), Path.GetFileName(y)));
-
-
-                  int i = 0;
-                  for (global::System.Int32 j = 0; j < arr.Length; j++)
-                  {
-
-                        PdfDocument pdf = PdfReader.Open(arr[i], PdfDocumentOpenMode.Import);
-                        pdf.Info.Title = Path.GetFileName(arr[i]);
-                        lst_AllFiles.Add(pdf);
-
-                        foreach (PdfDocument doc in lst_AllFiles)
-                        {
-                              if (int.Parse(pdf.Comment) == int.Parse(doc.Comment))
-                              {
-                                    lst_Questions.Add(pdf);
-                                    Console.WriteLine($"q {i} ---> {pdf.Info.Title}");
-                                    PdfDocument temp = CombineTwoPDFs(pdf, doc);
-                                    lst_joined.Add(temp);
-                                    i++;
-                              }
-                        }
-                  }
-
-                  string currDirectory = Directory.GetCurrentDirectory() + "\\";
-                  var newList = new List<PdfDocument>();
-
-                  for (int y = 0; y < lst_joined.Count; y++)
-                  {
-                        string path = $"Output\\{y}.pdf";
-                        lst_joined[y].Save(Path.Combine(currDirectory, path));
-                        newList.Add(lst_joined[y]);
-                  }
-                  Console.WriteLine("Ahuhu");
-                  lst_joined.Clear();
-
-                  return newList;
+                Console.WriteLine("Couldnt give every file a title, but at least we got " + x);
+                return false;
             }
 
-         
-            /// <summary>
-            /// Combines all PDF files in a directory into a single document.
-            /// </summary>
-            public static bool CombineAllInDirectory(string directory)
+        }
+
+
+
+        public static PdfDocument CombineTwoPDF(PdfDocument first, PdfDocument second)
+        {
+            PdfDocument firstDoc = PdfReader.Open(first.FullPath, PdfDocumentOpenMode.Import);
+            PdfDocument secondDoc = PdfReader.Open(second.FullPath, PdfDocumentOpenMode.Import);
+
+            PdfDocument targetDoc = new PdfDocument();
+
+            foreach (PdfPage page in first.Pages)
             {
-                  if (!Directory.Exists(directory))
-                        throw new DirectoryNotFoundException($"Directory not found: {directory}");
-
-                  string[] pdfFiles = Directory.GetFiles(directory, "*.pdf", SearchOption.TopDirectoryOnly);
-                  if (!pdfFiles.Any())
-                        return false;
-
-                  PdfDocument targetDoc = new PdfDocument();
-                  foreach (string pdfFile in pdfFiles)
-                  {
-                        PdfDocument sourceDoc = PdfReader.Open(pdfFile, PdfDocumentOpenMode.Import);
-                        CopyPagesToTarget(sourceDoc, targetDoc);
-                  }
-
-                  string outputDirectory = "Output";
-                  if (!Directory.Exists(outputDirectory))
-                        Directory.CreateDirectory(outputDirectory);
-
-                  string outputFilePath = Path.Combine(outputDirectory, $"{targetDoc.PageCount}.pdf");
-                  targetDoc.Save(outputFilePath);
-                  return true;
+                targetDoc.AddPage(page);
             }
-
-            /// <summary>
-            /// Combines a list of PDF files into a single document.
-            /// </summary>
-            public static PdfDocument CombineThesePDFs(List<string> list_of_documents)
+            foreach (PdfPage page in second.Pages)
             {
-                  PdfDocument targetDoc = new PdfDocument();
-
-                  foreach (string docPath in list_of_documents)
-                  {
-                        PdfDocument sourceDoc = PdfReader.Open(docPath, PdfDocumentOpenMode.Import);
-                        CopyPagesToTarget(sourceDoc, targetDoc);
-                  }
-
-                  string outputDirectory = "Output";
-                  if (!Directory.Exists(outputDirectory))
-                        Directory.CreateDirectory(outputDirectory);
-
-                  string outputFilePath = Path.Combine(outputDirectory, $"{targetDoc.PageCount}.pdf");
-                  targetDoc.Save(outputFilePath);
-
-                  return targetDoc;
+                targetDoc.AddPage(page);
             }
+            string outputDirectory = "Output";
+            if (!Directory.Exists(outputDirectory))
+            {
+                Directory.CreateDirectory(outputDirectory);
+            }
+
+            targetDoc.Save(Path.Combine(outputDirectory, $"{targetDoc.PageCount}.pdf"));
+            PdfDocument pdf = targetDoc;
+            targetDoc.Close();
+            return pdf;
+        }
+
+
+        /// <summary>
+        /// Combine two PDF files and save their page count as name
+        /// </summary>
+        /// <returns></returns>
+        public static PdfDocument CombineTwoPDFs(PdfDocument first, PdfDocument second)
+        {
+            PdfDocument targetDoc = new PdfDocument();
+            PdfDocument firstDoc = PdfReader.Open(first.FullPath, PdfDocumentOpenMode.Import);
+            PdfDocument secondDoc = PdfReader.Open(second.FullPath, PdfDocumentOpenMode.Import);
+
+            foreach (PdfPage page in first.Pages)
+            {
+                targetDoc.AddPage(page);
+            }
+            foreach (PdfPage page in second.Pages)
+            {
+                targetDoc.AddPage(page);
+            }
+
+            string outputDirectory = "Output";
+            if (!Directory.Exists(outputDirectory))
+            {
+                Directory.CreateDirectory(outputDirectory);
+            }
+
+            //targetDoc.Save(Path.Combine(outputDirectory, $"{targetDoc.PageCount}.pdf"));
+            PdfDocument pdf = targetDoc;
+            targetDoc.Close();
+            return pdf;
+        }
+
+        /// <summary>
+        /// Takes ONE picture and converts it into an internal instance of a PdfSharp PdfDocument
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns>PdfDocument</returns>
+        [Obsolete]
+        public static PdfDocument ConvertPictureToPdf(string filepath)
+        {
+            PdfPage fromPic = new PdfPage();
+            PdfDocument document = new PdfDocument();
+            document.AddPage(fromPic);
+            fromPic.Orientation = PageOrientation.Landscape;
+
+            XImage xImage = XImage.FromFile(filepath);
+
+            // Calculate the scaling factor to fit the image on the page while preserving the aspect ratio
+            double imageRatio = (double)xImage.PixelWidth / xImage.PixelHeight;
+            double pageRatio = (double)fromPic.Width / fromPic.Height;
+
+            double width, height;
+
+            // Determine dimensions to fit image within page
+            if (imageRatio > pageRatio)
+            {
+                // Image is wider than page aspect ratio; fit width
+                width = fromPic.Width;
+                height = fromPic.Width / imageRatio;
+            }
+            else
+            {
+                // Image is taller than page aspect ratio; fit height
+                height = fromPic.Height;
+                width = fromPic.Height * imageRatio;
+            }
+
+            // Calculate position to center the image on the page
+            double xPosition = (fromPic.Width - width) / 2;
+            double yPosition = (fromPic.Height - height) / 2;
+
+            XGraphics graphicsElement = XGraphics.FromPdfPage(fromPic);
+            XRect rect = new XRect(xPosition, yPosition, width, height);
+            graphicsElement.DrawImage(xImage, rect);
+            //document.Info.Title = filepath.Replace(Path.GetExtension(filepath), ".pdf"); // Set output path as .pdf
+            return document;
+        }
+
+        /// <summary>
+        /// Two pics combined in one doc, but without saving it as file
+        /// </summary>
+        /// <param name="first_path"></param>
+        /// <param name="other_path"></param>
+        /// <returns></returns>
+        [Obsolete]
+        public static PdfDocument ConvertPictureToPdf(string first_path, string other_path)
+        {
+            PdfDocument document = new PdfDocument();
+            PdfPage firstPic = new PdfPage(document);
+            PdfPage secondPic = new PdfPage(document);
+
+            firstPic.Orientation = PageOrientation.Landscape;
+            secondPic.Orientation = firstPic.Orientation;
+
+            XImage xImage = XImage.FromFile(first_path);
+            XImage yImage = XImage.FromFile(other_path);
+
+            // Calculate the scaling factor to fit the image on the page while preserving the aspect ratio
+            double imageRatio = (double)xImage.PixelWidth / xImage.PixelHeight;
+            double pageRatio = (double)firstPic.Width / firstPic.Height;
+
+            double width, height;
+
+            // Determine dimensions to fit image within page
+            if (imageRatio > pageRatio)
+            {
+                // Image is wider than page aspect ratio; fit width
+                width = firstPic.Width;
+                height = firstPic.Width / imageRatio;
+            }
+            else
+            {
+                // Image is taller than page aspect ratio; fit height
+                height = firstPic.Height;
+                width = firstPic.Height * imageRatio;
+            }
+
+            // Calculate position to center the image on the page
+            double xPosition = (firstPic.Width - width) / 2;
+            double yPosition = (firstPic.Height - height) / 2;
+
+            XGraphics graphicsElement = XGraphics.FromPdfPage(firstPic);
+            XGraphics graphicElement = XGraphics.FromPdfPage(secondPic);
+            XRect rect = new XRect(xPosition, yPosition, width, height);
+            graphicsElement.DrawImage(xImage, rect);
+            graphicElement.DrawImage(yImage, rect);
+
+            return document;
+        }
+        public static bool MassConvertToPdf(string directory)
+        {
+            List<PdfDocument> lst_files = new List<PdfDocument>();
+
+            if (Directory.Exists(directory))
+            {
+                string[] allPics = Directory.GetFiles(directory);
+
+                foreach (string pic in allPics)
+                {
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
+                    lst_files.Add(ConvertPictureToPdf(pic));
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
+                }
+                NameAllFiles(lst_files);
+
+                foreach (PdfDocument doc in lst_files)
+                {
+                    doc.Save($"__Output__\\{doc.Info.Title}.pdf");
+                    Console.WriteLine(doc.Info.Title);
+                }
+                return true;
+            }
+            else return false;
+        }
+
+
+
+
+
+
+        /// <summary>
+        /// Iterates through the selected directory and combines two documents following each other according to name
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <returns></returns>
+        public static List<PdfDocument> CombineAllIntoBundles(string directory)
+        {
+            List<PdfDocument> lst_AllFiles = new List<PdfDocument>();
+            List<PdfDocument> lst_Questions = new List<PdfDocument>();
+            List<PdfDocument> lst_Answers = new List<PdfDocument>();
+            List<PdfDocument> lst_joined = new List<PdfDocument>();
+
+            string[] arr = Directory.GetFiles(directory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+            //Array.Sort(arr, (x, y) => string.Compare(Path.GetFileName(x), Path.GetFileName(y)));
+
+
+            int i = 0;
+            for (global::System.Int32 j = 0; j < arr.Length; j++)
+            {
+
+                PdfDocument pdf = PdfReader.Open(arr[i], PdfDocumentOpenMode.Import);
+                pdf.Info.Title = Path.GetFileName(arr[i]);
+                lst_AllFiles.Add(pdf);
+
+                foreach (PdfDocument doc in lst_AllFiles)
+                {
+                    if (int.Parse(pdf.Comment) == int.Parse(doc.Comment))
+                    {
+                        lst_Questions.Add(pdf);
+                        Console.WriteLine($"q {i} ---> {pdf.Info.Title}");
+                        PdfDocument temp = CombineTwoPDFs(pdf, doc);
+                        lst_joined.Add(temp);
+                        i++;
+                    }
+                }
+            }
+
+            string currDirectory = Directory.GetCurrentDirectory() + "\\";
+            var newList = new List<PdfDocument>();
+
+            for (int y = 0; y < lst_joined.Count; y++)
+            {
+                string path = $"Output\\{y}.pdf";
+                lst_joined[y].Save(Path.Combine(currDirectory, path));
+                newList.Add(lst_joined[y]);
+            }
+            Console.WriteLine("Ahuhu");
+            lst_joined.Clear();
+
+            return newList;
+        }
+
+
+        /// <summary>
+        /// Combines all PDF files in a directory into a single document.
+        /// </summary>
+        public static bool CombineAllInDirectory(string directory)
+        {
+            if (!Directory.Exists(directory))
+                throw new DirectoryNotFoundException($"Directory not found: {directory}");
+
+            string[] pdfFiles = Directory.GetFiles(directory, "*.pdf", SearchOption.TopDirectoryOnly);
+            if (!pdfFiles.Any())
+                return false;
+
+            PdfDocument targetDoc = new PdfDocument();
+            foreach (string pdfFile in pdfFiles)
+            {
+                PdfDocument sourceDoc = PdfReader.Open(pdfFile, PdfDocumentOpenMode.Import);
+                CopyPagesToTarget(sourceDoc, targetDoc);
+            }
+
+            string outputDirectory = "Output";
+            if (!Directory.Exists(outputDirectory))
+                Directory.CreateDirectory(outputDirectory);
+
+            string outputFilePath = Path.Combine(outputDirectory, $"{targetDoc.PageCount}.pdf");
+            targetDoc.Save(outputFilePath);
+            return true;
+        }
+
+        /// <summary>
+        /// Combines a list of PDF files into a single document.
+        /// </summary>
+        public static PdfDocument CombineThesePDFs(List<string> list_of_documents)
+        {
+            PdfDocument targetDoc = new PdfDocument();
+
+            foreach (string docPath in list_of_documents)
+            {
+                PdfDocument sourceDoc = PdfReader.Open(docPath, PdfDocumentOpenMode.Import);
+                CopyPagesToTarget(sourceDoc, targetDoc);
+            }
+
+            string outputDirectory = "Output";
+            if (!Directory.Exists(outputDirectory))
+                Directory.CreateDirectory(outputDirectory);
+
+            string outputFilePath = Path.Combine(outputDirectory, $"{targetDoc.PageCount}.pdf");
+            targetDoc.Save(outputFilePath);
+
+            return targetDoc;
+        }
 
         //==============================================================================
 

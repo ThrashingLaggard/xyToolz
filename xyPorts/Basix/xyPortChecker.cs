@@ -128,7 +128,6 @@ namespace xyPorts.Basix
         /// <returns>IEnumerable[isAvaillable, portNumber]</returns>
         public IEnumerable<(bool, int)> ArePortsAvaillable(List<int> ports)
         {
-            int counter = 0;
             var yetOpen = GetOpenPorts().ToList();
             List<(bool, int)> isAvaillable = new List<(bool, int)>();
 

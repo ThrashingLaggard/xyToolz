@@ -19,12 +19,12 @@ namespace xyPorts.TCP
         /// <summary>
         /// Action for EventHandler
         /// </summary>
-        public Action<String> ReceivedMessage { get; set; }
+        public Action<String>? ReceivedMessage { get; set; }
 
         /// <summary>
         /// Active
         /// </summary>
-        public Boolean IsListening { get; set; }
+        public Boolean IsListening { get; set; } = false;
         
         /// <summary>
         /// M
@@ -50,7 +50,7 @@ namespace xyPorts.TCP
         /// <param name="port_"></param>
         public void Listen(ushort port_)
         {
-            TcpListener tcp_PortHost = null;
+            TcpListener tcp_PortHost = default!;
             try
             {
                 // Set the TcpListener on Port 13000 by default
@@ -58,31 +58,33 @@ namespace xyPorts.TCP
                 ushort port = port_ != 0 ? port_ : (ushort)13000;
 
                 IPEndPoint listeningAddress;
-                IPEndPoint.TryParse($"{localhost}:{port}", out listeningAddress);
+                IPEndPoint.TryParse($"{localhost}:{port}", out listeningAddress!);
 
-                // TcpListener tcp_Porthost = new TcpListener(port);
-                using (tcp_PortHost = new TcpListener(listeningAddress))
+                if(listeningAddress is not null)
                 {
-                    TcpPortMapping.Add(port, tcp_PortHost);
-                    // Start listening for client requests
-                    tcp_PortHost.Start();
-                    IsListening = true;
-                    xyLog.Log("Waiting for a connection... ");
-
-                    //  Enter the listening loop
-                    while (IsListening)
+                    using (tcp_PortHost = new TcpListener(listeningAddress))
                     {
-                        try
-                        {
-                            // Perform a blocking call to accept requests.
-                            TcpClient tcp_Client = tcp_PortHost.AcceptTcpClient();
+                        TcpPortMapping.Add(port, tcp_PortHost);
+                        // Start listening for client requests
+                        tcp_PortHost.Start();
+                        IsListening = true;
+                        xyLog.Log("Waiting for a connection... ");
 
-                            xyLog.Log("Connected!");
-                            GetDataStringFromNetworkStream(tcp_Client);
-                        }
-                        catch (Exception ex)
+                        //  Enter the listening loop
+                        while (IsListening)
                         {
-                            xyLog.ExLog(ex, LogLevel.Error);
+                            try
+                            {
+                                // Perform a blocking call to accept requests.
+                                TcpClient tcp_Client = tcp_PortHost.AcceptTcpClient();
+
+                                xyLog.Log("Connected!");
+                                GetDataStringFromNetworkStream(tcp_Client);
+                            }
+                            catch (Exception ex)
+                            {
+                                xyLog.ExLog(ex, LogLevel.Error);
+                            }
                         }
                     }
                 }

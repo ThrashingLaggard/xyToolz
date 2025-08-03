@@ -38,7 +38,9 @@ namespace xyToolz
     /// 
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs yet.")]
+#pragma warning disable CS8981 // Der Typname enthält nur ASCII-Zeichen in Kleinbuchstaben. Solche Namen können möglicherweise für die Sprache reserviert werden.
     public static class xy
+#pragma warning restore CS8981 // Der Typname enthält nur ASCII-Zeichen in Kleinbuchstaben. Solche Namen können möglicherweise für die Sprache reserviert werden.
     {
         #region TryCatch – Error-handling helpers
 
@@ -339,9 +341,9 @@ namespace xyToolz
         /// <summary>
         /// Opens Notepad without any file.
         /// </summary>
-        public static void Editor()
+        public static async Task Editor()
         {
-            Start("notepad.exe");
+            await Start("notepad.exe");
         }
 
         /// <summary>

@@ -8,8 +8,8 @@ namespace xyToolz.Helper.Interfaces
 {
     public interface IxyJson
     {
-        Task<string?> GetStringFromJsonFile(string path, string key);
-        Task AddOrUpdateEntry(string path, string key, string value);
+        Task<string> GetStringFromJsonFile(string path, string key);
+        Task AddOrUpdateEntry(string path, string key, string? value);
         Task<Dictionary<string, object>?> DeserializeKeyIntoDictionary(string path, string key);
 
     }

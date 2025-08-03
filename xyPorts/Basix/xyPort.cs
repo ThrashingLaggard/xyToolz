@@ -9,7 +9,7 @@
         /// <summary>
         /// Port number
         /// </summary>
-        public UInt16 PortID { get; set; }
+        public UInt16 PortID { get; set; } = 0;
 
         /// <summary>
         /// Allready has someone using it
@@ -24,12 +24,8 @@
         /// <summary>
         /// Store custom information u need here
         /// </summary>
-        public String Information { get; set; }
+        public String Information { get; set; } = "Use this class to store information about your ports";
 
-        /// <summary>
-        /// Provides basic port-checking operations
-        /// </summary>
-        public xyPortChecker PortChecker { get; set; }
     }
 
 }

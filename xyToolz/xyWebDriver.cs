@@ -17,7 +17,7 @@ namespace xyToolz
 
         public class BrowserDriver : IDisposable
         {
-            private static IWebDriver _driver;
+            private static IWebDriver? _driver;
             private readonly WebDriverWait _wait;
 
             public BrowserDriver(int timeoutSeconds = 10)
@@ -25,6 +25,7 @@ namespace xyToolz
                 TimeSpan timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 ChromeOptions chromeOptions = new();
                 chromeOptions.AddArgument("--start-maximized");
+
                 _driver = new ChromeDriver(chromeOptions);
                 _wait = new WebDriverWait(_driver, timeout);
             }
@@ -33,7 +34,7 @@ namespace xyToolz
             {
                 try
                 {
-                    await _driver.Navigate().GoToUrlAsync(url);
+                    await _driver!.Navigate().GoToUrlAsync(url);
                 }
                 catch (Exception ex)
                 {
@@ -74,7 +75,11 @@ namespace xyToolz
                     return null!;
                 }
             }
-
+            /// <summary>
+            /// Click
+            /// </summary>
+            /// <param name="by"></param>
+            /// <returns></returns>
             public async Task<bool> Click(By by)
             {
                 IWebElement target = await FindElement(by);
@@ -93,7 +98,13 @@ namespace xyToolz
                 }
                 return isClicked;
             }
-
+            
+            /// <summary>
+            /// Input text
+            /// </summary>
+            /// <param name="by"></param>
+            /// <param name="text"></param>
+            /// <returns></returns>
             public async Task EnterText(By by, string text)
             {
                 IWebElement webElement = await FindElement(by);
@@ -110,11 +121,16 @@ namespace xyToolz
                 }
             }
 
+            /// <summary>
+            /// Screenshot
+            /// </summary>
+            /// <param name="path"></param>
+            /// <returns></returns>
             public async Task TakeScreenshot(string path)
             {
                 try
                 {
-                    Screenshot screenshot = ((ITakesScreenshot)_driver).GetScreenshot();
+                    Screenshot screenshot = ((ITakesScreenshot)_driver!).GetScreenshot();
                     screenshot.SaveAsFile(path);
                 }
                 catch (Exception ex)
@@ -124,6 +140,13 @@ namespace xyToolz
             }
 
             // Fix later
+            /// <summary>
+            /// Fix
+            /// </summary>
+            /// <param name="by"></param>
+            /// <param name="target"></param>
+            /// <param name="selector"></param>
+            /// <returns></returns>
             public async Task SelectDropdownOption(By by, string target, int selector)
             {
                 string invalidSelector = "Chose a valid selector";
@@ -147,7 +170,11 @@ namespace xyToolz
                 }
             }
 
-
+            /// <summary>
+            /// Check
+            /// </summary>
+            /// <param name="by"></param>
+            /// <returns></returns>
             public async Task CheckCheckBox(By by)
             {
                 IWebElement checkBox = await FindElement(by);
@@ -164,6 +191,11 @@ namespace xyToolz
                 }
             }
 
+            /// <summary>
+            /// Uncheck
+            /// </summary>
+            /// <param name="by"></param>
+            /// <returns></returns>
             public async Task UncheckCheckbox(By by)
             {
                 IWebElement checkBox = await FindElement(by);
@@ -181,16 +213,23 @@ namespace xyToolz
             }
 
 
-
+            /// <summary>
+            /// Execute script but generic
+            /// </summary>
+            /// <typeparam name="T"></typeparam>
+            /// <param name="script"></param>
+            /// <param name="args"></param>
+            /// <returns></returns>
             public static async Task<T> ExecuteScript<T>(string script, params object[] args)
             {
                 try
                 {
-                    IJavaScriptExecutor jsExec = (IJavaScriptExecutor)_driver;
-
-                    if (jsExec.ExecuteAsyncScript(script) is T result)
+                    if ( (IJavaScriptExecutor)_driver! is IJavaScriptExecutor jsExec)
                     {
-                        return result;
+                        if (jsExec.ExecuteAsyncScript(script) is T result)
+                        {
+                            return result;
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -203,22 +242,28 @@ namespace xyToolz
                 return default!;
             }
 
-
+            /// <summary>
+            /// Execute Script
+            /// </summary>
+            /// <param name="script"></param>
+            /// <param name="args"></param>
+            /// <returns></returns>
             public static async Task ExecuteScript(string script, params object[] args)
             {
                 try
                 {
-                    IJavaScriptExecutor jsExec = (IJavaScriptExecutor)_driver;
-
-                    if (jsExec.ExecuteAsyncScript(script) is object result)
+                    if( (IJavaScriptExecutor)_driver! is IJavaScriptExecutor jsExec)
                     {
-                        string success = $"Script was executed successfully and returned an instance of: {result.ToString()}";
-                        await xyLog.AsxLog(success);
-                    }
-                    else
-                    {
-                        string fail = "Failed to execute the target script ";
-                        await xyLog.AsxLog(fail);
+                        if (jsExec.ExecuteAsyncScript(script) is object result)
+                        {
+                            string success = $"Script was executed successfully and returned an instance of: {result.ToString()}";
+                            await xyLog.AsxLog(success);
+                        }
+                        else
+                        {
+                            string fail = "Failed to execute the target script ";
+                            await xyLog.AsxLog(fail);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -228,13 +273,12 @@ namespace xyToolz
                 return;
             }
 
-
-
-
-
+            /// <summary>
+            /// Dispose
+            /// </summary>
             public void Dispose()
             {
-                _driver.Quit();
+                _driver!.Quit();
                 _driver.Dispose();
 
             }

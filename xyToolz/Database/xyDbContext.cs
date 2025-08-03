@@ -20,9 +20,8 @@ namespace xyToolz.Database
 
         public DbSet<object> Entities { get; set; }
 
-        public String PathForDB { get; set; }
+        public String? PathForDB { get; set; }
 
-        private String _test = "";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="xyDBContext"/> class.
@@ -49,10 +48,7 @@ namespace xyToolz.Database
         /// <typeparam name="T">The type of the entity.</typeparam>
         /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the found entity or null.</returns>
-        public async Task<T>? GetByID<T>(params object[] keyValues) where T : class
-        {
-            return await Set<T>().FindAsync(keyValues);
-        }
+        public async Task<T?>? GetByID<T>(params object[] keyValues) where T : class => await Set<T>()!.FindAsync(keyValues!);
 
         /// <summary>
         /// Adds the given entity to the context.
@@ -155,7 +151,7 @@ namespace xyToolz.Database
             {
                 xyLog.ExLog(ex);
             }
-            return PathForDB;
+            return PathForDB!;
         }
 
 

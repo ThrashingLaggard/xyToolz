@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+﻿using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Logging;
 
 namespace xyToolz.Helper.Logging
 {
@@ -93,8 +86,7 @@ namespace xyToolz.Helper.Logging
         private static readonly long _maxLogFileSize = 10485760;
         private static readonly object _threadSafetyLock = new object();
         private static xyLogArchiver _archiver = new(_maxLogFileSize);
-        private static bool IsLoggingToSystemConsole = true;
-        private static IEnumerable<xyLogTargets> _eTargets = new List<xyLogTargets>();
+        // private static IEnumerable<xyLogTargets> _eTargets = new List<xyLogTargets>();
 
         /// <summary>
         /// Converts raw integer targets into the xyLogTargets enum.
@@ -124,7 +116,7 @@ namespace xyToolz.Helper.Logging
         {
             Console.WriteLine(formattedMessage);
             Console.Out.Flush();
-            LogMessageSent?.Invoke(formattedMessage, callerName);
+            LogMessageSent?.Invoke(formattedMessage, callerName!);
         }
 
         /// <summary>
@@ -207,7 +199,7 @@ namespace xyToolz.Helper.Logging
                     File.AppendAllText(_logFilePath, formattedMessage);
                     Console.WriteLine(formattedMessage);
                     Console.Out.Flush();
-                    LogMessageSent?.Invoke(formattedMessage, callerName);
+                    LogMessageSent?.Invoke(formattedMessage, callerName!);
                     return true;
                 }
                 catch (Exception ex)
@@ -234,7 +226,7 @@ namespace xyToolz.Helper.Logging
                     File.AppendAllText(_exLogFilePath, exceptionDetails);
                     Console.WriteLine(exceptionDetails);
                     Console.Out.Flush();
-                    ExLogMessageSent?.Invoke(exceptionDetails, callerName);
+                    ExLogMessageSent?.Invoke(exceptionDetails, callerName!);
                     return true;
                 }
                 catch (Exception innerEx)
@@ -244,26 +236,21 @@ namespace xyToolz.Helper.Logging
                 return false;
             }
         }
-        
+
 
         #region Service
 
         /// <summary>
-        /// Führt eine Aktion aus und protokolliert deren Start, Erfolg oder Fehler, einschließlich spezifischer Behandlungen von Ausnahmen.
+        /// Execute a message and protocol the result
+        /// 
+        /// logger.ExecuteWithLogging(">Screaming()", () =>Screaming(testText),Exception => logger.ExLog(Exception,LogLevel.Warning,">Screaming()"));
+        /// 
         /// </summary>
-        /// <typeparam name="T">Der Rückgabetyp der Aktion, die ausgeführt wird.      </typeparam>
-        /// <param name="actionName">Der Name der Aktion, der in den Logmeldungen verwendet wird. </param>
-        /// <param name="action">Eine Methode oder Funktion (als Delegate `Func<T>`), die ausgeführt werden soll.   </param>
-        /// <param name="logOnError">Eine optionale Aktion (Delegate `Action<Exception>`), die bei Auftreten eines Fehlers ausgeführt wird. Kann null sein. </param>
-        /// <returns>
-        /// Das Ergebnis der ausgeführten Aktion vom Typ `T`. Wenn ein Fehler auftritt, wird der Standardwert von `T` zurückgegeben (`default(T)`).
-        /// </returns>
-        /// <example>
-        /// 
-        ///  logger.ExecuteWithLogging<string>(">Screaming()", () =>Screaming(testText),Exception => logger.ExLog(Exception,LogLevel.Warning,">Screaming()"));
-        /// 
-        /// 
-        /// </example>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="actionName"></param>
+        /// <param name="action"></param>
+        /// <param name="logOnError"></param>
+        /// <returns></returns>
         public static T ExecuteDebugging<T>(string actionName, Func<T> action, Action<Exception>? logOnError = null)
         {
             try
@@ -341,7 +328,7 @@ namespace xyToolz.Helper.Logging
                 await AsxExLog(ex, LogLevel.Critical, actionName);  // Wenn die Exception nicht anders definiert ist, als die des Delegaten, kommt ggf zweimal die gleiche Nachricht, mit unterschiedlichen Callern
             }
 
-            return default;
+            return default!;
         }
 
 
