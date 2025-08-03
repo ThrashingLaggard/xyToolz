@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<PackageVersion>1.0.53</PackageVersion>
+		<PackageVersion>1.0.54</PackageVersion>
 		<Nullable>enable</Nullable>
 		<SignAssembly>False</SignAssembly>
 		<Title>xyToolZ</Title>
