@@ -15,7 +15,7 @@ namespace xyToolz.Logging.Helper.Formatters
     /// Used to store log messages and exceptions in LogEntries or get the data out of them
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class xyLogEntryFormatter<T> : IDefaultEntityFormatter<T>
+    public class xyDefaultLogEntryFormatter<T> : IMessageEntityFormatter<T>
     {
         /// <summary>
         /// Unpack the data from a LogEntry
@@ -26,7 +26,7 @@ namespace xyToolz.Logging.Helper.Formatters
         /// <returns></returns>
         public string UnpackAndFormatFromEntity(T entry_, string? callerName = null, LogLevel? level_ = LogLevel.Debug)
         {
-            if (entry_ is xyLogEntry logEntry)
+            if (entry_ is xyDefaultLogEntry logEntry)
             {
                 uint ID = logEntry.ID;
                 string description ="Info:" +  logEntry.Description ?? "";
@@ -37,7 +37,7 @@ namespace xyToolz.Logging.Helper.Formatters
                 string message = logEntry.Message;
                 Exception? exception = logEntry.Exception?? default;
 
-                string formattedExceptionInformation = new xyExceptionFormatter().FormatExceptionDetails(exception,level,callerName);
+                string formattedExceptionInformation = new xyDefaultExceptionFormatter().FormatExceptionDetails(exception,level,callerName);
                 
                 //callerName = string.IsNullOrEmpty(callerName) ? " / " : callerName;
 
@@ -63,9 +63,9 @@ namespace xyToolz.Logging.Helper.Formatters
         /// <param name="comment"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public xyLogEntry PackAndFormatIntoEntity(string source, LogLevel level, string message, DateTime timestamp,  uint? id = null, string? description = null, string? comment= null, Exception? exception = null)
+        public xyDefaultLogEntry PackAndFormatIntoEntity(string source, LogLevel level, string message, DateTime timestamp,  uint? id = null, string? description = null, string? comment= null, Exception? exception = null)
         {
-            xyLogEntry entry = new(source_: source, level_: level, message_: message, exception_: exception, timestamp_: timestamp)
+            xyDefaultLogEntry entry = new(source_: source, level_: level, message_: message, exception_: exception, timestamp_: timestamp)
             {
                 ID = id ?? 0,
                 Description = description ?? "",

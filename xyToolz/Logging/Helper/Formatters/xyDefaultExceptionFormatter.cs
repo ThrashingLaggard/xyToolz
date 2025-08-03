@@ -11,7 +11,7 @@ namespace xyToolz.Logging.Helper.Formatters
     /// <summary>
     /// Format exceptions for structured logging
     /// </summary>
-    public class xyExceptionFormatter : IExceptionFormatter
+    public class xyDefaultExceptionFormatter : IExceptionFormatter
     {
         /// <summary>
         /// Read all relevant details from the exception

@@ -23,12 +23,12 @@ namespace xyToolz.Logging.Models
         /// <summary>
         /// What kind of exception does this?
         /// </summary>
-        public required Type TypeOfException { get; init; }
+        public Type TypeOfException { get; set; }
 
         /// <summary>
         /// Time of occurance
         /// </summary>
-        public required DateTime Timestamp { get; init; }
+        public DateTime Timestamp { get; init; }
 
         /// <summary>
         /// The root of the problem

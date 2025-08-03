@@ -9,7 +9,7 @@ namespace xyToolz.Logging.Models
     /// <summary>
     /// Bundled information for a log message
     /// </summary>
-    public class xyLogEntry(string source_, LogLevel level_, string message_, DateTime timestamp_, Exception? exception_ = null) : ISerializable
+    public class xyDefaultLogEntry(string source_, LogLevel level_, string message_, DateTime timestamp_, Exception? exception_ = null) : ISerializable
     {
         /// <summary>
         /// For easy administration
@@ -64,13 +64,13 @@ namespace xyToolz.Logging.Models
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public xyLogEntry FromJson(string json) 
+        public xyDefaultLogEntry FromJson(string json) 
         {
-            if( JsonSerializer.Deserialize<xyLogEntry>(json) is xyLogEntry entry)
+            if( JsonSerializer.Deserialize<xyDefaultLogEntry>(json) is xyDefaultLogEntry entry)
             {
                 return entry;
             }
-            else return new xyLogEntry("", LogLevel.Error, "", DateTime.Now)
+            else return new xyDefaultLogEntry("", LogLevel.Error, "", DateTime.Now)
             {
                 Source = "xyLogEntry.FromJson()",
                 Message = "Deserialization from JSON failed!",
@@ -85,7 +85,7 @@ namespace xyToolz.Logging.Models
         /// <returns></returns>
         public string ToXml()
         {
-            XmlSerializer serializer = new(typeof(xyLogEntry));
+            XmlSerializer serializer = new(typeof(xyDefaultLogEntry));
             using StringWriter writer = new();
             serializer.Serialize(writer, this);
             return writer.ToString();
@@ -96,12 +96,12 @@ namespace xyToolz.Logging.Models
         /// </summary>
         /// <param name="xml"></param>
         /// <returns></returns>
-        public xyLogEntry FromXml(string xml)
+        public xyDefaultLogEntry FromXml(string xml)
         {
-            XmlSerializer deserializer = new(typeof(xyLogEntry));
+            XmlSerializer deserializer = new(typeof(xyDefaultLogEntry));
             using StringReader reader = new(xml);
-            if (deserializer.Deserialize(reader) is xyLogEntry entry) return entry;
-            else return new xyLogEntry("", LogLevel.Error,"", DateTime.Now) 
+            if (deserializer.Deserialize(reader) is xyDefaultLogEntry entry) return entry;
+            else return new xyDefaultLogEntry("", LogLevel.Error,"", DateTime.Now) 
             { 
                 Source = "xyLogEntry.FromXml()",
                 Message = "Deserialization from xml failed!",
