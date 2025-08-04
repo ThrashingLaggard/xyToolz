@@ -22,5 +22,10 @@ namespace xyToolz.Logging.Interfaces
         /// <param name="level"></param>
         /// <param name="callerName"></param>
         void ExLog(Exception ex, LogLevel level, [CallerMemberName] string? callerName = null);
+
+        /// <summary>
+        /// Set reference to null
+        /// </summary>
+        void Shutdown();
     }
 }

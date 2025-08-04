@@ -11,6 +11,7 @@ namespace xyToolz
     /// <summary>
     /// Directory helpers
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<I want it that way>")]
     public static class xyDirUtils
     {
         /// <summary>
@@ -384,7 +385,7 @@ namespace xyToolz
                 if (!Directory.Exists(folderPath))
                     throw new DirectoryNotFoundException($"Folder not found: {folderPath}");
 
-                FileSystemWatcher watcher = new FileSystemWatcher(folderPath, filter)
+                FileSystemWatcher watcher = new (folderPath, filter)
                 {
                     NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.CreationTime,
                     IncludeSubdirectories = true,

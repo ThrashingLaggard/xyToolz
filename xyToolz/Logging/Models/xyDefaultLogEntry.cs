@@ -51,6 +51,8 @@ namespace xyToolz.Logging.Models
         /// </summary>
         public Exception? Exception { get; set; } = exception_ ?? default!;
 
+        public xyExceptionEntry ExceptionEntry { get; set; } = exception_ is not null? (new xyExceptionEntry(exception_: exception_ ) { Exception = exception_}) : default!;
+
 
 
         /// <summary>
