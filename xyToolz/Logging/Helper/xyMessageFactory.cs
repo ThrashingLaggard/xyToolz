@@ -121,7 +121,8 @@ namespace xyToolz.Logging.Helper
         /// Failed to read the target data from DB
         /// </summary>
         /// <returns></returns>
-        public string NotRead() => "Found no valid equivalent for the entered data!";
+        public string NotRead(int? ID = null) => ID == null? "Found no valid equivalent for the entered data!" : $"No corresponding entry/ valid data found for ID{ID}";
+
 
         /// <summary>
         /// Updated target -> ID
