@@ -37,9 +37,26 @@ namespace xyToolz.Logging.Helper
 
         #endregion
 
+
+
+
+
         #region "Serialization"
         // todo: fill in
         #endregion
+
+
+
+
+
+        #region "Login"
+
+        public string LoginSuccess()=> "The entered userdata seems valid and correct, you may proceed";
+        public string LoginFail() => "The userdata is invalid and/ or incorrect, please check the entered dataset";
+        
+        #endregion
+        
+
 
 
 
