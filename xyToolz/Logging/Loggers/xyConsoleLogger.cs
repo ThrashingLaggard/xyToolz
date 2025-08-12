@@ -79,7 +79,7 @@ namespace xyToolz.Logging.Loggers
         /// <param name="callerName">The name of the calling member. This is automatically populated by the compiler  if not explicitly provided.</param>
         public void Log(string message, LogLevel level, [CallerMemberName] string? callerName = null)
         {                                                               
-            string formattedMsg = FormatMsg(message, out _, DateTime.Now, null, null, null, callerName, level);// xyDefaultLogEntry logEntry
+            string formattedMsg = FormatMsg(message, out _, DateTime.Now, null, null, null, callerName, level);// _ = xyDefaultLogEntry logEntry
             Console.WriteLine(formattedMsg);
             Console.Out.Flush();
         }
@@ -91,10 +91,11 @@ namespace xyToolz.Logging.Loggers
         /// formatted message to the console.</remarks>
         /// <param name="ex">The exception to log. This parameter cannot be <see langword="null"/>.</param>
         /// <param name="level">The severity level of the log entry.</param>
+        /// <param name="message">Optional: additional informationen</param>
         /// <param name="callerName">The name of the calling member. This is automatically populated by the compiler if not explicitly provided.</param>
-        public void ExLog(Exception ex, LogLevel level, [CallerMemberName] string? callerName = null)
+        public void ExLog(Exception ex, LogLevel level, string? message = null, [CallerMemberName] string? callerName = null)
         {                                                 
-            string exMessage = FormatEx(ex, level,out _, null, callerName);  // xyExceptionEntry excEntry
+            string exMessage = FormatEx(ex, level,out _, message, callerName);  // _  = xyExceptionEntry excEntry
             Console.WriteLine(exMessage);
             Console.Out.Flush();
         }

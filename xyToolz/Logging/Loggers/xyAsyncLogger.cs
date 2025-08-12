@@ -63,10 +63,10 @@ namespace xyToolz.Logging.Loggers
         /// <param name="ex"></param>
         /// <param name="level"></param>
         /// <param name="callerName"></param>
-        public void ExLog(Exception ex, LogLevel level, [CallerMemberName] string? callerName = null)
+        public void ExLog(Exception ex, LogLevel level, string? message = null, [CallerMemberName] string? callerName = null)
         {
             //xyExceptionEntry? excEntry =  default;
-            string exMessage = FormatEx(ex, level, out _, null, callerName);
+            string exMessage = FormatEx(ex, level, out _, message, callerName);
 
             Enqueue(exMessage, callerName);
         }

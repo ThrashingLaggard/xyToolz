@@ -22,15 +22,22 @@ namespace xyToolz.Logging.Helper.Formatters
         /// recursively.</remarks>
         /// <param name="ex">The exception to format. Cannot be <see langword="null"/>.</param>
         /// <param name="level">The log level associated with the exception details.</param>
+        /// <param name="message">Optional: additional informationen</param>
         /// <param name="callerName">The name of the calling method or member. If <see langword="null"/>, a placeholder value is used.</param>
         /// <returns>A formatted string containing detailed information about the exception, including its type, source, target
         /// site, stack trace, message, custom data (if any), and details of any inner exceptions.</returns>
-        public string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null)
+        public string FormatExceptionDetails(Exception ex, LogLevel level, string? message = null,string? callerName = null)
         {
             StringBuilder sb_Builder = new ();
 
-            sb_Builder.AppendLine($"{DateTime.Now} [{callerName ?? " / "}] [{level}] Exception Details:");
-                      
+            sb_Builder.Append($"{DateTime.Now} [{callerName ?? " / "}] [{level}]");
+            
+            if (!string.IsNullOrEmpty(message))
+            {
+                sb_Builder.AppendLine("External message " + message + "\n");
+            }
+
+            sb_Builder.AppendLine("Exception Details:");
             sb_Builder.AppendLine($"Type: {ex.GetType().Name}");
             sb_Builder.AppendLine($"Source: {ex.Source}");
             sb_Builder.AppendLine($"TargetSite: {ex.TargetSite}");
