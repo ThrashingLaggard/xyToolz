@@ -15,7 +15,7 @@ namespace xyToolz.Logging.Helper
     /// 
     ///                                                                                                                                                                                     Stuff for Eventhandlers is planned!
     /// </summary>
-    public class xyLoggerManager
+    public class xyLoggerManager 
     {
         /// <summary>
         /// Add useful information

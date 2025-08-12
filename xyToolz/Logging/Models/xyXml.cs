@@ -34,6 +34,7 @@ namespace xyToolz
                 }
                 else
                 {
+                    xyLog.Log($"An error occured while trying to deserialize {nameof(xml)}");
                     throw (new SerializationException());
                 }
             }

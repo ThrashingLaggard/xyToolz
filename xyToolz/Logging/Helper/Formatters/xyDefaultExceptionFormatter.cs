@@ -29,7 +29,7 @@ namespace xyToolz.Logging.Helper.Formatters
 
             if (!string.IsNullOrWhiteSpace(message))
             {
-                sb_Builder.AppendLine($"External Message: {message}");
+                sb_Builder.AppendLine($"External Message: {message}     \n");
             }
 
             sb_Builder.AppendLine("Exception Details:");

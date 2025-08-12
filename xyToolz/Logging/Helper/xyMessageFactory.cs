@@ -31,9 +31,9 @@ namespace xyToolz.Logging.Helper
         /// <summary>
         /// No connection string found in config
         /// </summary>
-        /// <param name="nameOfTheKey"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        public string ConnectionStringNotFound(string? nameOfTheKey = null) => $"No connection string found for {nameOfTheKey}, unable to connect to the target database!!!";
+        public string ConnectionStringNotFound(string? name = null) => name is null? $"No connection string found, unable to connect to database!!!" :  $"No connection string found for {name}, unable to connect to the target database!!!";
 
         #endregion
 
@@ -42,7 +42,36 @@ namespace xyToolz.Logging.Helper
 
 
         #region "Serialization"
-        // todo: fill in
+
+        /// <summary>
+        /// Successfully serialized the target
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public string SerializationSuccess(object? target = null) => target is null ? $"The target has been serialized!" : $"{target.ToString()} has been serialized!";
+
+        /// <summary>
+        /// Failed to serialize the target
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string SerializationFail(string? name = null) => name is null ? $"An error occured while trying to serialize the target" : $"An error occured while trying to serialize {nameof(name)}";
+        
+        
+        /// <summary>
+        /// Successfully deserialized the target
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public string DeserializationSuccess(object?  target = null) => target is null? $"{target} has been deserialized!" : $"{target.ToString()} has been deserialized!";
+
+        /// <summary>
+        /// Failed to deserialize the target
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string DeserializationFail(string? name = null) => name is null ? $"An error occured while trying to deserialize the target" : $"An error occured while trying to deserialize {nameof(name)}";
+
         #endregion
 
 
@@ -51,7 +80,16 @@ namespace xyToolz.Logging.Helper
 
         #region "Login"
 
-        public string LoginSuccess()=> "The entered userdata seems valid and correct, you may proceed";
+        /// <summary>
+        /// Login-data is valid
+        /// </summary>
+        /// <returns></returns>
+        public string LoginSuccess(string? username)=> username is null? "The entered userdata seems valid and correct, you may proceed" : $"Login for {username} successfull";
+        
+        /// <summary>
+        /// User failed to provide valid data for login
+        /// </summary>
+        /// <returns></returns>
         public string LoginFail() => "The userdata is invalid and/ or incorrect, please check the entered dataset";
         
         #endregion

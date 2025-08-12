@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Xml.Serialization;
+
 
 
 namespace xyToolz.Logging.Models
@@ -96,11 +96,12 @@ namespace xyToolz.Logging.Models
         /// </summary>
         /// <param name="xml"></param>
         /// <returns></returns>
-        public xyDefaultLogEntry FromXml(string xml)
+        public xyDefaultLogEntry FromXml(string xml, bool outputTargetInConsole = false)
         {
-            XmlSerializer deserializer = new(typeof(xyDefaultLogEntry));
-            using StringReader reader = new(xml);
-            if (deserializer.Deserialize(reader) is xyDefaultLogEntry entry) return entry;
+            if(xyXml.FromXml<xyDefaultLogEntry>(xml, outputTargetInConsole) is xyDefaultLogEntry entry)
+            {
+                return entry;
+            }
             else return new xyDefaultLogEntry("", LogLevel.Error,"", DateTime.Now) 
             { 
                 Source = "xyLogEntry.FromXml()",

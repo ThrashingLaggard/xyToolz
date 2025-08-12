@@ -18,11 +18,17 @@ namespace xyToolz.Logging.Loggers
     {
         private readonly ILogging _logger = logger_;
 
+        // Implement!!!
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull
         {
             return null;
         }
 
+        /// <summary>
+        /// Basically allways enabled (Lvl 6 disables it) 
+        /// </summary>
+        /// <param name="logLevel"></param>
+        /// <returns></returns>
         public bool IsEnabled(LogLevel logLevel)
         {
             bool isEnabled = false;
@@ -34,6 +40,7 @@ namespace xyToolz.Logging.Loggers
             return isEnabled;
 
         }
+
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {

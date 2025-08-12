@@ -97,7 +97,7 @@ namespace xyToolz.Helper.Logging
             if (ex.InnerException != null)
             {
                 sb.AppendLine("Inner Exception Details:");
-                sb.AppendLine(FormatExceptionDetails(ex.InnerException, level, callerName, depth + 1));
+                sb.AppendLine(FormatExceptionDetails(ex.InnerException, level,null, callerName, depth + 1));
             }
 
             return sb.ToString();
