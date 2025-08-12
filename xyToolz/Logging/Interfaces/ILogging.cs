@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace xyToolz.Logging.Interfaces
 {
     /// <summary>
-    /// Interface for loggers
+    /// Interface for my own loggers
     /// </summary>
     public interface ILogging
     {
@@ -20,8 +20,9 @@ namespace xyToolz.Logging.Interfaces
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="level"></param>
+        /// <param name="message"></param>
         /// <param name="callerName"></param>
-        void ExLog(Exception ex, LogLevel level, [CallerMemberName] string? callerName = null);
+        void ExLog(Exception ex, LogLevel level, string? message = null, [CallerMemberName] string? callerName = null);
 
         /// <summary>
         /// Set reference to null

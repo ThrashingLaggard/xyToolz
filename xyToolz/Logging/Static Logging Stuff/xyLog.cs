@@ -147,9 +147,9 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Logs details of an exception synchronously.
         /// </summary>
-        public static void ExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
+        public static void ExLog(Exception ex, LogLevel level = LogLevel.Error, string? message =  null, [CallerMemberName] string? callerName = null)
         {
-            string exMessage = FormatEx(ex, level, callerName);
+            string exMessage = FormatEx(ex, level,message, callerName);
             Output(exMessage, callerName);
         }
 
@@ -371,9 +371,9 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Formats the Exception´s details for consistent logging.
         /// </summary>
-        private static string FormatEx(Exception ex, LogLevel level, string? callerName = null)
+        private static string FormatEx(Exception ex, LogLevel level, string? message = null, string? callerName = null)
         {
-            return xyLogFormatter.FormatExceptionDetails(ex, level, callerName);
+            return xyLogFormatter.FormatExceptionDetails(ex, level, message,callerName);
         }
 
         #endregion

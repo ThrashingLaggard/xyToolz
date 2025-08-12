@@ -63,18 +63,24 @@ namespace xyToolz.Helper.Logging
         /// </summary>
         /// <param name="ex">The exception to format.</param>
         /// <param name="level">The log level context in which the exception occurred.</param>
+        /// <param name="message">optional additional information</param>
         /// <param name="callerName">Optional: The method or class name that triggered the exception.</param>
         /// <param name="depth">Internal recursion depth counter (default 1).</param>
         /// <returns>A full textual description of the exception hierarchy.</returns>
-        public static string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null, int depth = 1)
+        public static string FormatExceptionDetails(Exception ex, LogLevel level, string? message = null,string? callerName = null, int depth = 1)
         {
             StringBuilder sb = new();
             string exceptionId = Guid.NewGuid().ToString();
+            sb.AppendLine($"{DateTime.Now} [{callerName ?? "Unknown"}] [{level}] ");
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                sb.AppendLine($"External Message: {message}  \n");
+            }
 
             sb.AppendLine($"====================[ EXCEPTION ]====================");
             sb.AppendLine($"Exception-ID: {exceptionId}");
             sb.AppendLine($"Depth: {depth}");
-            sb.AppendLine($"{DateTime.Now} [{callerName ?? "Unknown"}] [{level}] Exception Details:");
             sb.AppendLine($"Type: {ex.GetType().Name}");
             sb.AppendLine($"Message: {ex.Message}");
             sb.AppendLine($"TargetSite: {ex.TargetSite}");

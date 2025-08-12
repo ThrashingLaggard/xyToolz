@@ -12,8 +12,9 @@ namespace xyToolz.Logging.Interfaces
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="level"></param>
+        /// <param name="message"></param>
         /// <param name="callerName"></param>
         /// <returns></returns>
-        string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null);
+        string FormatExceptionDetails(Exception ex, LogLevel level, string? message = null, string? callerName = null);
     }
 }

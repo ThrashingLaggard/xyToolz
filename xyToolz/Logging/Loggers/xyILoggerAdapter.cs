@@ -10,7 +10,7 @@ namespace xyToolz.Logging.Loggers
 {
 
     /// <summary>
-    /// This is a wrapper to make ILogging and ILogger work togeter
+    /// This is a wrapper to make ILogger work with my own ILogging Framework
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="logger_"></param>
@@ -41,7 +41,7 @@ namespace xyToolz.Logging.Loggers
             string message = formatter(state, exception);
             if (exception is not null)
             {
-                _logger.ExLog(exception, logLevel, caller);
+                _logger.ExLog(exception, logLevel, message,caller);
             }
             else
             {

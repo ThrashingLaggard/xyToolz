@@ -18,14 +18,21 @@ namespace xyToolz.Logging.Helper.Formatters
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="level"></param>
+        /// <param name="message"></param>
         /// <param name="callerName"></param>
         /// <returns></returns>
-        public string FormatExceptionDetails(Exception ex, LogLevel level, string? callerName = null)
+        public string FormatExceptionDetails(Exception ex, LogLevel level, string? message = null,string? callerName = null)
         {
             StringBuilder sb_Builder = new();
 
-            sb_Builder.AppendLine($"{DateTime.Now} [{callerName ?? " / "}] [{level}] Exception Details:");
+            sb_Builder.Append($"{DateTime.Now} [{callerName ?? " / "}] [{level}] ");
 
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                sb_Builder.AppendLine($"External Message: {message}");
+            }
+
+            sb_Builder.AppendLine("Exception Details:");
             sb_Builder.AppendLine($"Type: {ex.GetType().Name}");
             sb_Builder.AppendLine($"Source: {ex.Source}");
             sb_Builder.AppendLine($"TargetSite: {ex.TargetSite}");

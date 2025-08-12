@@ -103,8 +103,11 @@ namespace xyToolz
         }
 
         /// <summary>
-        /// Serializes a dictionary to JSON (overwrites the file).
+        ///  Serializes a dictionary to JSON (overwrites the file).
         /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="updatedDictionary"></param>
+        /// <returns></returns>
         public static async Task<bool> SerializeDictionary(string filePath, Dictionary<string, object> updatedDictionary)
         {
             string successMessage = $"Successfully serialized {updatedDictionary.Count} entries to file: '{filePath}'.";
@@ -185,7 +188,7 @@ namespace xyToolz
         }
 
         /// <summary>
-        /// Reads a single key from the JSON file and returns it as an object.
+        /// Reads the value from a single key from the JSON file and returns it as an object.
         /// </summary>
         /// <param name="filePath">Path to the JSON file.</param>
         /// <param name="key">Top-level key to extract.</param>
@@ -227,7 +230,7 @@ namespace xyToolz
         #region "Generic Helpers (top‑level & subkey)"
 
         /// <summary>
-        /// Internal helper that attempts to extract a value of type <typeparamref name="T"/> from a top-level JSON key.
+        /// Generic internal helper that attempts to extract value from a top-level JSON key.
         /// </summary>
         /// <typeparam name="T">The expected return type.</typeparam>
         /// <param name="filePath">Path to the JSON file.</param>
@@ -257,7 +260,7 @@ namespace xyToolz
         }
 
         /// <summary>
-        /// Internal helper that attempts to extract a value of type <typeparamref name="T"/> from a nested key within a JSON object.
+        /// Generic internal helper that attempts to extract a value from a nested key within a JSON object.
         /// </summary>
         /// <typeparam name="T">The expected return type.</typeparam>
         /// <param name="filePath">Path to the JSON file.</param>
@@ -471,11 +474,13 @@ namespace xyToolz
 
 
         #endregion
-        
+
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// <summary>
         /// Returns the first line, last line, and full joined content from a text file.
         /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public static async Task<(string First, string Last, string Full)> GetFirstAndLastLinesAsync(string filePath)
         {
             try

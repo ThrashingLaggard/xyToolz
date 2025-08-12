@@ -85,13 +85,11 @@ namespace xyToolz.Logging.Models
         /// Serialize per System.Xml.Serialization
         /// </summary>
         /// <returns></returns>
-        public string ToXml()
-        {
-            XmlSerializer serializer = new(typeof(xyDefaultLogEntry));
-            using StringWriter writer = new();
-            serializer.Serialize(writer, this);
-            return writer.ToString();
-        }
+        public string ToXml()   =>  xyXml.ToXML<xyDefaultLogEntry>(this);
+   
+
+      
+
 
         /// <summary>
         /// Deserialize a xml string into an instance of xyLogEntry
@@ -111,6 +109,10 @@ namespace xyToolz.Logging.Models
             } ;
         }
 
+
+        
+
+        // ###################################################################################
 
         /// <summary>
         /// Method from ISerializable
@@ -136,7 +138,6 @@ namespace xyToolz.Logging.Models
             info.AddValue(nameof(Message), Message);
             info.AddValue(nameof(Exception), Exception?.ToString()); // Optional: Sie können auch die Exception-Details speichern
         }
-
 
         /// <summary>
         /// Get relevant information for the streaming context
@@ -179,4 +180,7 @@ namespace xyToolz.Logging.Models
         }
 
     }
+
+
+
 }
