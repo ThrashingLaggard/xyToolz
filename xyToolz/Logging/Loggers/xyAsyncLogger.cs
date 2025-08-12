@@ -62,6 +62,7 @@ namespace xyToolz.Logging.Loggers
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="level"></param>
+        /// <param name="message">Optional: additional informationen</param>
         /// <param name="callerName"></param>
         public void ExLog(Exception ex, LogLevel level, string? message = null, [CallerMemberName] string? callerName = null)
         {

@@ -303,18 +303,14 @@ namespace xyToolz.Logging.Helper
         public string EntryNotRemoved([MaybeNull] string? name = null) => name == null ? $"Failed to remove target from DB-Context!" : $"Failed to remove {name} from DB-Context!";
 
 
-        /// <summary>
-        /// Context saved the changes
-        /// </summary>
-        /// <returns></returns>
-        public string ContextSaved() => $"Target DB-Context was saved successfully!";
+
         /// <summary>
         /// Context saved [...] changes
         /// </summary>
         /// <param name="name"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public string ContextSaved(string name, int count) => $" All {count} changes in {name} have been saved successfully!";
+        public string ContextSaved(string name, int count) => ( name is null && string.IsNullOrEmpty(count+"") )? $"Target DB-Context was saved successfully!" : $"All {count} changes in {name} have been saved successfully!";
         /// <summary>
         /// Context didnt save
         /// </summary>

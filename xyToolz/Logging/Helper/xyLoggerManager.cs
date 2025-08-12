@@ -11,7 +11,7 @@ using xyToolz.Logging.Interfaces;
 namespace xyToolz.Logging.Helper
 {
     /// <summary>
-    /// Manages a collection of loggers and provides methods for logging messages and exceptions.
+    /// Manages a collection of loggers (ILogging) and provides methods for logging messages and exceptions.
     /// 
     ///                                                                                                                                                                                     Stuff for Eventhandlers is planned!
     /// </summary>
