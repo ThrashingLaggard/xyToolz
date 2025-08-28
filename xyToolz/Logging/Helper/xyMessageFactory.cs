@@ -375,7 +375,7 @@ namespace xyToolz.Logging.Helper
 
 
         #region "Network"
-        public string NetworkUnavailable(string? host = null) =>  host is null? "Network unavailable!!!": $"Network unavailable for host '{host}'!!!";
+        public string NetworkUnavailable(string? host = null) =>  host is null? "Target network is unavailable!!!": $"Network unavailable for host '{host}'!!!";
 
         public string TimeoutOccurred(string? operation = null) =>operation is null? "A network timeout occurred!!!": $"A timeout occurred while performing '{operation}'!!!";
 
