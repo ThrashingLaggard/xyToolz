@@ -1,5 +1,0 @@
-### xyAvalonia Workflow in bash
-
-
- ./generate-workflow.sh xyAvalonia xyToolz/xyavalonia XYAVALONIA_API_KEY
-

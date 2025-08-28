@@ -28,6 +28,10 @@ namespace xyToolz.Logging.Helper
         /// <returns></returns>
         public string EmptyList(string? nameOfTheList = null) => nameOfTheList== null? "The target list is empty! Please check recent operations and logs!":$"{nameOfTheList} is EMPTY!";
         
+
+        #endregion
+
+        #region "Database"
         /// <summary>
         /// No connection string found in config
         /// </summary>
@@ -35,9 +39,24 @@ namespace xyToolz.Logging.Helper
         /// <returns></returns>
         public string ConnectionStringNotFound(string? name = null) => name is null? $"No connection string found, unable to connect to database!!!" :  $"No connection string found for {name}, unable to connect to the target database!!!";
 
+        public string DatabaseConnectionFailed(string? dbName = null) => dbName is null? "Database connection failed!!!": $"Database connection to '{dbName}' failed!!!";
+
+        public string DatabaseQueryError(string? query = null) => query is null? "Database query execution failed!!!": $"Database query execution failed for query: {query}";
+
         #endregion
 
 
+        #region "ModelState"
+
+        public string ModelUnvalidated(string? modelName = null) => modelName is null? $"Model validation has not been performed yet!": $"Model '{modelName}' validation has not been performed yet!";
+
+            public string ModelValid(string? modelName = null) => modelName is null ? $"Model is valid.": $"Model '{modelName}' is valid.";
+
+            public string ModelInvalid(string? modelName = null) => modelName is null ? $"Model validation failed! Invalid model state.": $"Model '{modelName}' validation failed! Invalid state.";
+
+            public string ModelSkipped(string? modelName = null) =>modelName is null? $"Model validation has been skipped.": $"Model '{modelName}' validation has been skipped.";
+
+        #endregion
 
 
 
@@ -348,14 +367,63 @@ namespace xyToolz.Logging.Helper
         /// Token generation failed
         /// </summary>
         /// <returns></returns>
-        public string TokenNotGenerated() => "Critical Failure in the token generation process!"; 
-        
-        #endregion
+        public string TokenNotGenerated() => "Critical Failure in the token generation process!";
+
+        public string TokenExpired(string? tokenId = null) => tokenId is null? "Authentication token has expired!!!" : $"Authentication token '{tokenId}' has expired!!!";
 
         #endregion
 
 
+        #region "Network"
+        public string NetworkUnavailable(string? host = null) =>  host is null? "Network unavailable!!!": $"Network unavailable for host '{host}'!!!";
+
+        public string TimeoutOccurred(string? operation = null) =>operation is null? "A network timeout occurred!!!": $"A timeout occurred while performing '{operation}'!!!";
+
+        public string HostUnreachable(string? host = null) =>host is null? "Host unreachable!!!" : $"Host '{host}' is unreachable!!!";
+
+        #endregion
+
+        #region "File Operations"
+        public string FileNotFound(string? file = null) =>file is null? "File not found!!!": $"File '{file}' not found!!!";
+
+        public string FileAccessDenied(string? file = null) =>file is null? "File access denied!!!": $"Access denied for file '{file}'!!!";
+
+        public string FileReadError(string? file = null) =>file is null? "File read error!!!": $"Error while reading file '{file}'!!!";
+        #endregion
 
 
+        #region "User Messages"
+        public string UserNotFound(string? user = null) =>user is null? "User not found!!!": $"User '{user}' not found!!!";
+
+        public string UserAlreadyExists(string? user = null) =>user is null? "User already exists!!!": $"User '{user}' already exists!!!";
+
+        public string UserLockedOut(string? user = null) =>user is null? "User account is locked out!!!": $"User '{user}' is locked out!!!";
+        #endregion
+
+
+        #region "Security Messages"
+        public string EncryptionFailed(string? target = null) => target is null? "Encryption failed!!!": $"Encryption failed for '{target}'!!!";
+
+        public string DecryptionFailed(string? target = null) =>target is null? "Decryption failed!!!": $"Decryption failed for '{target}'!!!";
+
+        public string InvalidCertificate(string? cert = null) =>cert is null? "Invalid certificate detected!!!": $"Invalid certificate '{cert}' detected!!!";
+        #endregion
+
+
+        #region "System Messages"
+        public string OperationFailed(string? operation = null) =>operation is null? "Operation failed!!!": $"Operation '{operation}' failed!!!";
+
+        public string ConfigurationError(string? config = null) =>config is null? "Configuration error detected!!!": $"Configuration error detected for '{config}'!!!";
+
+        public string UnknownError(string? details = null) =>details is null? "An unknown error occurred!!!": $"An unknown error occurred: {details}";
+        #endregion
+
+
+    #endregion
     }
+
+
+
+
 }
+
