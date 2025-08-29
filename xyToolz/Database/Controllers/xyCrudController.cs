@@ -8,7 +8,7 @@
 
                                                                                                                                                                             // Sample for a generic API Crud controller
 
-//namespace xyToolz.Database.Controllers
+namespace xyToolz.Database.Controllers;
 //{
 //    [Authorize]
 //    [Route("api/[controller]")]

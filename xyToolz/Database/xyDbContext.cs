@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using xyToolz.Helper.Logging;
 
-namespace xyToolz.Database
+namespace xyToolz.Database.Basix
 {
     /// <summary>
     ///  A generic DbContext class providing common functionality for managing entities.
