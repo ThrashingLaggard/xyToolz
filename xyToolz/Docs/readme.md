@@ -1,12 +1,12 @@
 # xyToolz
 
-**xyToolz** is the core utility library of the xyToolz suite. It offers reusable, modular helper classes for developers working with .NET. The focus lies on simplifying common tasks like logging, file operations, encryption, JSON handling, and data conversion.
+**xyToolz** is the core utility library of the xy Empire. It offers reusable, modular helper classes for developers working with .NET. 
+The focus lies on simplifying common tasks like logging, file operations, de-/encryption, JSON handling, and much more.
 
----
 
-## 🔍 Overview
+## Overview
 
-This project contains the foundation of the xyToolz ecosystem. It can be used independently or embedded into other xyToolz modules (such as xyPorts or xyAndroid).
+This project contains the foundation of the xy ecosystem. It can be used independently or embedded into other xy modules (i.e. xyPorts or xyAndroid).
 
 ---
 

@@ -4,21 +4,23 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PackageVersion>1.0.62</PackageVersion>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
 		<Nullable>enable</Nullable>
 		<SignAssembly>False</SignAssembly>
 		<Title>xyToolZ</Title>
 		<Company></Company>
 		<Authors>ThrashingLaggard</Authors>
 		<Description>
-			Little toolz to save some precious seconds with my doggo.
-			Providing helper classes and utilities for common development tasks, including:
-			file handling, 
-			logging, 
-			encryption, 
-			JSON processing,
-			PDF manipulation, 
-			browser automation,
-			and other QOL stuff
+		Little toolz to save some precious seconds with my doggo.
+		Providing helper classes and utility stuff:
+		
+		file handling, 
+		logging, 
+		encryption, 
+		JSON processing,
+		PDF manipulation, 
+		browser automation,
+		and other QOL stuff
 
 
 		</Description>
@@ -51,7 +53,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="readme.md">
+		<None Include="Docs\readme.md" Pack="true" PackagePath="\"/>
+		 <None Update="Docs\readme.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
