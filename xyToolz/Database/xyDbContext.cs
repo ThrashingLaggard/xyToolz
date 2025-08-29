@@ -144,7 +144,7 @@ namespace xyToolz.Database
         {
             try
             {
-                String appFolder = xyDirUtils.GetInnerApplicationFolder();
+                String appFolder = xyDirectoryHelper.GetInnerApplicationFolder();
                 xyLog.Log(PathForDB = Path.Join(appFolder, pathDB));
             }
             catch (Exception ex)
