@@ -344,7 +344,19 @@ namespace xyToolz.Logging.Helper
 
 
         #region "Key & Token Handling"
-        
+        /// <summary>
+        /// Successfully managed to set the value of the target key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public string KeySet(string? key = null) => key == null ? "Set target value successfully!" : $"Set target value successfully for the key {key}!";
+        /// <summary>
+        /// Failed to set the value of the target key to the target value
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public string KeyNotSet(string? key = null) => key == null ? "Failed to set target value!" : $"Failed to set target value for the key {key}!";
+
         /// <summary>
         /// Key found
         /// </summary>
