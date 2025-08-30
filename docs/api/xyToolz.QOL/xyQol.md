@@ -1,20 +1,20 @@
 # class xyQol
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.QOL`  
 Visibility: `public`  
-Source: `xyToolz\xyQol.cs`
+Source: `xyToolz\QOL\xyQol.cs`
 
 ## Description:
 
 (No XML‑Summary )
 
-## Konstruktoren
+## Constructors
 
 - `xyQol(xyLoggerManager log_, xyMessageFactory fac_)` — `public`
   
   (No XML‑Summary )
 
-## Methoden
+## Methods
 
 - `Dictionary<TKey, TValue> GetPropertyValuesForTarget<TKey, TValue, T>(T obj)` — `public`
   
@@ -32,4 +32,13 @@ Source: `xyToolz\xyQol.cs`
   
   /// Create an instance of whatever the dictionary holds
         ///
+
+## Fields
+
+- `xyLoggerManager _log` — `private readonly`
+  
+  (No XML‑Summary )
+- `xyMessageFactory _fac` — `private readonly`
+  
+  (No XML‑Summary )
 

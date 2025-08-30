@@ -11,14 +11,14 @@ Source: `xyToolz\Database\xyDBContext.cs`
     ///  Can be used as a base class for specific database contexts.
     ///
 
-## Konstruktoren
+## Constructors
 
 - `xyDBContext(DbContextOptions options)` — `public`
   
   /// Initializes a new instance of the  class.
         ///
 
-## Eigenschaften
+## Properties
 
 - `DbSet<object> Entities{ get; set; }` — `public`
   
@@ -30,7 +30,7 @@ Source: `xyToolz\Database\xyDBContext.cs`
   
   (No XML‑Summary )
 
-## Methoden
+## Methods
 
 - `DbSet<T> GetDbSet<T>()` — `public`
   
@@ -51,6 +51,10 @@ Source: `xyToolz\Database\xyDBContext.cs`
 - `void AddEntity<T>(T entity)` — `public`
   
   /// Adds the given entity to the context.
+        ///
+- `void ApplyAllConfigurations(ModelBuilder modelBuilder)` — `private`
+  
+  /// Applies configurations for all entity types in the assembly.
         ///
 - `void OnModelCreating(ModelBuilder modelBuilder)` — `protected override`
   

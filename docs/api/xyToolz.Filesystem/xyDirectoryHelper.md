@@ -1,16 +1,16 @@
 # class xyDirectoryHelper
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.Filesystem`  
 Visibility: `public static`  
 Attribute: `System.Diagnostics.CodeAnalysis.SuppressMessage`  
-Source: `xyToolz\xyDirectoryHelper.cs`
+Source: `xyToolz\Filesystem\xyDirectoryHelper.cs`
 
 ## Description:
 
 /// Directory helpers
     ///
 
-## Methoden
+## Methods
 
 - `bool DeleteFolder(string folderPath)` — `public static`
   
@@ -44,7 +44,7 @@ Source: `xyToolz\xyDirectoryHelper.cs`
   
   /// While debugging in C# use this to get the app directory
         ///
-- `String GetSolutionFolder()` — `public static`
+- `string GetSolutionFolder()` — `public static`
   
   /// Get the full path of the directory containing this programs     .sln    file
         ///

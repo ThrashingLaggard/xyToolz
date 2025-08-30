@@ -11,14 +11,14 @@ Source: `xyToolz\Logging\Helper\xyLoggerManager.cs`
     ///                                                                                                                                                                                     Stuff for Eventhandlers is planned!
     ///
 
-## Konstruktoren
+## Constructors
 
 - `xyLoggerManager()` — `public`
   
   /// 
         ///
 
-## Eigenschaften
+## Properties
 
 - `string Description{ get; set; }` — `public`
   
@@ -28,8 +28,11 @@ Source: `xyToolz\Logging\Helper\xyLoggerManager.cs`
   
   (No XML‑Summary )
 
-## Methoden
+## Methods
 
+- `string OutputMissingLogger(ILogging logger)` — `private`
+  
+  (No XML‑Summary )
 - `void ExLog(Exception ex, LogLevel level = LogLevel.Error)` — `public`
   
   /// Logs the specified exception at the given log level using all registered loggers.
@@ -46,4 +49,10 @@ Source: `xyToolz\Logging\Helper\xyLoggerManager.cs`
   
   /// Unregisters the specified logger from the logging system.
         ///
+
+## Fields
+
+- `IEnumerable<ILogging> _loggers` — `private readonly`
+  
+  (No XML‑Summary )
 

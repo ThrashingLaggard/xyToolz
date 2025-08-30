@@ -1,8 +1,8 @@
 # class xyJson
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.Serialization`  
 Visibility: `public`  
-Source: `xyToolz\xyJson.cs`
+Source: `xyToolz\Serialization\xyJson.cs`
 
 ## Description:
 
@@ -57,8 +57,12 @@ Related:
     /// 
     ///
 
-## Methoden
+## Methods
 
+- `string AddRootTag(string content)` — `private static`
+  
+  /// Adds surrounding braces to content to ensure JSON root structure.
+        ///
 - `Task AddOrUpdateEntry<T>(string path, string key, T value)` — `public static async`
   
   /// Adds or updates a key-value pair in a JSON file.
@@ -112,6 +116,10 @@ Related:
   
   /// Extracts a raw JToken from the given key.
         ///
+- `Task<JToken?> GetJTokenFromSubkey(string filePath, string key, string subkey)` — `private static async`
+  
+  /// Tries to access a nested subkey inside a top-level key and returns its value.
+        ///
 - `Task<object?> DeserializeFromKey(string filePath, string key)` — `public static async`
   
   /// Reads the value from a single key from the JSON file and returns it as an object.
@@ -127,6 +135,14 @@ Related:
 - `Task<string> TestGetStringFromJsonFile(string path, string key)` — `public static`
   
   (No XML‑Summary )
+- `Task<T?> TryDeserializeKey<T>(string filePath, string key)` — `private static async`
+  
+  /// Generic internal helper that attempts to extract value from a top-level JSON key.
+        ///
+- `Task<T?> TryDeserializeSubkey<T>(string filePath, string key, string subkey)` — `private static async`
+  
+  /// Generic internal helper that attempts to extract a value from a nested key within a JSON object.
+        ///
 - `void OverrideForTests(IxyJson mocked)` — `public static`
   
   (No XML‑Summary )
@@ -134,8 +150,11 @@ Related:
   
   (No XML‑Summary )
 
-## Felder
+## Fields
 
+- `IxyJson? _override` — `private static`
+  
+  (No XML‑Summary )
 - `JsonSerializerOptions defaultJsonOptions` — `internal static readonly`
   
   /// JSON serialization settings for consistent formatting and behavior.

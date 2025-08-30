@@ -1,15 +1,15 @@
 # class xyPdf
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.PDF`  
 Visibility: `public`  
-Source: `xyToolz\xyPdf.cs`
+Source: `xyToolz\PDF\xyPdf.cs`
 
 ## Description:
 
 /// QOL stuff for handling pdf files
     ///
 
-## Methoden
+## Methods
 
 - `bool CombineAllInDirectory(string directory)` — `public static`
   
@@ -55,5 +55,9 @@ Source: `xyToolz\xyPdf.cs`
 - `PdfDocument OpenDoc(string filepath)` — `public static`
   
   /// creates an internal PDF_Document from the specified file  -  requires said file to be .pdf
+        ///
+- `void CopyPagesToTarget(PdfDocument sourceDoc, PdfDocument targetDoc)` — `private static`
+  
+  /// Copies pages from a source document to a target document and appends them.
         ///
 

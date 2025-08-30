@@ -9,3 +9,10 @@ Source: `xyToolz\Logging\Interfaces\IExceptionFormatter.cs`
 /// Interface for Exception-Formatters
     ///
 
+## Methods
+
+- `string FormatExceptionDetails(Exception ex, LogLevel level, string? message = null, string? callerName = null)`
+  
+  /// Format Exception details
+        ///
+

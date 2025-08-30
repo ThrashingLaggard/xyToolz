@@ -1,21 +1,21 @@
 # class xyPath
 
-Namespace: `xyToolz.Helper`  
+Namespace: `xyToolz.Filesystem`  
 Visibility: `public static`  
 Attribute: `System.Diagnostics.CodeAnalysis.SuppressMessage`  
-Source: `xyToolz\xyPath.cs`
+Source: `xyToolz\Filesystem\xyPath.cs`
 
 ## Description:
 
 (No XML‑Summary )
 
-## Eigenschaften
+## Properties
 
 - `string BasePath{ get; }` — `public static`
   
   (No XML‑Summary )
 
-## Methoden
+## Methods
 
 - `string Combine(params string[] paths)` — `public static`
   

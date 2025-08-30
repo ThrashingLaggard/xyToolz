@@ -1,4 +1,4 @@
-# Projektstruktur
+# Project structure 
 
 └─xyToolz/
   ├─.github/
@@ -10,17 +10,9 @@
   │   ├─_global_/
   │   └─Program.md
   │   ├─xyToolz/
-  │   ├─xy.md
-  │   ├─xyColQol.md
-  │   ├─xyConversion.md
-  │   ├─xyDataProtector.md
-  │   ├─xyDirectoryHelper.md
-  │   ├─xyFiles.md
-  │   ├─xyJson.md
-  │   ├─xyPdf.md
-  │   ├─xyQol.md
-  │   ├─xyRsa.md
-  │   └─xyXml.md
+  │   └─xyConversion.md
+  │   ├─xyToolz_Exec.Properties/
+  │   └─Resources.md
   │   ├─xyToolz.Database.Basix/
   │   ├─xyBaseModel.md
   │   ├─xyBasicModel.md
@@ -34,8 +26,12 @@
   │   └─xyCrudRepo_T_.md
   │   ├─xyToolz.Database.Services/
   │   └─xyCrudService_T_.md
-  │   ├─xyToolz.Helper/
-  │   ├─xyHasher.md
+  │   ├─xyToolz.Driver/
+  │   ├─xyWebDriver.BrowserDriver.md
+  │   └─xyWebDriver.md
+  │   ├─xyToolz.Filesystem/
+  │   ├─xyDirectoryHelper.md
+  │   ├─xyFiles.md
   │   └─xyPath.md
   │   ├─xyToolz.Helper.Interfaces/
   │   ├─IxyDataProtector.md
@@ -43,13 +39,16 @@
   │   └─IxyJson.md
   │   ├─xyToolz.Helper.Logging/
   │   ├─xyLog.md
+  │   ├─xyLogArchiver.md
   │   ├─xyLogFormatter.md
-  │   └─xyStaticMsgFactory.md
+  │   └─xyLogTargets.md
   │   ├─xyToolz.List/
-  │   └─xyList_T_.md
+  │   ├─xyList_T_.md
+  │   └─xyListWrapper.md
   │   ├─xyToolz.Logging.Helper/
   │   ├─xyLoggerManager.md
-  │   └─xyMessageFactory.md
+  │   ├─xyMessageFactory.md
+  │   └─xyStaticMsgFactory.md
   │   ├─xyToolz.Logging.Helper.Formatters/
   │   ├─xyDefaultExceptionEntryFormatter.md
   │   ├─xyDefaultExceptionFormatter.md
@@ -66,9 +65,23 @@
   │   ├─xyAsyncLogger_T_.md
   │   ├─xyConsoleLogger_T_.md
   │   └─xyILoggerAdapter_T_.md
-  │   └─xyToolz.Logging.Models/
+  │   ├─xyToolz.Logging.Models/
   │   ├─xyDefaultLogEntry.md
   │   └─xyExceptionEntry.md
+  │   ├─xyToolz.PDF/
+  │   ├─xyCard.md
+  │   └─xyPdf.md
+  │   ├─xyToolz.QOL/
+  │   ├─xy.md
+  │   ├─xyColQol.md
+  │   └─xyQol.md
+  │   ├─xyToolz.Security/
+  │   ├─xyDataProtector.md
+  │   ├─xyHasher.md
+  │   └─xyRsa.md
+  │   └─xyToolz.Serialization/
+  │   ├─xyJson.md
+  │   └─xyXml.md
   │ └─INDEX.md
   ├─source/
   ├─xyToolz/
@@ -87,7 +100,16 @@
   │ ├─xyBaseModel.cs
   │ └─xyDBContext.cs
   │ ├─Docs/
-  │ └─readme.md
+  │ ├─PdfSharp_License.txt
+  │ ├─readme.md
+  │ ├─ShellCommands.txt
+  │ └─TODO.txt
+  │ ├─Driver/
+  │ └─xyWebDriver.cs
+  │ ├─Filesystem/
+  │ ├─xyDirectoryHelper.cs
+  │ ├─xyFiles.cs
+  │ └─xyPath.cs
   │ ├─List/
   │ ├─xyList.cs
   │ └─xyListWrapper.cs
@@ -113,41 +135,40 @@
   │ │ └─xyILoggerAdapter.cs
   │ │ ├─Models/
   │ │ ├─xyDefaultLogEntry.cs
-  │ │ ├─xyExceptionEntry.cs
-  │ │ └─xyXml.cs
+  │ │ └─xyExceptionEntry.cs
   │ │ └─Static Logging Stuff/
   │ │ ├─xyLog.cs
   │ │ ├─xyLogArchiver.cs
   │ │ ├─xyLogFormatter.cs
   │ │ ├─xyLogTargets.cs
   │ │ └─xyStaticMsgFactory.cs
+  │ ├─PDF/
+  │ ├─xyCard.cs
+  │ └─xyPdf.cs
+  │ ├─QOL/
+  │ ├─xy.cs
+  │ ├─xyColQol.cs
+  │ └─xyQol.cs
   │ ├─READMEs/
   │ ├─README_xyLog.md
   │ ├─README_xyRsa.md
   │ ├─xyDataProtectionHelper_README.md
   │ ├─xyFiles_Documentation.md
   │ └─xyJson_Documentation.md
+  │ ├─Security/
+  │ ├─xyDataProtector.cs
+  │ ├─xyHasher.cs
+  │ └─xyRsa.cs
+  │ ├─Serialization/
+  │ ├─xyJson.cs
+  │ └─xyXml.cs
   │ └─xUnit Test-Interfaces/
   │ ├─IxyDataProtector.cs
   │ ├─IxyFiles.cs
   │ └─IxyJson.cs
   ├─GlobalSuppressions.cs
-  ├─PdfSharp_License.txt
-  ├─xy.cs
-  ├─xyCard.cs
-  ├─xyColQol.cs
   ├─xyConversion.cs
-  ├─xyDataProtector.cs
-  ├─xyDirectoryHelper.cs
-  ├─xyFiles.cs
-  ├─xyHasher.cs
-  ├─xyJson.cs
-  ├─xyPath.cs
-  ├─xyPdf.cs
-  ├─xyQol.cs
-  ├─xyRsa.cs
-  ├─xyToolz.csproj
-  └─xyWebDriver.cs
+  └─xyToolz.csproj
   └─xyToolz_Exec/
     └─Properties/
     ├─Resources.Designer.cs
@@ -163,6 +184,5 @@
 ├─CONTRIBUTIONS.md
 ├─generate-workflow.sh
 ├─LICENSE.txt
-├─ReadMe.md
 ├─SECURITY.md
 └─xyToolz.sln

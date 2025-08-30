@@ -1,8 +1,8 @@
 # class xyHasher
 
-Namespace: `xyToolz.Helper`  
+Namespace: `xyToolz.Security`  
 Visibility: `public static`  
-Source: `xyToolz\xyHasher.cs`
+Source: `xyToolz\Security\xyHasher.cs`
 
 ## Description:
 
@@ -52,7 +52,7 @@ Example Usage:
     /// 
     ///
 
-## Methoden
+## Methods
 
 - `bool VerifyPassword(HashAlgorithmName hashAlgorithm, byte[] hash1, byte[] hash2)` — `public static`
   
@@ -100,6 +100,10 @@ Example Usage:
   
   /// Returns a derived key (hash) as a byte array using PBKDF2 and the given hash algorithm.
         ///
+- `int SetKeySize(HashAlgorithmName algorithm)` — `private static`
+  
+  /// Determines the key size in bytes based on the specified hash algorithm.
+        ///
 - `string BuildSaltedHash(HashAlgorithmName hashAlgorithm, string password, out byte[] salt)` — `public static`
   
   /// Builds a combined salt and Base64-encoded password hash string in the format "salt:hash".
@@ -116,8 +120,12 @@ Example Usage:
   
   /// Returns a Base64-encoded hash string created with PBKDF2 from the provided password and salt.
         ///
+- `string PepperPassword(string password)` — `private static`
+  
+  /// Appends the configured pepper to the password to increase entropy.
+        ///
 
-## Felder
+## Fields
 
 - `int Iterations` — `public static readonly`
   
@@ -130,5 +138,17 @@ Example Usage:
 - `int KeyLength512` — `public static readonly`
   
   /// Key length in bytes for SHA512-based hashes.
+        ///
+- `string Pepper` — `private static readonly`
+  
+  /// The configured pepper value, loaded from environment variable or defaults to "Ahuhu".
+        ///
+- `string PepperEnvVarName` — `private const`
+  
+  /// Name of the environment variable used to retrieve the pepper value.
+        ///
+- `string Separator` — `private const`
+  
+  /// Separator used between salt and hash when combining to a single string.
         ///
 

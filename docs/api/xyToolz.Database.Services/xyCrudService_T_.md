@@ -10,7 +10,7 @@ Source: `xyToolz\Database\Services\xyCrudService.cs`
 /// The logic surrounding the CrudRepository
     ///
 
-## Methoden
+## Methods
 
 - `Task<bool> Create(T entity, [CallerMemberName] string? callerName = null)` — `public`
   
@@ -39,5 +39,12 @@ Source: `xyToolz\Database\Services\xyCrudService.cs`
 - `Task<T?> Read(int id, [CallerMemberName] string? callerName = null)` — `public`
   
   /// Calls Read(id) from CRUD-Repo
+        ///
+
+## Fields
+
+- `xyCrudRepo<T> _crudRepository` — `private readonly`
+  
+  /// Providing access to the target DB
         ///
 

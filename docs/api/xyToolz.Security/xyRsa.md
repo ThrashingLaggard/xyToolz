@@ -1,8 +1,8 @@
 # class xyRsa
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.Security`  
 Visibility: `public static`  
-Source: `xyToolz\xyRsa.cs`
+Source: `xyToolz\Security\xyRsa.cs`
 
 ## Description:
 
@@ -39,7 +39,7 @@ Example Usage:
     /// 
     ///
 
-## Methoden
+## Methods
 
 - `Task<bool> ConfigureAsync(string issuer, string audience)` — `public static async`
   
@@ -61,4 +61,19 @@ Example Usage:
   
   /// Exports the configured public RSA key as a PEM-formatted string.
         ///
+
+## Fields
+
+- `RSA? _privateRsaKey` — `private static`
+  
+  (No XML‑Summary )
+- `RSA? _publicRsaKey` — `private static`
+  
+  (No XML‑Summary )
+- `string? _audience` — `private static`
+  
+  (No XML‑Summary )
+- `string? _issuer` — `private static`
+  
+  (No XML‑Summary )
 

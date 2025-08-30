@@ -10,7 +10,7 @@ Source: `xyToolz\Logging\Helper\Formatters\xyDefaultLogEntryFormatter.cs`
 /// Used to store log messages and exceptions in LogEntries or get the data out of them
     ///
 
-## Methoden
+## Methods
 
 - `string UnpackAndFormatFromEntity(T entry_, string? callerName = null, LogLevel? level_ = LogLevel.Debug)` — `public`
   

@@ -13,14 +13,14 @@ Source: `xyToolz\Logging\Helper\xyMessageFactory.cs`
     /// Really nice, lol
     ///
 
-## Eigenschaften
+## Properties
 
 - `string[]? Description{ get; set; }` — `public`
   
   /// Add usefull information
         ///
 
-## Methoden
+## Methods
 
 - `string ConfigurationError(string? config = null)` — `public`
   

@@ -77,7 +77,7 @@ Example Usage:
     /// 
     ///
 
-## Methoden
+## Methods
 
 - `bool WriteExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)` — `public static`
   
@@ -90,6 +90,10 @@ Example Usage:
 - `IEnumerable<xyLogTargets> SetLogTargets(ushort[] logTargets)` — `internal static`
   
   /// Converts raw integer targets into the xyLogTargets enum.
+        ///
+- `string FormatEx(Exception ex, LogLevel level, string? message = null, string? callerName = null)` — `private static`
+  
+  /// Formats the Exception´s details for consistent logging.
         ///
 - `string FormatMsg(string message, string? callerName = null, LogLevel? level = null)` — `public static`
   
@@ -122,6 +126,10 @@ Example Usage:
   
   /// Execute "a function" with one main return value with logging BUT ASYNC
         ///
+- `void CheckFileSizeAndMoveLogsToArchiveWhenTooBig()` — `private static`
+  
+  /// Checks the filesize for both logtypes and archives the logs if they get "too big"
+        ///
 - `void ExLog(Exception ex, LogLevel level = LogLevel.Error, string? message = null, [CallerMemberName] string? callerName = null)` — `public static`
   
   /// Logs details of an exception synchronously.
@@ -138,6 +146,10 @@ Example Usage:
   
   /// Helper method to manually trigger the LogMessageSent event.
         ///
+- `void Output(string formattedMessage, string? callerName)` — `private static`
+  
+  /// Centralized method for printing log messages to console and firing events.
+        ///
 
 ## Events
 
@@ -149,4 +161,22 @@ Example Usage:
   
   /// Event triggered when a standard log message is sent.
         ///
+
+## Fields
+
+- `long _maxLogFileSize` — `private static readonly`
+  
+  (No XML‑Summary )
+- `object _threadSafetyLock` — `private static readonly`
+  
+  (No XML‑Summary )
+- `string _exLogFilePath` — `private static readonly`
+  
+  (No XML‑Summary )
+- `string _logFilePath` — `private static readonly`
+  
+  (No XML‑Summary )
+- `xyLogArchiver _archiver` — `private readonly static`
+  
+  (No XML‑Summary )
 

@@ -10,7 +10,7 @@ Source: `xyToolz\Logging\Helper\Formatters\xyDefaultExceptionFormatter.cs`
 /// Format exceptions for structured logging
     ///
 
-## Methoden
+## Methods
 
 - `string FormatExceptionDetails(Exception ex, LogLevel level, string? message = null,string? callerName = null)` — `public`
   

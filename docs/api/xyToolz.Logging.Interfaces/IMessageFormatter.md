@@ -9,3 +9,10 @@ Source: `xyToolz\Logging\Interfaces\IMessageFormatter.cs`
 /// Interface for Message-Formatters
     ///
 
+## Methods
+
+- `string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)`
+  
+  /// Format log message
+        ///
+

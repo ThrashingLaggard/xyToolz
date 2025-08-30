@@ -1,8 +1,8 @@
 # class xyFiles
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.Filesystem`  
 Visibility: `public static`  
-Source: `xyToolz\xyFiles.cs`
+Source: `xyToolz\Filesystem\xyFiles.cs`
 
 ## Description:
 
@@ -10,7 +10,7 @@ Source: `xyToolz\xyFiles.cs`
     /// and validating files or folders across supported platforms.
     ///
 
-## Methoden
+## Methods
 
 - `bool CheckForDirectories(string[] directories)` — `public static`
   
@@ -27,6 +27,10 @@ Source: `xyToolz\xyFiles.cs`
 - `IEnumerable<string> InventoryNames(string path)` — `public static`
   
   /// Returns a list of full file names (paths) from the specified directory.
+        ///
+- `string EnsureDirectory(string dir)` — `private static`
+  
+  /// Resolves and returns a platform-correct path to a directory, ensuring compatibility.
         ///
 - `Task<bool> EnsurePathExistsAsync(string filePath)` — `public static async`
   
@@ -82,6 +86,15 @@ Source: `xyToolz\xyFiles.cs`
   
   (No XML‑Summary )
 - `void ResetOverride()` — `public static`
+  
+  (No XML‑Summary )
+
+## Fields
+
+- `IxyFiles? _override` — `private static`
+  
+  (No XML‑Summary )
+- `JsonSerializerOptions DefaultJsonOptions` — `private static readonly`
   
   (No XML‑Summary )
 

@@ -10,7 +10,7 @@ Source: `xyToolz\Logging\Helper\Formatters\xyMessageFormatter.cs`
 /// Default Log-Message Formatter
     ///
 
-## Methoden
+## Methods
 
 - `string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)` — `public`
   

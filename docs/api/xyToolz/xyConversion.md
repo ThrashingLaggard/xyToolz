@@ -9,7 +9,7 @@ Source: `xyToolz\xyConversion.cs`
 /// Hier könnte ihre Werbung stehen!
         ///
 
-## Methoden
+## Methods
 
 - `string Bin_to_Dec(string number)` — `public static`
   
@@ -51,4 +51,10 @@ Source: `xyToolz\xyConversion.cs`
   
   /// Convert any number into any system
             ///
+
+## Fields
+
+- `string endergebnis, endausgabe` — `private static`
+  
+  (No XML‑Summary )
 

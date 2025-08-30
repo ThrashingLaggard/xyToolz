@@ -49,7 +49,7 @@ Example Usage:
     /// 
     ///
 
-## Methoden
+## Methods
 
 - `string FormatExceptionAsJson(Exception ex)` — `public static`
   
@@ -73,4 +73,37 @@ Example Usage:
   
   /// Creates a log string summarizing a named operation and its execution duration.
         ///
+
+## Fields
+
+- `string AttachmentsLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string BodyLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string DurationLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string FromLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string HeaderLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string OperationLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string SenderLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string SubjectLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string TimestampLabel` — `private const`
+  
+  (No XML‑Summary )
+- `string ToLabel` — `private const`
+  
+  (No XML‑Summary )
 

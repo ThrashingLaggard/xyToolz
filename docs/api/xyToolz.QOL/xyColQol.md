@@ -1,8 +1,8 @@
 # class xyColQol
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.QOL`  
 Visibility: `public static`  
-Source: `xyToolz\xyColQol.cs`
+Source: `xyToolz\QOL\xyColQol.cs`
 
 ## Description:
 
@@ -19,7 +19,7 @@ Source: `xyToolz\xyColQol.cs`
       ///     
       ///
 
-## Methoden
+## Methods
 
 - `IEnumerable<int> FillEvenList( int limit )` — `public static`
   
@@ -30,6 +30,10 @@ Source: `xyToolz\xyColQol.cs`
 - `IEnumerable<int> FillTheList( int limit )` — `public static`
   
   (No XML‑Summary )
+- `IEnumerable<string> GetQuarterHours()` — `private static`
+  
+  /// Returns a list filled with all the quarters of an hour in the day
+            ///
 - `string Spill( IEnumerable values )` — `public static`
   
   /// Print the targets intestines on your favourite console

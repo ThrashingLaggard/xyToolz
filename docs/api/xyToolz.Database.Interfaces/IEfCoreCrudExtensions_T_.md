@@ -9,3 +9,9 @@ Source: `xyToolz\Database\Interfaces\IEfCoreCrudExtensions.cs`
 /// Providing EF Core extensions for IBaseCrud
     ///
 
+## Methods
+
+- `Task<EntityEntry> GetEntryByID(int id, [CallerMemberName] string? callerName = null)`
+  
+  (No XML‑Summary )
+

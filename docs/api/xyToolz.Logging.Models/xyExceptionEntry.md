@@ -8,13 +8,13 @@ Source: `xyToolz\Logging\Models\xyExceptionEntry.cs`
 
 (No XML‑Summary )
 
-## Konstruktoren
+## Constructors
 
 - `xyExceptionEntry(Exception exception_)` — `public`
   
   (No XML‑Summary )
 
-## Eigenschaften
+## Properties
 
 - `DateTime Timestamp{ get; init; }` — `public`
   

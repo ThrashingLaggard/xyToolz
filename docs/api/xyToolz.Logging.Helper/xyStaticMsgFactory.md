@@ -1,6 +1,6 @@
 # class xyStaticMsgFactory
 
-Namespace: `xyToolz.Helper.Logging`  
+Namespace: `xyToolz.Logging.Helper`  
 Visibility: `public static`  
 Source: `xyToolz\Logging\Static Logging Stuff\xyStaticMsgFactory.cs`
 
@@ -9,7 +9,7 @@ Source: `xyToolz\Logging\Static Logging Stuff\xyStaticMsgFactory.cs`
 ///  Providing reusable samples for logging
     ///
 
-## Methoden
+## Methods
 
 - `string ActionFailed(string description)` — `public static`
   

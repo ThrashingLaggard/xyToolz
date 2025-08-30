@@ -10,7 +10,7 @@ Source: `xyToolz\Logging\Helper\Formatters\xyDefaultLogFormatter.cs`
 /// Provides default formatting for log messages and exception details.
   ///
 
-## Methoden
+## Methods
 
 - `string FormatExceptionDetails(Exception ex, LogLevel level, string? message = null,string? callerName = null)` — `public`
   

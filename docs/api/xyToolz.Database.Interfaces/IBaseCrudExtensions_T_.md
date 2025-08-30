@@ -15,3 +15,14 @@ Source: `xyToolz\Database\Interfaces\IBaseCrudExtensions.cs`
     /// 
     ///
 
+## Methods
+
+- `Task<IEnumerable<T?>> GetAll([CallerMemberName] string? callerName = null)`
+  
+  /// Get all instances
+        ///
+- `Task<IEnumerable<T>> Pageineering(int page, int pageSize, [CallerMemberName] string? callerName = null)`
+  
+  /// Filter the entries to be shown
+        ///
+

@@ -11,7 +11,7 @@ Source: `xyToolz\Logging\Loggers\xyConsoleLogger.cs`
 /// Log formatted MESSAGES and EXCEPTIONS to the console    (currently discards LogEntries)
     ///
 
-## Konstruktoren
+## Constructors
 
 - `xyConsoleLogger( IMessageEntityFormatter<T> entFormatter_)` — `public`
   
@@ -30,11 +30,19 @@ Source: `xyToolz\Logging\Loggers\xyConsoleLogger.cs`
   /// 
             ///
 
-## Methoden
+## Methods
 
+- `string FormatEx(Exception ex, LogLevel level, out xyExceptionEntry excEntry, string? information = null,string? callerName = null)` — `private`
+  
+  /// Formats the Exception´s details for consistent logging.
+        ///
 - `string FormatFromEntity(T entry_, string? callerName = null, LogLevel? level = null)` — `public`
   
   /// Format a log entity into a message
+        ///
+- `string FormatMsg(string message, out xyDefaultLogEntry logEntry,DateTime? timestamp = null,uint? id = null,string? description = null, string? comment = null, string? callerName = null, LogLevel? level = LogLevel.Debug)` — `private`
+  
+  /// Formats a log message with optional caller information and log level.
         ///
 - `void ExLog(Exception ex, LogLevel level, string? message = null, [CallerMemberName] string? callerName = null)` — `public`
   
@@ -55,4 +63,19 @@ Source: `xyToolz\Logging\Loggers\xyConsoleLogger.cs`
   
   ///  Pack an Exception into an ExceptionEntry for easier serialization and storage
         ///
+
+## Fields
+
+- `IExceptionEntityFormatter? _excEntryFormatter` — `private readonly`
+  
+  (No XML‑Summary )
+- `IExceptionFormatter? _excFormatter` — `private readonly`
+  
+  (No XML‑Summary )
+- `IMessageEntityFormatter<T>? _logEntryFormatter` — `private readonly`
+  
+  (No XML‑Summary )
+- `IMessageFormatter? _msgFormatter` — `private readonly`
+  
+  (No XML‑Summary )
 

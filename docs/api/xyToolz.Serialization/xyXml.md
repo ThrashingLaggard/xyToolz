@@ -1,15 +1,15 @@
 # class xyXml
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.Serialization`  
 Visibility: `public static`  
-Source: `xyToolz\Logging\Models\xyXml.cs`
+Source: `xyToolz\Serialization\xyXml.cs`
 
 ## Description:
 
 /// Helper class to (de)serialize objects from and to XML
     ///
 
-## Methoden
+## Methods
 
 - `string ToXML<T>(T target)` — `public static`
   

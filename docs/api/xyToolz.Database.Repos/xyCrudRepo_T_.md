@@ -10,7 +10,7 @@ Source: `xyToolz\Database\Repos\xyCrudRepo.cs`
 /// Generic Repository for extended CRUD using EF Core
     ///
 
-## Methoden
+## Methods
 
 - `Task<bool> Create(T entity, [CallerMemberName] string? callerName = null)` — `public async`
   
@@ -39,5 +39,12 @@ Source: `xyToolz\Database\Repos\xyCrudRepo.cs`
 - `Task<T?> Read(int id, [CallerMemberName] string? callerName = null)` — `public async`
   
   /// Get the corresponding instance for the given id
+        ///
+
+## Fields
+
+- `dynamic _context` — `private readonly`
+  
+  /// Black magic to service incoming DB contexts
         ///
 

@@ -10,7 +10,7 @@ Source: `xyToolz\Logging\Models\xyDefaultLogEntry.cs`
 /// Bundled information for a log message
     ///
 
-## Eigenschaften
+## Properties
 
 - `DateTime Timestamp{ get; init; }` — `public required`
   
@@ -48,7 +48,7 @@ Source: `xyToolz\Logging\Models\xyDefaultLogEntry.cs`
   
   (No XML‑Summary )
 
-## Methoden
+## Methods
 
 - `string ToJson()` — `public`
   

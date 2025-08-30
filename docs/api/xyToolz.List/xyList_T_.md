@@ -10,7 +10,7 @@ Source: `xyToolz\List\xyList.cs`
     /// This can neither be used in async/await, iterators, interfaces nor in fields 
     ///
 
-## Konstruktoren
+## Constructors
 
 - `xyList(Span<T> initialBuffer_, uint expansionFactor_ )` — `public`
   
@@ -26,7 +26,7 @@ Source: `xyToolz\List\xyList.cs`
   /// Initialize a new instance of xyList with expansion factor
         ///
 
-## Eigenschaften
+## Properties
 
 - `int Capacity` — `public`
   
@@ -41,7 +41,7 @@ Source: `xyToolz\List\xyList.cs`
   /// Add useful information
         ///
 
-## Methoden
+## Methods
 
 - `bool IsEmpty()` — `public`
   
@@ -75,8 +75,12 @@ Source: `xyToolz\List\xyList.cs`
   /// Removes the element at the specified index from the collection.
         ///
 
-## Felder
+## Fields
 
+- `int _count` — `private`
+  
+  /// How many elements are in the span
+        ///
 - `Span<T> _viewPointerSpan` — `public`
   
   /// View/ Pointer
@@ -89,5 +93,9 @@ Source: `xyToolz\List\xyList.cs`
   /// Sitting on the heap
         /// Rented from the Array-Pool
         /// Ideal for JSON-Parsing, Network Communication or editing pictures
+        ///
+- `uint _factor` — `private`
+  
+  /// By how much do you want to multiply the size of reserved space in case of a resize
         ///
 

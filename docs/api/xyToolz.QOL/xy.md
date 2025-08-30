@@ -1,9 +1,9 @@
 # class xy
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.QOL`  
 Visibility: `public static`  
 Attribute: `System.Diagnostics.CodeAnalysis.SuppressMessage`  
-Source: `xyToolz\xy.cs`
+Source: `xyToolz\QOL\xy.cs`
 
 ## Description:
 
@@ -32,7 +32,7 @@ Source: `xyToolz\xy.cs`
     /// 
     ///
 
-## Methoden
+## Methods
 
 - `byte[] BaseToBytes(string base64)` — `public static`
   

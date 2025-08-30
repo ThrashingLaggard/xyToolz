@@ -15,7 +15,7 @@ Source: `xyToolz\Database\xyBaseModel.cs`
     /// 
     ///
 
-## Eigenschaften
+## Properties
 
 - `string? Comment{ get; set; }` — `public virtual`
   
@@ -34,7 +34,7 @@ Source: `xyToolz\Database\xyBaseModel.cs`
   /// Index
         ///
 
-## Methoden
+## Methods
 
 - `string ToString()` — `public override`
   

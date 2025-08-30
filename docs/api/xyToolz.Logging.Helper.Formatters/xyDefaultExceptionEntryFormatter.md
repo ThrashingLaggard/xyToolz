@@ -9,7 +9,7 @@ Source: `xyToolz\Logging\Helper\Formatters\xyDefaultExceptionEntryFormatter.cs`
 
 (No XML‑Summary )
 
-## Methoden
+## Methods
 
 - `string UnpackAndFormatFromEntity<T, TKey, TValue>(T entry_, string? callerName = null, LogLevel? level = LogLevel.Debug)` — `public`
   

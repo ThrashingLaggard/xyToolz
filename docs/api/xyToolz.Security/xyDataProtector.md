@@ -1,8 +1,8 @@
 # class xyDataProtector
 
-Namespace: `xyToolz`  
+Namespace: `xyToolz.Security`  
 Visibility: `public static`  
-Source: `xyToolz\xyDataProtector.cs`
+Source: `xyToolz\Security\xyDataProtector.cs`
 
 ## Description:
 
@@ -26,7 +26,7 @@ Available Features:
     /// 
     ///
 
-## Methoden
+## Methods
 
 - `Task<bool> ProtectFileAsync<T>(string filePath)` — `public static async`
   
@@ -84,4 +84,10 @@ Available Features:
   
   /// Resets to original implementation after testing.
         ///
+
+## Fields
+
+- `IxyDataProtector? _override` — `private static`
+  
+  (No XML‑Summary )
 

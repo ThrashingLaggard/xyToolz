@@ -8,3 +8,9 @@ Source: `xyToolz_Exec\Program.cs`
 
 (No XML‑Summary )
 
+## Methods
+
+- `void main(string[] args)` — `private static`
+  
+  (No XML‑Summary )
+
