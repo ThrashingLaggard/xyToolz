@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 using xyToolz.Helper.Logging;
 
 
-namespace xyToolz
+namespace xyToolz.Serialization
 {
     /// <summary>
     /// Helper class to (de)serialize objects from and to XML
@@ -35,7 +35,7 @@ namespace xyToolz
                 else
                 {
                     xyLog.Log($"An error occured while trying to deserialize {nameof(xml)}");
-                    throw (new SerializationException());
+                    throw new SerializationException();
                 }
             }
             catch(Exception ex)

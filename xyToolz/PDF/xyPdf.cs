@@ -4,7 +4,7 @@ using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using xyToolz.Helper.Logging;
 
-namespace xyToolz
+namespace xyToolz.PDF
 {
     /// <summary>
     /// QOL stuff for handling pdf files
@@ -91,7 +91,7 @@ namespace xyToolz
                     if (test.Info.Title == string.Empty)
                     {
                         // Why is this here???
-                        if ((x - (int)x) == 0)
+                        if (x - (int)x == 0)
                         {
                             test.Info.Title = $"{x}";
                             test.Comment = $"{x}";
@@ -323,7 +323,7 @@ namespace xyToolz
 
 
             int i = 0;
-            for (global::System.Int32 j = 0; j < arr.Length; j++)
+            for (int j = 0; j < arr.Length; j++)
             {
 
                 PdfDocument pdf = PdfReader.Open(arr[i], PdfDocumentOpenMode.Import);

@@ -3,7 +3,7 @@ using System.Text;
 using xyToolz.Logging.Helper;
 using xyToolz.Logging.Loggers;
 
-namespace xyToolz
+namespace xyToolz.QOL
 {
     public class xyQol
     {

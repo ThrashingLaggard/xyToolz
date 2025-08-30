@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using xyToolz.Helper.Logging;
 
-namespace xyToolz
+namespace xyToolz.Filesystem
 {
     /// <summary>
     /// Directory helpers
@@ -18,7 +18,7 @@ namespace xyToolz
         /// Get the full path of the directory containing this programs     .sln    file
         /// </summary>
         /// <returns></returns>
-        public static String GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolder())!.FullName;
+        public static string GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolder())!.FullName;
 
         /// <summary>
         /// Get the directory containing the application

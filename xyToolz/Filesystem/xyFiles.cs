@@ -6,9 +6,10 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using xyToolz.Helper;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
+using xyToolz.QOL;
+using xyToolz.Serialization;
 
 
 #if ANDROID
@@ -16,7 +17,7 @@ using Android.Content;
 using Android.App;
 #endif
 
-namespace xyToolz
+namespace xyToolz.Filesystem
 {
     /// <summary>
     /// Provides file system utilities for reading, writing, copying, renaming,
@@ -72,7 +73,7 @@ namespace xyToolz
     /// </code>
     ///
     /// <para><b>See Also:</b></para>
-    /// <see cref="System.IO.File"/>, <see cref="System.IO.Directory"/>, <see cref="xyToolz.Helper.xyPath"/>
+    /// <see cref="File"/>, <see cref="Directory"/>, <see cref="xyPath"/>
     /// </remarks>
     public static class xyFiles
     {
@@ -106,7 +107,7 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.Directory.Exists(string)"/>
+        /// <see cref="Directory.Exists(string)"/>
         /// </remarks>
         /// <param name="directories">An array of absolute or relative directory paths to verify.</param>
         /// <returns>True if all directories exist; otherwise, false.</returns>
@@ -184,7 +185,7 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.File.Create(string)"/>, <see cref="xyLog"/>
+        /// <see cref="File.Create(string)"/>, <see cref="xyLog"/>
         /// </remarks>
         /// <param name="filePath">The absolute or relative file path to check or create.</param>
         /// <returns>True if the file exists or was created successfully; otherwise, false.</returns>
@@ -256,7 +257,7 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.FileInfo"/>, <see cref="Directory.GetFiles(string)"/>
+        /// <see cref="FileInfo"/>, <see cref="Directory.GetFiles(string)"/>
         /// </remarks>
         /// <param name="path">The directory path to inspect.</param>
         /// <returns>A list of <see cref="FileInfo"/> objects representing the files in the directory.</returns>
@@ -333,7 +334,7 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.File.Move(string, string)"/>
+        /// <see cref="File.Move(string, string)"/>
         /// </remarks>
         /// <param name="completePath">The full original path of the file to rename.</param>
         /// <param name="newName">The new name for the file (not a full path).</param>
@@ -859,7 +860,7 @@ namespace xyToolz
         /// </code>
         ///
         /// <para><b>See Also:</b></para>
-        /// <see cref="System.IO.File.Delete(string)"/>
+        /// <see cref="File.Delete(string)"/>
         /// </remarks>
         /// <param name="subfolder">The folder where the file is located.</param>
         /// <param name="fileName">The file name to delete.</param>

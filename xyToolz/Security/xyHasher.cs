@@ -3,8 +3,9 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using xyToolz.Helper.Logging;
+using xyToolz.QOL;
 
-namespace xyToolz.Helper
+namespace xyToolz.Security
 {
     /// <summary>
     /// Provides secure password hashing and verification functionality using PBKDF2.
@@ -113,7 +114,7 @@ namespace xyToolz.Helper
             string errorPassword = "Password must not be null or empty.";
             string ok = "Seems to work";
 
-            xyLog.Log((salt is null || salt.Length == 0) ? errorSalt : string.IsNullOrWhiteSpace(password) ? errorPassword : ok);
+            xyLog.Log(salt is null || salt.Length == 0 ? errorSalt : string.IsNullOrWhiteSpace(password) ? errorPassword : ok);
 
             using Rfc2898DeriveBytes pbkdf2 = new(xy.StringToBytes(password), salt!, Iterations, HashAlgorithmName.SHA256);
 
@@ -196,8 +197,8 @@ namespace xyToolz.Helper
             string pwError = "Password is null or empty.";
             string weird = "You should not be able to read this, please inform experts immediately!";
 
-            bool isSaltValid = (salt is not null && salt.Length > 0);
-            bool isPwValid = (!string.IsNullOrWhiteSpace(password));
+            bool isSaltValid = salt is not null && salt.Length > 0;
+            bool isPwValid = !string.IsNullOrWhiteSpace(password);
 
             if (isSaltValid && isPwValid)
             {
@@ -205,7 +206,7 @@ namespace xyToolz.Helper
             }
             else
             {
-                xyLog.Log(!isSaltValid ? saltError : (!isPwValid ? pwError : weird));
+                xyLog.Log(!isSaltValid ? saltError : !isPwValid ? pwError : weird);
                 return string.Empty;
             }
         }
@@ -235,13 +236,13 @@ namespace xyToolz.Helper
             bool isValid = false;
             bool isFormat = false;
             bool isSaltValid = false;
-            bool isPwNull = (string.IsNullOrWhiteSpace(password));
-            bool isCheckNull = (string.IsNullOrWhiteSpace(saltNhash));
+            bool isPwNull = string.IsNullOrWhiteSpace(password);
+            bool isCheckNull = string.IsNullOrWhiteSpace(saltNhash);
 
             if (!isPwNull &&  !isCheckNull)
             {
                 input = saltNhash.Split(Separator);
-                isFormat = (input.Length == 2);
+                isFormat = input.Length == 2;
                 if (isFormat)
                 {
                     salt = xy.BaseToBytes(input[0]);
@@ -254,7 +255,7 @@ namespace xyToolz.Helper
                     }
                 }
             }     
-            xyLog.Log(!isSaltValid? logSaltNull :(!isFormat ? logInvalidFormat : isPwNull ? logPasswordNull : bug));
+            xyLog.Log(!isSaltValid? logSaltNull :!isFormat ? logInvalidFormat : isPwNull ? logPasswordNull : bug);
             return isValid;
         }
 
@@ -274,7 +275,7 @@ namespace xyToolz.Helper
 
             bool isHash2Valid = hash2 is not null && hash2.Length > 0;
             bool isHash1Valid = hash1 is not null && hash1.Length > 0;
-            bool isSameLength = isHash1Valid && isHash2Valid && (hash1!.Length == hash2!.Length); 
+            bool isSameLength = isHash1Valid && isHash2Valid && hash1!.Length == hash2!.Length; 
             bool result = false;
 
             if (isHash1Valid && isHash2Valid)
@@ -284,7 +285,7 @@ namespace xyToolz.Helper
                     result= CryptographicOperations.FixedTimeEquals(hash1, hash2);
                 }
             }  
-            xyLog.Log(!isHash1Valid ? nullHash1 : (!isHash2Valid ? nullHash2 : !isSameLength? lengthNotEqual : bugMessage));
+            xyLog.Log(!isHash1Valid ? nullHash1 : !isHash2Valid ? nullHash2 : !isSameLength? lengthNotEqual : bugMessage);
             return result;
         }
 

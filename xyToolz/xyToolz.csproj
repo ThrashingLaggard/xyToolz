@@ -58,14 +58,6 @@
 		<PackageReference Include="System.Text.Json" Version="9.0.2" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Include="Docs\readme.md" Pack="true" PackagePath="\" />
-		 <None Update="Docs\readme.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	</ItemGroup>
-
 
 
 

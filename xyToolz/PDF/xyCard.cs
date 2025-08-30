@@ -1,7 +1,7 @@
 ﻿
 using PdfSharp.Pdf;
 
-namespace xyToolz
+namespace xyToolz.PDF
 {
     /// <summary>
     /// Symbolizing an indexing Card for learning or ....
@@ -29,7 +29,7 @@ namespace xyToolz
 
         xyCard(PdfPage frontSide, PdfPage backSide, PdfDocumentInformation info,int num, PdfDocumentSettings settings, PdfDocumentOptions options, PdfPageLayout layout)
         {
-            this.Number = num;
+            Number = num;
             this.frontSide = frontSide;
             this.backSide = backSide;
             this.info = info;

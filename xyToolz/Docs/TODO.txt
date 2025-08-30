@@ -1,0 +1,3 @@
+﻿- Global suppressions für Namensrichtline
+- Markdowns verschönern
+  -> Ergebnis als Klasse kapseln

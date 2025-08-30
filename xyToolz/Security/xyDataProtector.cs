@@ -1,12 +1,14 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using xyToolz.Helper;
+using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
-using static xyToolz.xyDataProtector;
+using xyToolz.QOL;
+using xyToolz.Serialization;
+using static xyToolz.Security.xyDataProtector;
 
-namespace xyToolz
+namespace xyToolz.Security
 {
 
 

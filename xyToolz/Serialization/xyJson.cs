@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
+using xyToolz.QOL;
 
-namespace xyToolz
+namespace xyToolz.Serialization
 {
 
     /// <summary>
@@ -41,8 +43,8 @@ namespace xyToolz
     ///
     /// <para><b>Related:</b></para>
     /// <see cref="System.Text.Json"/>
-    /// <see cref="Newtonsoft.Json.Linq.JObject"/>
-    /// <see cref="Helper.Logging.xyLog"/>
+    /// <see cref="JObject"/>
+    /// <see cref="xyLog"/>
     /// </summary>
     public class xyJson
     {

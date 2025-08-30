@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using xyToolz.Logging.Interfaces;
 using xyToolz.Logging.Models;
+using xyToolz.QOL;
 
 namespace xyToolz.Logging.Helper.Formatters
 {

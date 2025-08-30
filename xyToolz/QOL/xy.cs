@@ -9,7 +9,7 @@ using System.Collections;
 using xyToolz.Helper.Logging;
 
 
-namespace xyToolz
+namespace xyToolz.QOL
 {
 
     /// <summary>
@@ -390,7 +390,7 @@ namespace xyToolz
         loop1:
             Console.WriteLine("Hey");
             a++;
-            if (b > (high_number / 2))
+            if (b > high_number / 2)
             {
                 Piep();
                 Console.WriteLine(a);
@@ -399,7 +399,7 @@ namespace xyToolz
 
         loop2:
             Console.WriteLine("Ho");
-            if (a > (high_number / 2))
+            if (a > high_number / 2)
             {
                 Piep();
                 Console.WriteLine(b);

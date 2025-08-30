@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using xyToolz.Helper.Logging;
 
-namespace xyToolz.Helper
+namespace xyToolz.Filesystem
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<Because its my wish to do so!>")]
     public static class xyPath

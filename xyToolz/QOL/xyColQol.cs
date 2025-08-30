@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Text;
 using xyToolz.Helper.Logging;
 
-namespace xyToolz
+namespace xyToolz.QOL
 {
       /// <summary>
       /// Helpers for Enumerables:
