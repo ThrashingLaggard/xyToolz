@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xyToolz.Helper.Logging
+namespace xyToolz.Logging.Helper
 {
     /// <summary>
     ///  Providing reusable samples for logging

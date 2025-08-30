@@ -1,0 +1,9 @@
+﻿### Database  -  EF Core
+
+dotnet ef migrations add <MigrationsName>
+dotnet ef database update
+
+
+
+### Generate Documentation
+dotnet run --project C:\Users\	\Downloads\TestDocGen_tool\xyDocGen -- --root . --out docs/api --exclude ".git;bin;obj;node_modules;.vs;TestResults"
