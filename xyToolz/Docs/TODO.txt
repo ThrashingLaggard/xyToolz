@@ -1,3 +1,6 @@
 ﻿- Global suppressions für Namensrichtline
 - Markdowns verschönern
   -> Ergebnis als Klasse kapseln
+
+  über das Doku Tool ein generelles Readme für das Projekt anfertigen lassen
+  Doku Tool ausbauen, bei Nuget einreichen & Yaml Workflow einrichten
