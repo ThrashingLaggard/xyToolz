@@ -6,4 +6,14 @@ dotnet ef database update
 
 
 ### Generate Documentation
-dotnet run --project C:\Users\	\Downloads\TestDocGen_tool\xyDocGen -- --root . --out docs/api --exclude ".git;bin;obj;node_modules;.vs;TestResults"
+
+#recommended
+(dotnet new tool-manifest)
+(dotnet tool install --local xyDocGen --version 1.0.14)
+dotnet xydocgen --root . --out docs/api --exclude ".git;bin;obj;node_modules;.vs;TestResults"
+or
+(dotnet tool install --global xyDocGen --version 1.0.14)
+xydocgen --root . --out docs/api --exclude ".git;bin;obj;node_modules;.vs;TestResults"
+
+
+

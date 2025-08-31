@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "xydocgen": {
+      "version": "1.0.14",
+      "commands": [
+        "xyDocGen"
+      ],
+      "rollForward": false
+    }
+  }
+}
