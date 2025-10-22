@@ -16,4 +16,4 @@ or
 xydocgen --root . --out docs/api --exclude ".git;bin;obj;node_modules;.vs;TestResults"
 
 
-
+--------------------------------------------
