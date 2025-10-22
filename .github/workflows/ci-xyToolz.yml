@@ -9,6 +9,13 @@ on:
 
 permissions:
   contents: write
+
+# -----------------------------------
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+#------------------------------------
+
 jobs:
   build-and-changed:
     runs-on: ubuntu-latest  # GitHub-hosted Ubuntu Linux runner
@@ -16,6 +23,36 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4  # Clone the GitHub repository
+
+   # -------------------- GUARD (new) --------------------
+    - name: Guard – skip bot or duplicate commit message
+      id: guard
+      shell: bash
+      run: |
+        # 1) Bot-Commits (z.B. Version-Bump der CI) überspringen
+        if [ "${{ github.actor }}" = "github-actions[bot]" ]; then
+          echo "SKIP=true" >> "$GITHUB_ENV"
+          echo "reason=bot" >> "$GITHUB_OUTPUT"
+          echo "Guard: bot commit -> skip"
+          exit 0
+        fi
+
+        # 2) Doppelte Commit-Message (aktueller == vorheriger Commit)
+        #    Holt die letzten 2 Messages sicher (nach Checkout).
+        git fetch --depth=2 origin ${{ github.ref }}
+        m1="$(git log -1 --pretty=%B)"
+        m2="$(git log -2 --pretty=%B | sed -n '2p')"
+
+        if [ "$m1" = "$m2" ]; then
+          echo "SKIP=true" >> "$GITHUB_ENV"
+          echo "reason=duplicate-message" >> "$GITHUB_OUTPUT"
+          echo "Guard: duplicate commit message -> skip"
+          exit 0
+        fi
+
+        # Sonst: weiter
+        echo "SKIP=false" >> "$GITHUB_ENV"
+    # -----------------------------------------------------
 
     - name: Setup .NET 8
       uses: actions/setup-dotnet@v4  # Install the .NET 8 SDK
