@@ -1,4 +1,3 @@
 ﻿- Global suppressions für Namensrichtline
 
-  über das Doku Tool ein generelles Readme für das Projekt anfertigen lassen
-  -> Ergebnis als Klasse kapseln
+
