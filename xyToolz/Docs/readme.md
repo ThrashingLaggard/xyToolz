@@ -283,3 +283,5 @@ xyDirUtils.EnsureDirectory(path);
 bool exists = xyDirUtils.CheckForDirectories("myfolder");
 var all = xyDirUtils.Inventory("myfolder");
 ```
+
+Not enough!!!!!!!!!!!!
