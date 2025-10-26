@@ -1,192 +1,358 @@
 name: CI/CD for xyToolz
 
-# Trigger: Push to the "master" branch to run this workflow 
+# ==================================================================================
+# 0) TRIGGER
+#    - Runs on pushes to the "master" branch.
+#    - If you work with PRs, this still runs when the PR is merged into master.
+# ==================================================================================
 on:
   push:
     branches:
       - master
 
-
+# ==================================================================================
+# 1) PERMISSIONS
+#    - We need write access to repository contents in order to commit the updated
+#      version back to the repo (only after the success criteria have been met).
+# ==================================================================================
 permissions:
   contents: write
 
-# -----------------------------------
+# ==================================================================================
+# 2) CONCURRENCY
+#    - Ensures only the *latest* run for a given workflow+ref remains active.
+#    - If multiple pushes happen in quick succession, older in-flight runs will be
+#      canceled to avoid double-publishing and wasted CI minutes.
+# ==================================================================================
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-#------------------------------------
 
 jobs:
+  # ================================================================================
+  # JOB A) PRECHECK
+  # Purpose:
+  #   - Inspect the latest commit message to decide whether we should run the build.
+  #   - Derive a semantic version “bump kind” from conventional keywords:
+  #       * "BREAKING CHANGE" -> major
+  #       * "feat:"           -> minor
+  #       * "fix:"            -> patch
+  #   - Output a strict gate "should_run" so that we skip the heavy job when the
+  #     commit message does not request a publish-worthy change.
+  #
+  # Guarantees:
+  #   - Does NOT modify files.
+  #   - Produces three outputs that Job B uses: should_run, bump_kind, match_keyword.
+  # ================================================================================
+  precheck:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run:    ${{ steps.scan.outputs.should_run }}
+      bump_kind:     ${{ steps.scan.outputs.bump_kind }}
+      match_keyword: ${{ steps.scan.outputs.match_keyword }}
+    steps:
+      # ----------------------------------------------------------------------------
+      # A.1) CHECKOUT (SHALLOW)
+      #   - Only need the latest commit to read its message.
+      #   - fetch-depth: 2 ensures the last commit is definitely present.
+      # ----------------------------------------------------------------------------
+      - name: A.1) Checkout (shallow)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      # ----------------------------------------------------------------------------
+      # A.2) COMMIT MESSAGE SCAN
+      #   - Single source of truth for version bump semantics.
+      #   - Emits:
+      #       should_run=true/false
+      #       bump_kind=major/minor/patch/none
+      #       match_keyword=diagnostic string (e.g., "feat:")
+      # ----------------------------------------------------------------------------
+      - name: A.2) Scan latest commit message (case-insensitive)
+        id: scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          msg="$(git log -1 --pretty=%B)"
+
+          echo "Commit message payload:"
+          echo "-----------------------"
+          echo "$msg"
+          echo "-----------------------"
+
+          bump_kind="none"
+          match_keyword=""
+          
+          if echo "$msg" | grep -iqE '(^|[[:space:]])BREAKING[[:space:]]+CHANGE([[:space:]]|$)'; then
+            bump_kind="major"; match_keyword="BREAKING CHANGE"
+          elif echo "$msg" | grep -iqE '(^|[[:space:]])feat(\([^)]+\))?:'; then
+            bump_kind="minor"; match_keyword="feat:"
+          elif echo "$msg" | grep -iqE '(^|[[:space:]])fix(\([^)]+\))?:'; then
+            bump_kind="patch"; match_keyword="fix:"
+          fi
+  
+          if [ "$bump_kind" != "none" ]; then
+            echo "Keyword matched: $match_keyword  -> bump_kind=$bump_kind"
+            echo "should_run=true"        >> "$GITHUB_OUTPUT"
+            echo "bump_kind=$bump_kind"   >> "$GITHUB_OUTPUT"
+            echo "match_keyword=$match_keyword" >> "$GITHUB_OUTPUT"
+          else
+            echo "No matching keyword found -> should_run=false"
+            echo "should_run=false"        >> "$GITHUB_OUTPUT"
+            echo "bump_kind=none"          >> "$GITHUB_OUTPUT"
+            echo "match_keyword="          >> "$GITHUB_OUTPUT"
+          fi
+
+  # ================================================================================
+  # JOB B) BUILD-AND-PUBLISH  (runs only if precheck.should_run == 'true')
+  #
+  # High-level flow:
+  #   B.1  Checkout full repository
+  #   B.2  Guard for duplicate commit messages (diagnostic only)
+  #   B.3  Setup .NET SDK
+  #   B.4  Restore dependencies
+  #   B.5  Compute *planned* next version (do not persist yet)
+  #   B.6  Build (Release)
+  #   B.7  Test (no-build)
+  #   B.8  Pack into ./out using the planned version
+  #   B.9  Check whether this planned version already exists on NuGet
+  #   B.10 Publish to NuGet (only when not existing)
+  #   B.11 Persist the version into the .csproj and commit (only on success)
+  #   B.12 Create a GitHub Release (only if we actually published)
+  #
+  # Persistence policy (B.11):
+  #   - Only persist (commit) the new version if Build + Test + Pack succeeded AND
+  #     (the version already existed -> publish skipped) OR (publish succeeded now).
+  #   - This ensures the repo’s version matches a buildable/testable package that
+  #     is either already available on NuGet or has just been published.
+  # ================================================================================
   build-and-changed:
-    runs-on: ubuntu-latest  # GitHub-hosted Ubuntu Linux runner
+    needs: precheck
+    runs-on: ubuntu-latest
+
+    # Hard gate: skip this job entirely when PRECHECK says “no bump”.
+    if: needs.precheck.outputs.should_run == 'true'
+    
+    env:
+      # Forwarded diagnostics and bump kind from PRECHECK
+      BUMP_KIND:     ${{ needs.precheck.outputs.bump_kind }}
+      MATCH_KEYWORD: ${{ needs.precheck.outputs.match_keyword }}
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4  # Clone the GitHub repository
+      # ----------------------------------------------------------------------------
+      # B.1) CHECKOUT REPOSITORY (FULL)
+      #   - Required for building, testing, packing, and later committing the bump.
+      # ----------------------------------------------------------------------------
+      - name: B.1) Checkout repository
+        uses: actions/checkout@v4
 
-   # -------------------- GUARD (new) --------------------
-    - name: Guard – skip bot or duplicate commit message
-      id: guard
-      shell: bash
-      run: |
-        # 1) Bot-Commits (z.B. Version-Bump der CI) überspringen
-        if [ "${{ github.actor }}" = "github-actions[bot]" ]; then
-          echo "SKIP=true" >> "$GITHUB_ENV"
-          echo "reason=bot" >> "$GITHUB_OUTPUT"
-          echo "Guard: bot commit -> skip"
-          exit 0
-        fi
-
-        # 2) Doppelte Commit-Message (aktueller == vorheriger Commit)
-        #    Holt die letzten 2 Messages sicher (nach Checkout).
-        git fetch --depth=2 origin ${{ github.ref }}
-        m1="$(git log -1 --pretty=%B)"
-        m2="$(git log -2 --pretty=%B | sed -n '2p')"
-
-        if [ "$m1" = "$m2" ]; then
-          echo "SKIP=true" >> "$GITHUB_ENV"
-          echo "reason=duplicate-message" >> "$GITHUB_OUTPUT"
-          echo "Guard: duplicate commit message -> skip"
-          exit 0
-        fi
-
-        # Sonst: weiter
-        echo "SKIP=false" >> "$GITHUB_ENV"
-    # -----------------------------------------------------
-
-    - name: Setup .NET 8
-      uses: actions/setup-dotnet@v4  # Install the .NET 8 SDK
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Restore dependencies
-      run: dotnet restore xyToolz/xyToolz.csproj  # Restore NuGet packages
-
-    - name: Generate new version from commits
-      id: versioning
-      run: |
-        # Get current version from the .csproj
-        current_version=$(grep -oPm1 "(?<=<PackageVersion>)[^<]+" xyToolz/xyToolz.csproj)
-        echo "Current version: $current_version"
-
-        # Get last commit message
-        commits=$(git log -1 --pretty=%B)
-        echo "Last commit message: $commits"
-
-        # Split current version into major. minor. patch
-        major=$(echo $current_version | cut -d. -f1)
-        minor=$(echo $current_version | cut -d. -f2)
-        patch=$(echo $current_version | cut -d. -f3)
-
-      
-        # Determine version bump based on commit message content
-        changed="false"
-        if echo "$commits" | grep -iq "BREAKING CHANGE"; then
-          major=$((major + 1))
-          minor=0
-          patch=0
-          changed="true"
-        elif echo "$commits" | grep -iqE "^(feat|fix):"; then
-          if echo "$commits" | grep -iq "^feat:"; then
-            minor=$((minor + 1))
-            patch=0
-            changed="true"
-          elif echo "$commits" | grep -iq "^fix:"; then
-            patch=$((patch + 1))
-            changed="true"
+      # ----------------------------------------------------------------------------
+      # B.2) DUPLICATE COMMIT MESSAGE GUARD (DIAGNOSTIC)
+      #   - Detects identical last-two commit messages (often a double-push).
+      #   - This does NOT stop the pipeline; it’s informational only.
+      #   - The actual run gate is PRECHECK.should_run above.
+      # ----------------------------------------------------------------------------
+      - name: B.2) Guard – duplicate commit message
+        id: guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --depth=2 origin ${{ github.ref }}
+          m1="$(git log -1 --pretty=%B)"
+          m2="$(git log -2 --pretty=%B | sed -n '2p')"
+          if [ "$m1" = "$m2" ]; then
+            echo "SKIP=true" >> "$GITHUB_ENV"
+            echo "Duplicate commit message detected (diagnostic)."
+          else
+            echo "SKIP=false" >> "$GITHUB_ENV"
           fi
-        fi
 
-        # Try again...because fuck you too.
-        if [ "$changed" == "false" ]; then
-          commitsSingleLine=$(echo "$commits" | tr '\n' ' ')
+      # ----------------------------------------------------------------------------
+      # B.3) SETUP .NET 8 SDK
+      #   - Ensures we build and test with a known .NET SDK (8.x).
+      # ----------------------------------------------------------------------------
+      - name: B.3) Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-          if echo "$commitsSingleLine" | grep -iq "BREAKING CHANGE"; then
-            major=$((major + 1)); minor=0; patch=0
-            changed="true"
-          elif echo "$commitsSingleLine" | grep -iq "feat:"; then
-            minor=$((minor + 1)); patch=0
-            changed="true"
-          elif echo "$commitsSingleLine" | grep -iq "fix:"; then
-            patch=$((patch + 1))
-            changed="true"
+      # ----------------------------------------------------------------------------
+      # B.4) RESTORE DEPENDENCIES
+      #   - Restores NuGet packages for reproducible builds.
+      # ----------------------------------------------------------------------------
+      - name: B.4) Restore dependencies
+        id: restore
+        run: dotnet restore xyToolz/xyToolz.csproj
+
+      # ----------------------------------------------------------------------------
+      # B.5) COMPUTE NEXT SEMVER (PLAN ONLY, DO NOT PERSIST)
+      #   - Reads current <PackageVersion> from the .csproj.
+      #   - Applies bump_kind from PRECHECK (with a defensive rescan fallback).
+      #   - Exports the *planned* version to $GITHUB_ENV as "version".
+      #   - We intentionally DO NOT modify .csproj yet (only after success).
+      # ----------------------------------------------------------------------------
+      - name: B.5) Compute next semantic version (plan only)
+        id: versioning
+        shell: bash
+        run: |
+          set -euo pipefail
+          current_version=$(grep -oPm1 "(?<=<PackageVersion>)[^<]+" xyToolz/xyToolz.csproj)
+          echo "Current version: $current_version"
+
+          major=$(echo "$current_version" | cut -d. -f1)
+          minor=$(echo "$current_version" | cut -d. -f2)
+          patch=$(echo "$current_version" | cut -d. -f3)
+
+          bump="${BUMP_KIND:-}"
+
+          if [ -z "$bump" ] || [ "$bump" = "none" ]; then
+            echo "BUMP_KIND missing/none – performing a defensive one-time rescan."
+            commits="$(git log -1 --pretty=%B)"
+            if echo "$commits" | grep -iqE '(^|[[:space:]])BREAKING[[:space:]]+CHANGE([[:space:]]|$)'; then
+              bump="major"
+            elif echo "$commits" | grep -iqE '(^|[[:space:]])feat(\([^)]+\))?:'; then
+              bump="minor"
+            elif echo "$commits" | grep -iqE '(^|[[:space:]])fix(\([^)]+\))?:'; then
+              bump="patch"
+            else
+              flat="$(echo "$commits" | tr '\n' ' ')"
+              if echo "$flat" | grep -iqE 'BREAKING[[:space:]]+CHANGE'; then
+                bump="major"
+              elif echo "$flat" | grep -iqE 'feat(\([^)]+\))?:'; then
+                bump="minor"
+              elif echo "$flat" | grep -iqE 'fix(\([^)]+\))?:'; then
+                bump="patch"
+              else
+                bump="none"
+              fi
+            fi
           fi
-        fi
-        
-        # Debug message
-        if [ "$changed" == "false" ]; then
-            echo "No semantic version keyword found. Keeping current version."
-        else
-          echo "Semantic version keyword found. Updating current version."
-        fi
 
+          case "$bump" in
+            major) major=$((major + 1)); minor=0; patch=0; echo "Applying MAJOR bump." ;;
+            minor) minor=$((minor + 1)); patch=0;              echo "Applying MINOR bump." ;;
+            patch) patch=$((patch + 1));                       echo "Applying PATCH bump." ;;
+            *)     echo "No bump requested – keeping current version." ;;
+          esac
 
-        # Create new version string
-        new_version="$major.$minor.$patch"
-        echo "New version: $new_version"
+          new_version="$major.$minor.$patch"
+          echo "Planned version: $new_version"
+          echo "version=$new_version" >> "$GITHUB_ENV"
 
-        # Export version for other steps
-        echo "version=$new_version" >> $GITHUB_ENV
+      # ----------------------------------------------------------------------------
+      # B.6) BUILD (RELEASE)
+      #   - Uses restored dependencies; does not re-restore.
+      # ----------------------------------------------------------------------------
+      - name: B.6) Build (Release)
+        id: build
+        run: dotnet build xyToolz/xyToolz.csproj --configuration Release --no-restore
 
-    - name: Update .csproj with new version
-      run: |
-        # Replace <PackageVersion> tag in .csproj file with the new version
-        sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/" xyToolz/xyToolz.csproj
+      # ----------------------------------------------------------------------------
+      # B.7) TEST
+      #   - Runs unit tests without rebuilding sources (fast feedback).
+      # ----------------------------------------------------------------------------
+      - name: B.7) Test
+        id: test
+        run: dotnet test xyToolz/xyToolz.csproj --no-build --verbosity detailed
 
-    - name: Commit updated version
-      run: | 
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
+      # ----------------------------------------------------------------------------
+      # B.8) PACK
+      #   - Produces a .nupkg in ./out using the *planned* version (env.version).
+      #   - The .csproj remains unchanged until B.11.
+      # ----------------------------------------------------------------------------
+      - name: B.8) Pack (.nupkg to ./out)
+        id: pack
+        run: dotnet pack xyToolz/xyToolz.csproj --configuration Release --no-build -o out -p:PackageVersion=${{ env.version }}
 
-        git pull origin master  
-        git add xyToolz/xyToolz.csproj
-        if git diff --cached --quiet; then
-          echo "Nothing to commit – skipping."
-        else
-          git commit -m "chore: bump version to ${{ env.version }}"
-          git push origin master
-          echo "Changes committed and pushed."
-        fi
-      continue-on-error: true
+      # ----------------------------------------------------------------------------
+      # B.9) CHECK IF VERSION EXISTS ON NUGET
+      #   - HEAD request to the NuGet flat container for this exact version.
+      #   - If found, we skip publishing (idempotency). Persisting is still allowed
+      #     because the package is buildable/testable and already public.
+      # ----------------------------------------------------------------------------
+      - name: B.9) Check package version on nuget.org
+        id: check_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ env.version }}"
+          echo "Checking NuGet for version: $version"
 
-    - name: Build xyToolz
-      run: dotnet build xyToolz/xyToolz.csproj --configuration Release --no-restore  # Build the project
+          content_type=$(curl -sI -o /dev/null -w "%{content_type}" \
+            "https://api.nuget.org/v3-flatcontainer/xytoolz/$version/xytoolz.$version.nupkg")
 
-    - name: Test xyToolz
-      run: dotnet test xyToolz/xyToolz.csproj --no-build --verbosity normal  # Run unit tests
+          if [[ "$content_type" == "application/octet-stream" ]]; then
+            echo "Package version $version already exists. Skipping publish."
+            echo "skip_publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Package version $version not found. Proceeding to publish."
+            echo "skip_publish=false" >> "$GITHUB_OUTPUT"
+          fi
 
-    - name: Pack NuGet package
-      run: dotnet pack xyToolz/xyToolz.csproj --configuration Release --no-build -o out  # Create .nupkg file
+      # ----------------------------------------------------------------------------
+      # B.10) PUBLISH TO NUGET
+      #   - Only runs when the target version does not already exist.
+      #   - --skip-duplicate provides extra safety against race conditions.
+      # ----------------------------------------------------------------------------
+      - name: B.10) Publish to NuGet
+        id: publish
+        if: steps.check_version.outputs.skip_publish == 'false'
+        run: >
+          dotnet nuget push out/*.nupkg
+          --source https://api.nuget.org/v3/index.json
+          --api-key ${{ secrets.XYTOOLZ_API_KEY }}
+          --skip-duplicate
 
-    - name: Check package version exists
-      id: check_version
-      run: |
-        version=$(grep -oPm1 "(?<=<PackageVersion>)[^<]+" xyToolz/xyToolz.csproj)
-        echo "Detected version: $version"
+      # ----------------------------------------------------------------------------
+      # B.11) PERSIST VERSION INTO .CSPROJ AND COMMIT
+      #   - Make the version bump *real* in version control.
+      #   - Strict success criteria:
+      #       * build.outcome == success
+      #       * test.outcome  == success
+      #       * pack.outcome  == success
+      #       * AND (skip_publish == 'true'  OR  publish.outcome == 'success')
+      #   - Rationale:
+      #       Only advance the repo version if it represents a buildable/tested
+      #       package that is already public or has just been published.
+      # ----------------------------------------------------------------------------
+      - name: B.11) Persist version to .csproj and commit
+        if: ${{ steps.build.outcome == 'success' 
+             && steps.test.outcome == 'success'
+             && steps.pack.outcome == 'success'
+             && (steps.check_version.outputs.skip_publish == 'true' || steps.publish.outcome == 'success') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/" xyToolz/xyToolz.csproj
 
-        content_type=$(curl -sI -o /dev/null -w "%{content_type}" https://api.nuget.org/v3-flatcontainer/xytoolz/$version/xytoolz.$version.nupkg)
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        if [[ "$content_type" == "application/octet-stream" ]]; then
-          echo "Package version $version already exists. Skipping publish."
-          echo "skip_publish=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "Package version $version not found. Proceeding to publish."
-          echo "skip_publish=false" >> "$GITHUB_OUTPUT"
-        fi
+          git pull --ff-only origin master
+          git add xyToolz/xyToolz.csproj
 
+          if git diff --cached --quiet; then
+            echo "No version change to commit."
+          else
+            git commit -m "chore: bump version to ${{ env.version }}"
+            git push origin master
+          fi
 
-    - name: Push to NuGet
-      if: steps.check_version.outputs.skip_publish == 'false'  # Only push if version doesn't already exist              
-      run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.XYTOOLZ_API_KEY }} --skip-duplicate
-
-
-
-
-    - name: Create GitHub Release
-      if: steps.check_version.outputs.skip_publish == 'false'  # Only create release for new versions
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v${{ env.version }}  # Use version as GitHub release tag
-        name: Release ${{ env.version }}
-        draft: false
-        prerelease: false
+      # ----------------------------------------------------------------------------
+      # B.12) CREATE GITHUB RELEASE
+      #   - Only when we actually published a new version (skip_publish == 'false')
+      #     AND the publish step succeeded. If the version already existed, we skip
+      #     creating a duplicate release to avoid noise.
+      # ----------------------------------------------------------------------------
+      - name: B.12) Create GitHub Release
+        if: steps.check_version.outputs.skip_publish == 'false' && steps.publish.outcome == 'success'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.version }}
+          name: Release ${{ env.version }}
+          body: |
+            Bump kind: ${{ env.BUMP_KIND }}
+            Triggered by keyword: ${{ env.MATCH_KEYWORD }}
+          draft: false
+          prerelease: false
