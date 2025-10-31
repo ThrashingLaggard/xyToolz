@@ -474,11 +474,13 @@ namespace xyToolz.Logging.Helper
 
         public string FileStreamSuccess(string? file = null) => file is null ? "Successfully read a file into the stream" : $"Successfully loaded {file} into the stream." ;
         #endregion
+        #endregion
 
+        #region "Paths" 
+        public string PathNotFound(string? path = null) => path is null ? "The given path is null or empty." : $"The given path '{path}' is null or empty.";
 
 
         #endregion
-
 
         #region "File Operations"
         public string FileNotFound(string? file = null) =>file is null? "File not found!!!": $"File '{file}' not found!!!";
