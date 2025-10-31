@@ -245,6 +245,32 @@ namespace xyToolz.Helper.Logging
             }
         }
 
+        /// <summary>
+        /// Synchronous: Writes a json message into file and console
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="callerName"></param>
+        /// <returns></returns>
+        public static bool WriteJson(string message, [CallerMemberName] string? callerName = null)
+        {
+            lock (_threadSafetyLock)
+            {
+                CheckFileSizeAndMoveLogsToArchiveWhenTooBig();
+                try
+                {
+                    string formattedMessage = FormatMsg(message, callerName);
+                    File.AppendAllText(_logFilePath, formattedMessage);
+                    Output(formattedMessage, callerName);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Log("BaseLogger.WriteLog() failed...!", callerName);
+                    WriteExLog(ex, LogLevel.Error);
+                    return false;
+                }
+            }
+        }
 
         #region Service
 

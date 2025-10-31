@@ -53,6 +53,11 @@ namespace xyToolz.Helper.Logging
         private const string OperationLabel = "Operation:";
         private const string DurationLabel = "Duration:";
 
+
+        public static JsonSerializerOptions jsonOptions = new JsonSerializerOptions() 
+        {
+            WriteIndented = true,
+        };
         #endregion
 
         #region Exception Formatting
@@ -122,10 +127,7 @@ namespace xyToolz.Helper.Logging
                 ["InnerException"] = ex.InnerException?.Message
             };
 
-            return JsonSerializer.Serialize(exceptionInfo, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            return JsonSerializer.Serialize(exceptionInfo, jsonOptions);
         }
 
         #endregion
@@ -146,6 +148,25 @@ namespace xyToolz.Helper.Logging
             string caller = string.IsNullOrEmpty(callerName) ? "UnknownCaller" : callerName;
             return $"[{timestamp}] [{logLevel}] [{caller}] {message}";
         }
+
+        /// <summary>
+        /// Format a log message and serialize to JSON,
+        /// Adds a timestamp, optional caller name and severity.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        /// <param name="callerName">Optional: Caller class/method name.</param>
+        /// <param name="level">Optional: Severity level of the log message (default = Information).</param>
+        /// <returns>A formatted JSON string for logging.</returns>
+        public static string FormatMessageAsJson(string message, string? callerName = null, LogLevel? level = null)
+        {
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            string logLevel = level?.ToString() ?? "Debug";
+            string caller = string.IsNullOrEmpty(callerName) ? "UnknownCaller" : callerName;
+
+            string test = $"[{timestamp}] [{logLevel}] [{caller}] {message}";
+            return JsonSerializer.Serialize(test, jsonOptions);
+        }
+
 
         #endregion
 
