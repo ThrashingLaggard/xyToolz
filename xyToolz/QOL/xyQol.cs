@@ -30,7 +30,7 @@ namespace xyToolz.QOL
             {
                 if (obj is null)
                 {
-                    _log.Log(_fac.ParameterIsNull(nameof(obj)));
+                    _log.Log(_fac.ParameterNull(nameof(obj)));
                     return [];
                 }
                 else

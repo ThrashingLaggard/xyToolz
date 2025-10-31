@@ -150,14 +150,14 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public string ParameterIsNull(string? paramName = null) => paramName == null ? "Input data is NULL! Please check your input!" : $"{paramName} is NULL! Please check your input!";
+        public string ParameterNull(string? paramName = null) => paramName == null ? "Input data is NULL! Please check your input!" : $"{paramName} is NULL! Please check your input!";
 
         /// <summary>
         /// Lists the given parameters below each other
         /// </summary>
         /// <param name="paramNames"></param>
         /// <returns></returns>
-        public string ParametersAreNull(string[]? paramNames = null)
+        public string ParametersNull(string[]? paramNames = null)
         {
             if (paramNames == null)
             {
