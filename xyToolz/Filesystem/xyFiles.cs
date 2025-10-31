@@ -22,12 +22,12 @@ namespace xyToolz.Filesystem
 {
     /// <summary>
     /// Provides file system utilities for reading, writing, copying, renaming,
-    /// and validating files or folders across supported platforms.
+    /// and validating files or folders WITHOUT HAVING TO WRITE TRY/CATCH every time. 
+    /// Logging is included!
     /// </summary>
     /// <remarks>
     /// <para><b>Available Features:</b></para>
     /// <list type="bullet">
-    ///   <item><description>Directory management (EnsureDirectory, CheckForDirectories)</description></item>
     ///   <item><description>File path validation (EnsurePathExistsAsync)</description></item>
     ///   <item><description>File metadata manipulation (Inventory, InventoryNames, RenameFileAsync)</description></item>
     ///   <item><description>File content handling (ReadLinesAsync, SaveToFile, LoadFileAsync, DeleteFile)</description></item>
@@ -76,64 +76,26 @@ namespace xyToolz.Filesystem
     /// <para><b>See Also:</b></para>
     /// <see cref="File"/>, <see cref="Directory"/>, <see cref="xyPath"/>
     /// </remarks>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Muy importante!!! Siiii, mucho!")]
     public static class xyFiles
     {
         private static readonly JsonSerializerOptions DefaultJsonOptions = xyJson.defaultJsonOptions;
 
-        #region Directory Management
-
-        /// <summary>
-        /// Checks whether all specified directories currently exist.
-        /// </summary>
-        /// <remarks>
-        /// <para><b>Behavior:</b></para>
-        /// Returns true only if all provided paths refer to existing directories.
-        /// Paths that are null or empty will return false.
-        ///
-        /// <para><b>Thread Safety:</b></para>
-        /// Thread-safe due to stateless, read-only evaluation.
-        ///
-        /// <para><b>Platform Notes:</b></para>
-        /// Works consistently across platforms including Windows, Linux, Android.
-        ///
-        /// <para><b>Performance:</b></para>
-        /// Executes a simple check using <c>Directory.Exists</c> for each path.
-        ///
-        /// <para><b>Logging:</b></para>
-        /// This method does not perform any logging. It is side-effect free.
-        ///
-        /// <para><b>Example:</b></para>
-        /// <code>
-        /// bool allExist = xyFiles.CheckForDirectories(new[] { "AppData", "Cache" });
-        /// </code>
-        ///
-        /// <para><b>See Also:</b></para>
-        /// <see cref="Directory.Exists(string)"/>
-        /// </remarks>
-        /// <param name="directories">An array of absolute or relative directory paths to verify.</param>
-        /// <returns>True if all directories exist; otherwise, false.</returns>
-        public static bool CheckForDirectories(string[] directories) =>
-            directories.All(dir => Directory.Exists(dir));
+        #region Directory Management and  File Path Validation
 
         /// <summary>
         /// Resolves and returns a platform-correct path to a directory, ensuring compatibility.
         /// </summary>
         /// <remarks>
-        /// <para><b>Behavior:</b></para>
-        /// On Android, the path is combined with the app's internal file storage root.
-        /// On other platforms, <c>xyPathHelper.EnsureDirectory</c> is used to resolve the path.
-        ///
         /// <para><b>Thread Safety:</b></para>
         /// Thread-safe due to local processing and read-only resolution.
         ///
         /// <para><b>Platform Notes:</b></para>
         /// Uses <c>Application.Context.FilesDir</c> or <c>GetExternalFilesDir</c> on Android.
-        /// On other platforms, delegates to <c>xyPathHelper</c>.
+        /// On other platforms, delegates to <c>xyPath</c>.
         ///
         /// <para><b>Logging:</b></para>
         /// This method does not log directly. It assumes responsibility lies with caller.
-        ///
-        /// <para><b>See Also:</b></para>
         /// </remarks>
         /// <param name="dir">The relative or absolute path to resolve.</param>
         /// <returns>The resolved and platform-correct directory path.</returns>
@@ -149,37 +111,19 @@ namespace xyToolz.Filesystem
             return path;
         }
 
-        #endregion
-
-        #region File Path Validation
 
         /// <summary>
         /// Ensures the target file path exists by creating the file if necessary.
         /// </summary>
         /// <remarks>
         /// <para><b>Behavior:</b></para>
-        /// Verifies the existence of the target file path. If it does not exist, the method attempts to create it.
-        /// The method logs whether the file was found or created successfully.
-        ///
-        /// <para><b>Thread Safety:</b></para>
-        /// Thread-safe due to isolated file system access and async operation.
-        ///
-        /// <para><b>Platform Notes:</b></para>
-        /// Fully compatible with all .NET-supported platforms.
+        /// Guarantees the existence of the target file path. If its nonexistent, attempts to create it.
         ///
         /// <para><b>Performance:</b></para>
         /// Uses asynchronous file I/O; suitable for runtime checks and quick creation.
         ///
-        /// <para><b>Logging:</b></para>
-        /// Logs one of the following:
-        /// - If the path was empty
-        /// - If the file already existed
-        /// - If a new file was created
-        /// - Any exceptions encountered
-        ///
-        /// <para><b>Exceptions:</b></para>
-        /// All exceptions are caught and logged via <c>xyLog.AsxExLog</c>. Method returns false on failure.
-        ///
+        /// <para><b>Thread Safety:</b></para>
+        /// Thread-safe due to isolated file system access and async operation.
         /// <para><b>Example:</b></para>
         /// <code>
         /// bool valid = await xyFiles.EnsurePathExistsAsync("data/logs/output.txt");
@@ -248,7 +192,8 @@ namespace xyToolz.Filesystem
         /// Each file's full path is logged individually using <c>xyLog.Log</c>.
         ///
         /// <para><b>Exceptions:</b></para>
-        /// May throw exceptions if the path is invalid or access is denied. No internal exception handling.
+        /// May throw exceptions if the path is invalid or access is denied. 
+        /// Provides internal exception handling by trycatch and exception logging!
         ///
         /// <para><b>Example:</b></para>
         /// <code>
@@ -256,20 +201,23 @@ namespace xyToolz.Filesystem
         /// foreach (var file in files)
         ///     Console.WriteLine(file.FullName);
         /// </code>
-        ///
-        /// <para><b>See Also:</b></para>
-        /// <see cref="FileInfo"/>, <see cref="Directory.GetFiles(string)"/>
-        /// </remarks>
         /// <param name="path">The directory path to inspect.</param>
         /// <returns>A list of <see cref="FileInfo"/> objects representing the files in the directory.</returns>
         public static IEnumerable<FileInfo> Inventory(string path)
         {
-            List<FileInfo> fileList = new();
-            foreach (string file in Directory.GetFiles(xyPath.Combine(path)))
+            List<FileInfo> fileList = [];
+            try
             {
-                FileInfo fileInfo = new(file);
-                fileList.Add(fileInfo);
-                xyLog.Log(fileInfo.FullName);
+                foreach (string file in Directory.GetFiles(xyPath.Combine(path)))
+                {
+                    FileInfo fileInfo = new(file);
+                    fileList.Add(fileInfo);
+                    xyLog.Log(fileInfo.FullName);
+                }
+            }
+            catch(Exception ex)
+            {
+                xyLog.ExLog(ex);
             }
             return fileList;
         }
@@ -405,12 +353,6 @@ namespace xyToolz.Filesystem
         /// <para><b>Thread Safety:</b></para>
         /// Thread-safe due to async file access with no shared state.
         ///
-        /// <para><b>Logging:</b></para>
-        /// Logs:
-        /// - Missing file
-        /// - Read success including byte count
-        /// - Any exception via <c>xyLog.AsxExLog</c>
-        ///
         /// <para><b>Exceptions:</b></para>
         /// All exceptions are caught and logged. No exceptions are thrown to the caller.
         ///
@@ -435,7 +377,7 @@ namespace xyToolz.Filesystem
             string success = $"Bytes have been read from {filePath}:";
             string[] allLines;
 
-            if (!await EnsurePathExistsAsync(filePath))
+            if (!File.Exists(filePath))
             {
                 await xyLog.AsxLog($"{noFile} {filePath}");
                 return Enumerable.Empty<string>();
@@ -500,8 +442,8 @@ namespace xyToolz.Filesystem
                 return null;
             }
 
-            bool exists = await EnsurePathExistsAsync(filePath);
-            if (!exists || !File.Exists(filePath))
+            
+            if (!File.Exists(filePath))
             {
                 await xyLog.AsxLog($"{notFoundMsg} {filePath}");
                 return null; ;
@@ -536,10 +478,6 @@ namespace xyToolz.Filesystem
         /// <para><b>Thread Safety:</b></para>
         /// Thread-safe due to async file operations with no shared state.
         ///
-        /// <para><b>Logging:</b></para>
-        /// Logs success and failure messages via <c>xyLog.AsxLog</c>.
-        /// Any exceptions are logged using <c>xyLog.AsxExLog</c>.
-        ///
         /// <para><b>Exceptions:</b></para>
         /// All exceptions are caught internally. Returns false if any error occurs.
         ///
@@ -561,6 +499,7 @@ namespace xyToolz.Filesystem
 
             try
             {
+                 xyPath.EnsureParentDirectoryExists(filePath);
                 await File.WriteAllTextAsync(filePath, content, new UTF8Encoding(false));
                 await xyLog.AsxLog(saveSuccessMsg + $" {filePath}");
                 return true;

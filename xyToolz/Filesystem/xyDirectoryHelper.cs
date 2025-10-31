@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 using xyToolz.Helper.Logging;
 
 namespace xyToolz.Filesystem
@@ -41,48 +36,6 @@ namespace xyToolz.Filesystem
             string appFolder = Directory.GetParent(bin)!.FullName; xyLog.Log(appFolder);
 
             return appFolder;
-        }
-
-        /// <summary>
-        /// Make sure that this  specific Subfolder exists
-        /// </summary>
-        /// <param name="basePath"></param>
-        /// <param name="subfolder"></param>
-        /// <param name="createIfNotExist"></param>
-        /// <returns></returns>
-        public static string EnsureSubfolderExists(string basePath, string subfolder, bool createIfNotExist = true)
-        {
-            string folderPath = Path.Combine(basePath, subfolder);
-            try
-            {
-                if (createIfNotExist && !Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-            }
-            catch (Exception e)
-            {
-                xyLog.ExLog(e);
-            }
-            return folderPath;
-        }
-
-
-        /// <summary>
-        /// Gibt den vollständigen Pfad eines Unterordners zurück. Optional kann der Ordner erstellt werden, falls er nicht existiert.
-        /// </summary>
-        /// <param name="basePath">Das Basisverzeichnis.</param>
-        /// <param name="subfolder">Der Name des Unterordners.</param>
-        /// <param name="createIfNotExist">Falls true, wird der Ordner erstellt, wenn er nicht existiert.</param>
-        /// <returns>Vollständiger Pfad zum Unterordner.</returns>
-        public static string GetSubfolderPath(string basePath, string subfolder, bool createIfNotExist = false)
-        {
-            string folderPath = Path.Combine(basePath, subfolder);
-            if (createIfNotExist && !Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            return folderPath;
         }
 
         /// <summary>
@@ -184,7 +137,7 @@ namespace xyToolz.Filesystem
                 {
                     string? parentPath = Directory.GetParent(currentFolderPath)?.FullName;
                     if (parentPath == null)
-                    return null!;
+                        return null!;
 
                     string newFolderPath = Path.Combine(parentPath, newFolderName);
                     Directory.Move(currentFolderPath, newFolderPath);
@@ -350,10 +303,10 @@ namespace xyToolz.Filesystem
 
                 // Erstelle den Zielordner, falls er nicht existiert.
                 Directory.CreateDirectory(extractFolder);
-                #if! NETSTANDARD2_0
+#if !NETSTANDARD2_0
                 // Extrahiere den Inhalt der ZIP-Datei
                 ZipFile.ExtractToDirectory(zipFilePath, extractFolder, overwriteFiles: true);
-                #endif
+#endif
             }
             catch (Exception ex)
             {
@@ -385,7 +338,7 @@ namespace xyToolz.Filesystem
                 if (!Directory.Exists(folderPath))
                     throw new DirectoryNotFoundException($"Folder not found: {folderPath}");
 
-                FileSystemWatcher watcher = new (folderPath, filter)
+                FileSystemWatcher watcher = new(folderPath, filter)
                 {
                     NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.CreationTime,
                     IncludeSubdirectories = true,
@@ -406,8 +359,8 @@ namespace xyToolz.Filesystem
                 return null!;
             }
         }
-    
-    
-    
+
+
+
     }
 }

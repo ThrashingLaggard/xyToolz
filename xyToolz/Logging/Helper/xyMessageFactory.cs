@@ -21,15 +21,24 @@ namespace xyToolz.Logging.Helper
 
         #region "Misc"
 
+
+
+        #endregion
+
+
+        #region "ListigeCollectionen
+
         /// <summary>
         /// List is empty
         /// </summary>
         /// <param name="nameOfTheList"></param>
         /// <returns></returns>
         public string EmptyList(string? nameOfTheList = null) => nameOfTheList== null? "The target list is empty! Please check recent operations and logs!":$"{nameOfTheList} is EMPTY!";
-        
+
 
         #endregion
+
+
 
         #region "Database"
         /// <summary>
@@ -95,28 +104,6 @@ namespace xyToolz.Logging.Helper
 
 
 
-
-
-        #region "Login"
-
-        /// <summary>
-        /// Login-data is valid
-        /// </summary>
-        /// <returns></returns>
-        public string LoginSuccess(string? username)=> username is null? "The entered userdata seems valid and correct, you may proceed" : $"Login for {username} successfull";
-        
-        /// <summary>
-        /// User failed to provide valid data for login
-        /// </summary>
-        /// <returns></returns>
-        public string LoginFail() => "The userdata is invalid and/ or incorrect, please check the entered dataset";
-        
-        #endregion
-        
-
-
-
-
         #region "Parameter"
 
         /// <summary>
@@ -161,8 +148,7 @@ namespace xyToolz.Logging.Helper
             public string WrongPassword() => "Entered password is wrong, please input correct password!";
 
         #endregion
-        
-        
+            
 
 
 
@@ -230,8 +216,6 @@ namespace xyToolz.Logging.Helper
         public string NotDeleted([MaybeNull] int? ID = null) => ID == null ? $"Error! Target was not deleted from the database" : $"Error! The target with the ID {ID} was NOT deleted from the database";
 
         #endregion
-
-
 
 
 
@@ -395,12 +379,29 @@ namespace xyToolz.Logging.Helper
 
         #endregion
 
+
+        #region Streams
+
+
+        #region "FileStream"
+        public string FileStreamError(string? file = null) => file is null ? "An Error occured while reading a file into stream" :$"An Error occured while reading '{file}' into a stream!!!";
+
+        public string FileStreamSuccess(string? file = null) => file is null ? "Successfully read a file into the stream" : $"Successfully loaded {file} into the stream." ;
+        #endregion
+
+
+
+        #endregion
+
+
         #region "File Operations"
         public string FileNotFound(string? file = null) =>file is null? "File not found!!!": $"File '{file}' not found!!!";
 
         public string FileAccessDenied(string? file = null) =>file is null? "File access denied!!!": $"Access denied for file '{file}'!!!";
 
         public string FileReadError(string? file = null) =>file is null? "File read error!!!": $"Error while reading file '{file}'!!!";
+        
+
         #endregion
 
 
@@ -412,6 +413,23 @@ namespace xyToolz.Logging.Helper
         public string UserLockedOut(string? user = null) =>user is null? "User account is locked out!!!": $"User '{user}' is locked out!!!";
         #endregion
 
+
+        #region "Login"
+
+        /// <summary>
+        /// Login-data is valid
+        /// </summary>
+        /// <returns></returns>
+        public string LoginSuccess(string? username)=> username is null? "The entered userdata seems valid and correct, you may proceed" : $"Login for {username} successfull";
+        
+        /// <summary>
+        /// User failed to provide valid data for login
+        /// </summary>
+        /// <returns></returns>
+        public string LoginFail() => "The userdata is invalid and/ or incorrect, please check the entered dataset";
+        
+        #endregion
+        
 
         #region "Security Messages"
         public string EncryptionFailed(string? target = null) => target is null? "Encryption failed!!!": $"Encryption failed for '{target}'!!!";
