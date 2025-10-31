@@ -188,10 +188,10 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Logs an exception as JSON formatted string (asynchronous).
         /// </summary>
-        public static async Task JsonAsxExLog(Exception ex)
+        public static async Task AsxJsonExLog(Exception ex, [CallerMemberName] string? callerName = null)
         {
             string json = xyLogFormatter.FormatExceptionAsJson(ex);
-            await Console.Out.WriteLineAsync(json);
+            await OutputAsync(json, callerName);
         }
         #endregion
         /// <summary>
@@ -222,6 +222,32 @@ namespace xyToolz.Helper.Logging
         }
 
         /// <summary>
+        /// Synchronous: Writes a json message into file and console
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="callerName"></param>
+        /// <returns></returns>
+        public static bool WriteJsonLog(string message, [CallerMemberName] string? callerName = null)
+        {
+            lock (_threadSafetyLock)
+            {
+                CheckFileSizeAndMoveLogsToArchiveWhenTooBig();
+                try
+                {
+                    string formattedMessage = xyLogFormatter.FormatMessageAsJson(message);
+                    File.AppendAllTextAsync(_logFilePath, formattedMessage);
+                    Output(formattedMessage, callerName);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    WriteExLog(ex, LogLevel.Error,callerName);
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Synchronous: Writes details for the given exception to into console and file
         /// </summary>
         public static bool WriteExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
@@ -245,32 +271,31 @@ namespace xyToolz.Helper.Logging
             }
         }
 
+
         /// <summary>
-        /// Synchronous: Writes a json message into file and console
+        /// Synchronous: Writes details serialized as JSON  to into console and file for the given exception
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="callerName"></param>
-        /// <returns></returns>
-        public static bool WriteJson(string message, [CallerMemberName] string? callerName = null)
+        public static bool WriteJsonExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
             lock (_threadSafetyLock)
             {
-                CheckFileSizeAndMoveLogsToArchiveWhenTooBig();
                 try
                 {
-                    string formattedMessage = FormatMsg(message, callerName);
-                    File.AppendAllText(_logFilePath, formattedMessage);
-                    Output(formattedMessage, callerName);
+                    CheckFileSizeAndMoveLogsToArchiveWhenTooBig();
+
+                    string exceptionDetails = xyLogFormatter.FormatExceptionAsJson(ex);
+                    File.AppendAllText(_exLogFilePath, exceptionDetails);
+                    Output(exceptionDetails, callerName);
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception innerEx)
                 {
-                    Log("BaseLogger.WriteLog() failed...!", callerName);
-                    WriteExLog(ex, LogLevel.Error);
-                    return false;
+                    ExLog(innerEx, LogLevel.Warning, callerName);
                 }
+                return false;
             }
         }
+
 
         #region Service
 
