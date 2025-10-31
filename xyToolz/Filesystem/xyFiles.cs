@@ -660,7 +660,6 @@ namespace xyToolz.Filesystem
                 try
                 {
                     string content = await File.ReadAllTextAsync(fileName);
-                    await xyLog.AsxLog("Loaded content from: " + fileName);
                     return content;
                 }
                 catch (Exception ex)
