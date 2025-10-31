@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
+using xyToolz.Logging.Helper;
 using xyToolz.QOL;
 using xyToolz.Serialization;
 
@@ -81,6 +82,8 @@ namespace xyToolz.Filesystem
     public static class xyFiles
     {
         private static readonly JsonSerializerOptions DefaultJsonOptions = xyJson.defaultJsonOptions;
+        private static readonly xyMessageFactory _msg = new();
+
 
         #region Directory Management and  File Path Validation
 
@@ -203,6 +206,8 @@ namespace xyToolz.Filesystem
         ///     Console.WriteLine(file.FullName);
         /// </code>
         /// <param name="path">The directory path to inspect.</param>
+        /// <param name="callerName"></param>
+        /// </remarks>
         /// <returns>A list of <see cref="FileInfo"/> objects representing the files in the directory.</returns>
         public static IEnumerable<FileInfo> Inventory(string path, [CallerMemberName] string? callerName = null)
         {
@@ -300,7 +305,7 @@ namespace xyToolz.Filesystem
 
             if (string.IsNullOrWhiteSpace(completePath) || string.IsNullOrWhiteSpace(newName))
             {
-                await xyLog.AsxLog(errorMissingInput);
+                await xyLog.AsxLog(_msg.ParametersInvalid([completePath, newName]));
                 return false;
             }
 
@@ -373,27 +378,26 @@ namespace xyToolz.Filesystem
         /// <returns>A collection of lines as strings, or an empty collection if failed.</returns>
         public static async Task<IEnumerable<string>> ReadLinesAsync(string filePath)
         {
-            string noFile = $"File does not exist:{filePath}";
-            string error = $"Error reading file:{filePath}";
-            string success = $"Bytes have been read from {filePath}:";
+      
             string[] allLines;
+            string success = $"Bytes have been read from {filePath}:";
 
             if (!File.Exists(filePath))
             {
-                await xyLog.AsxLog($"{noFile} {filePath}");
+                await xyLog.AsxLog(_msg.FileNotFound(filePath));
                 return Enumerable.Empty<string>();
             }
 
             try
             {
                 allLines = await File.ReadAllLinesAsync(filePath);
-                await xyLog.AsxLog(string.Format(success, allLines.Length) + $" {filePath}");
+                await xyLog.AsxLog(success);
                 return allLines;
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
-                await xyLog.AsxLog($"{error} {filePath}");
+                await xyLog.AsxLog(_msg.FileReadError(filePath));
                 return Enumerable.Empty<string>();
             }
         }

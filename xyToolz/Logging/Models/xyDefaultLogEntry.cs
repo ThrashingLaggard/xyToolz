@@ -87,15 +87,16 @@ namespace xyToolz.Logging.Models
         /// </summary>
         /// <returns></returns>
         public string ToXml()   =>  xyXml.ToXML<xyDefaultLogEntry>(this);
-   
 
-      
+
+
 
 
         /// <summary>
         /// Deserialize a xml string into an instance of xyLogEntry
         /// </summary>
         /// <param name="xml"></param>
+        /// <param name="outputTargetInConsole"></param>
         /// <returns></returns>
         public xyDefaultLogEntry FromXml(string xml, bool outputTargetInConsole = false)
         {

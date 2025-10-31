@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace xyToolz.Logging.Helper
 {
@@ -118,13 +119,63 @@ namespace xyToolz.Logging.Helper
         /// <param name="paramName"></param>
         /// <returns></returns>
         public string ParameterInvalid(string? paramName = null) => paramName == null? "Invalid data! Please check your input!": $"{paramName} is INVALID! Please check your input!";
+
+        /// <summary>
+        /// Lists the given parameters below each other
+        /// </summary>
+        /// <param name="paramNames"></param>
+        /// <returns></returns>
+        public string ParametersInvalid( string[]? paramNames = null)
+        {
+            if ( paramNames == null)
+            {
+                return "Invalid parameter in the parameter checking function!";
+            }
+            else
+            {
+                StringBuilder sb_Params = new();
+                sb_Params.Append("The following parameters are INVALID:\n");
+                foreach (var param in paramNames) 
+                {
+                    sb_Params.AppendLine(param);
+                }
+                sb_Params.AppendLine("Please check your input!");
+                return sb_Params.ToString();
+            }
+        }
+            
+
         /// <summary>
         /// Parameter is null
         /// </summary>
         /// <param name="paramName"></param>
         /// <returns></returns>
         public string ParameterIsNull(string? paramName = null) => paramName == null ? "Input data is NULL! Please check your input!" : $"{paramName} is NULL! Please check your input!";
-        
+
+        /// <summary>
+        /// Lists the given parameters below each other
+        /// </summary>
+        /// <param name="paramNames"></param>
+        /// <returns></returns>
+        public string ParametersAreNull(string[]? paramNames = null)
+        {
+            if (paramNames == null)
+            {
+                return "Invalid parameter data in parameter checking method!";
+            }
+            else
+            {
+                StringBuilder sb_Params = new();
+                sb_Params.Append("The following parameters are NULL:\n");
+                foreach (var param in paramNames)
+                {
+                    sb_Params.AppendLine(param);
+                }
+                sb_Params.AppendLine("Please check your input!");
+                return sb_Params.ToString();
+            }
+        }
+
         /// <summary>
         /// Invalid ID
         /// </summary>
