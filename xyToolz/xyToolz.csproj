@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<PackageVersion>1.0.69</PackageVersion>
+		<PackageVersion>1.0.70</PackageVersion>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 		<Nullable>enable</Nullable>
 		<SignAssembly>False</SignAssembly>
