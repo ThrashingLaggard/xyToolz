@@ -212,7 +212,7 @@ namespace xyToolz.Filesystem
                 {
                     FileInfo fileInfo = new(file);
                     fileList.Add(fileInfo);
-                    xyLog.Log(fileInfo.FullName);
+                    xyLog.Log(fileInfo.FullName,);
                 }
             }
             catch(Exception ex)

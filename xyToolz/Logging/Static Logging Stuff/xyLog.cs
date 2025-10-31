@@ -121,6 +121,18 @@ namespace xyToolz.Helper.Logging
         }
 
         /// <summary>
+        /// Centralized method for printing log messages to console and firing events.
+        /// </summary>
+        /// <param name="formattedMessage">Already formatted log string</param>
+        /// <param name="callerName">Optional caller name</param>
+        private static async Task OutputAsync(string formattedMessage, string? callerName)
+        {
+            await Console.Out.WriteLineAsync(formattedMessage);
+            Console.Out.Flush();
+            LogMessageSent?.Invoke(formattedMessage, callerName!);
+        }
+
+        /// <summary>
         /// Logs a simple text message synchronously.
         /// </summary>
         public static string Log(string message, [CallerMemberName] string? callerName = null)
@@ -140,7 +152,8 @@ namespace xyToolz.Helper.Logging
             {
                 return "What in the fucking hell happened here?";
             }
-            await Task.Run(() => Output(formattedMsg, callerName));
+            await OutputAsync(formattedMsg, callerName);
+                
             return formattedMsg;
         }
 
@@ -158,20 +171,18 @@ namespace xyToolz.Helper.Logging
         /// </summary>
         public static async Task AsxExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
-            await Task.Run(() =>
-            {
-                string exMessage = FormatEx(ex, level, callerName);
-                Output(exMessage, callerName);
-            });
+            string exMessage =  await Task.Run(() =>FormatEx(ex, level, callerName));
+            
+            await OutputAsync(exMessage, callerName);
         }
 
         /// <summary>
         /// Logs an exception as JSON formatted string (synchronous).
         /// </summary>
-        public static void JsonExLog(Exception ex)
+        public static void JsonExLog(Exception ex, [CallerMemberName] string? callerName = null)
         {
             string json = xyLogFormatter.FormatExceptionAsJson(ex);
-            Console.WriteLine(json);
+            Output(json, callerName);
         }
 
         /// <summary>
@@ -198,9 +209,7 @@ namespace xyToolz.Helper.Logging
                 {
                     string formattedMessage = FormatMsg(message, callerName);
                     File.AppendAllText(_logFilePath, formattedMessage);
-                    Console.WriteLine(formattedMessage);
-                    Console.Out.Flush();
-                    LogMessageSent?.Invoke(formattedMessage, callerName!);
+                    Output(formattedMessage, callerName);
                     return true;
                 }
                 catch (Exception ex)
@@ -225,9 +234,7 @@ namespace xyToolz.Helper.Logging
 
                     string exceptionDetails = FormatEx(ex, level, callerName);
                     File.AppendAllText(_exLogFilePath, exceptionDetails);
-                    Console.WriteLine(exceptionDetails);
-                    Console.Out.Flush();
-                    ExLogMessageSent?.Invoke(exceptionDetails, callerName!);
+                    Output(exceptionDetails, callerName);
                     return true;
                 }
                 catch (Exception innerEx)
