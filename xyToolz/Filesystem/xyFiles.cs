@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
 using xyToolz.QOL;
@@ -203,7 +204,7 @@ namespace xyToolz.Filesystem
         /// </code>
         /// <param name="path">The directory path to inspect.</param>
         /// <returns>A list of <see cref="FileInfo"/> objects representing the files in the directory.</returns>
-        public static IEnumerable<FileInfo> Inventory(string path)
+        public static IEnumerable<FileInfo> Inventory(string path, [CallerMemberName] string? callerName = null)
         {
             List<FileInfo> fileList = [];
             try
@@ -212,7 +213,7 @@ namespace xyToolz.Filesystem
                 {
                     FileInfo fileInfo = new(file);
                     fileList.Add(fileInfo);
-                    xyLog.Log(fileInfo.FullName,);
+                    xyLog.Log(fileInfo.FullName,callerName);
                 }
             }
             catch(Exception ex)
