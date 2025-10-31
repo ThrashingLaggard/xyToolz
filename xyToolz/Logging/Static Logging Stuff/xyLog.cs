@@ -275,7 +275,7 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Synchronous: Writes details serialized as JSON  to into console and file for the given exception
         /// </summary>
-        public static bool WriteJsonExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
+        public static bool WriteJsonExLog(Exception ex, LogLevel? level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
             lock (_threadSafetyLock)
             {
@@ -290,7 +290,7 @@ namespace xyToolz.Helper.Logging
                 }
                 catch (Exception innerEx)
                 {
-                    ExLog(innerEx, LogLevel.Warning, callerName);
+                    ExLog(innerEx,level?? LogLevel.Warning, callerName);
                 }
                 return false;
             }

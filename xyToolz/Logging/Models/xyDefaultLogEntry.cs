@@ -113,10 +113,6 @@ namespace xyToolz.Logging.Models
         }
 
 
-        
-
-        // ###################################################################################
-
         /// <summary>
         /// Method from ISerializable
         /// </summary>

@@ -5,6 +5,8 @@ using xyToolz.Logging.Loggers;
 
 namespace xyToolz.QOL
 {
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "...")]
     public class xyQol
     {
         private readonly xyLoggerManager _log;
@@ -36,7 +38,7 @@ namespace xyToolz.QOL
                 else
                 {
                     Type type = typeof(T);
-                    if (type.GetProperties() is PropertyInfo[] propertyInfos && propertyInfos.Any())
+                    if (type.GetProperties() is PropertyInfo[] propertyInfos && propertyInfos.Length > 0)
                     {
                         _log.Log($"Successfully read the property infos for {type}");
                         return propertyInfos;
@@ -62,7 +64,7 @@ namespace xyToolz.QOL
         {
             PropertyInfo[] propertyInfos = GetPropertyInfosForTarget(obj);
 
-            Dictionary<TKey, TValue> propertyDictionary = new();
+            Dictionary<TKey, TValue> propertyDictionary = [];
             TKey key = default!;
             object? value = default;
 
@@ -145,7 +147,7 @@ namespace xyToolz.QOL
         /// <typeparam name="TValue"></typeparam>
         /// <param name="keyValuePairs"></param>
         /// <returns></returns>
-        public string PropertiesToString< TKey, TValue,T>(Dictionary<TKey, TValue>  keyValuePairs) where T : class where TKey :class
+        public static string PropertiesToString< TKey, TValue,T>(Dictionary<TKey, TValue>  keyValuePairs) where T : class where TKey :class
         {
             StringBuilder stringBuilder = new();
             foreach (var keyValue in keyValuePairs)

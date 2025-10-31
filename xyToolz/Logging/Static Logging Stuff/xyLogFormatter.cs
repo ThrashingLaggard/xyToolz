@@ -38,6 +38,7 @@ namespace xyToolz.Helper.Logging
     /// Console.WriteLine(formatted);
     /// </code>
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "mimimimimimimimiimmiimmiimi")]
     public static class xyLogFormatter
     {
         #region Constants

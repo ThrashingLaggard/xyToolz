@@ -25,7 +25,7 @@ namespace xyToolz.Filesystem
 #if ANDROID
                   return Path.Combine(BasePath, Path.Combine(paths));
 #else
-            return Path.Combine(paths.Prepend(BasePath).ToArray());
+            return Path.Combine([.. paths.Prepend(BasePath)]);
 #endif
         }
 

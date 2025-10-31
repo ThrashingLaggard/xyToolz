@@ -255,7 +255,7 @@ namespace xyToolz.Filesystem
         /// </remarks>
         /// <param name="path">The directory to scan for files.</param>
         /// <returns>A list of full file paths as strings.</returns>
-        public static IEnumerable<string> InventoryNames(string path) => Inventory(path).Select(f => f.FullName).ToList();
+        public static IEnumerable<string> InventoryNames(string path) => [.. Inventory(path).Select(f => f.FullName)];
 
         /// <summary>
         /// Renames a file to a new name within its current directory.
@@ -297,7 +297,6 @@ namespace xyToolz.Filesystem
         public static async Task<bool> RenameFileAsync(string completePath, string newName)
         {
             string newPath;
-            string errorMissingInput = "The provided file path or new file name is null or empty.";
             string errorInvalidName = "The new file name contains invalid characters or is a directory path.";
             string errorFileNotFound = "The original file does not exist.";
             string errorTargetExists = "A file with the target name already exists.";
@@ -436,21 +435,15 @@ namespace xyToolz.Filesystem
         /// <returns>A <see cref="Stream"/> containing the file content, or null on failure.</returns>
         public static async Task<Stream?> GetStreamFromFileAsync(string filePath)
         {
-            const string invalidPathMsg = "The given file path is null or empty.";
-            string notFoundMsg = "File does not exist:";
-            string errorReadMsg = "Error reading file into stream:";
-            string success = $"Loaded file into stream from {filePath}:";
-
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                await xyLog.AsxLog(invalidPathMsg);
+                await xyLog.AsxLog(_msg.PathNotFound(filePath));
                 return null;
             }
 
-            
             if (!File.Exists(filePath))
             {
-                await xyLog.AsxLog($"{notFoundMsg} {filePath}");
+                await xyLog.AsxLog(_msg.FileNotFound(filePath));
                 return null; ;
             }
 
@@ -466,8 +459,8 @@ namespace xyToolz.Filesystem
             }
             catch (Exception ex)
             {
+                await xyLog.AsxLog(_msg.FileStreamError());
                 await xyLog.AsxExLog(ex);
-                await xyLog.AsxLog($"{errorReadMsg} {filePath}");
                 return null;
             }
         }
@@ -498,21 +491,15 @@ namespace xyToolz.Filesystem
         /// <returns>True if the content was successfully saved; otherwise, false.</returns>
         public static async Task<bool> SaveToFile(string content, string filePath = "config.json")
         {
-
-            string saveSuccessMsg = "Successfully saved file to:";
-            string saveErrorMsg = "Error saving file:";
-
             try
             {
                  xyPath.EnsureParentDirectoryExists(filePath);
                 await File.WriteAllTextAsync(filePath, content, new UTF8Encoding(false));
-                await xyLog.AsxLog(saveSuccessMsg + $" {filePath}");
                 return true;
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
-                await xyLog.AsxLog($"{saveErrorMsg} {filePath}");
                 return false;
             }
         }
@@ -583,18 +570,14 @@ namespace xyToolz.Filesystem
         /// <returns>True if the file was saved successfully; otherwise, false.</returns>
         public static async Task<bool> SaveStringToFileAsync(string content, string subfolder = "AppData", string fileName = "config.json")
         {
-            string invalidContentMsg = "Content is null or empty.";
-            string invalidPathMsg = "Subfolder or filename is null or empty.";
-
-
             if (string.IsNullOrEmpty(content))
             {
-                await xyLog.AsxLog(invalidContentMsg);
+                await xyLog.AsxLog(_msg.FileContentError(fileName));
                 return false;
             }
             if (string.IsNullOrWhiteSpace(subfolder) || string.IsNullOrWhiteSpace(fileName))
             {
-                await xyLog.AsxLog(invalidPathMsg);
+                await xyLog.AsxLog(_msg.ParametersNullOrInvalid([subfolder,fileName]));
                 return false;
             }
 
@@ -667,11 +650,9 @@ namespace xyToolz.Filesystem
         /// <returns>The file content as string, or null on failure.</returns>
         public static async Task<string?> LoadFileAsync(string fileName = "config.json")
         {
-            string noFile = "File does not exist:";
-
             if (!File.Exists(fileName))
             {
-                await xyLog.AsxLog($"{noFile} {fileName}");
+                await xyLog.AsxLog(_msg.FileNotFound());
                 return null;
             }
             else
@@ -679,7 +660,7 @@ namespace xyToolz.Filesystem
                 try
                 {
                     string content = await File.ReadAllTextAsync(fileName);
-                    await xyLog.AsxLog("Successfully loaded content from: " + fileName);
+                    await xyLog.AsxLog("Loaded content from: " + fileName);
                     return content;
                 }
                 catch (Exception ex)

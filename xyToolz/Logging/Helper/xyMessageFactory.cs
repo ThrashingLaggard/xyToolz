@@ -10,7 +10,8 @@ namespace xyToolz.Logging.Helper
     /// 
     /// Really nice, lol
     /// </summary>
-    public class xyMessageFactory
+    [SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Mimimiimimimimimimimimimimimii")]
+    public class xyMessageFactory 
     {
         /// <summary>
         /// Add usefull information
@@ -488,8 +489,9 @@ namespace xyToolz.Logging.Helper
         public string FileAccessDenied(string? file = null) =>file is null? "File access denied!!!": $"Access denied for file '{file}'!!!";
 
         public string FileReadError(string? file = null) =>file is null? "File read error!!!": $"Error while reading file '{file}'!!!";
-        
 
+        public string FileContentError(string? file = null) => file is null ? "File content is empty or unreadable." : $"File content from '{file}' is unreadable or empty!!!";
+     
         #endregion
 
 
