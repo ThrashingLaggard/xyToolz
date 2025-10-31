@@ -28,7 +28,7 @@ namespace xyToolz.Logging.Helper.Formatters
             {
                 xyQol qol = new(new(),new());
                 Dictionary<TKey,TValue> dictionary = qol.GetPropertyValuesForTarget<TKey, TValue, T>(entry_);
-                string properties = qol.PropertiesToString<TKey,TValue,T>(dictionary);
+                string properties = xyQol.PropertiesToString<TKey,TValue,T>(dictionary);
                 return properties;
             }
             return "";

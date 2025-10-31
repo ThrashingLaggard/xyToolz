@@ -1,3 +1,2 @@
 ﻿- Global suppressions für Namensrichtline
 
-Test
