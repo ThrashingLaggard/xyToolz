@@ -161,7 +161,7 @@ namespace xyToolz.Logging.Helper
         {
             if (paramNames == null)
             {
-                return "Invalid parameter data in parameter checking method!";
+                return "Invalid parameter data!";
             }
             else
             {
@@ -175,6 +175,41 @@ namespace xyToolz.Logging.Helper
                 return sb_Params.ToString();
             }
         }
+
+
+        /// <summary>
+        /// Parameter is null or invalid
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <returns></returns>
+        public string ParameterNullOrInvalid(string? paramName = null) => paramName == null ? 
+            $"Input data is NULL or INVALID! Please check your input!" : 
+            $"{paramName} is NULL or INVALID! Please check your input!";
+
+        /// <summary>
+        /// Lists the given parameters below each other
+        /// </summary>
+        /// <param name="paramNames"></param>
+        /// <returns></returns>
+        public string ParametersNullOrInvalid(string[]? paramNames = null)
+        {
+            if (paramNames == null)
+            {
+                return "Parameters are NULL or hold INVALID data!";
+            }
+            else
+            {
+                StringBuilder sb_Params = new();
+                sb_Params.Append("The following parameters are NULL or INVALID:\n");
+                foreach (var param in paramNames)
+                {
+                    sb_Params.AppendLine(param);
+                }
+                sb_Params.AppendLine("Please check your input!");
+                return sb_Params.ToString();
+            }
+        }
+
 
         /// <summary>
         /// Invalid ID
