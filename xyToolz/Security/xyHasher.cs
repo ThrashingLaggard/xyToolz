@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using xyToolz.Helper.Logging;
@@ -7,6 +8,16 @@ using xyToolz.QOL;
 
 namespace xyToolz.Security
 {
+
+    internal static class xySecurityDefaults
+    {
+        public const int Pbkdf2Iterations = 150_000; // sicher & flott genug
+        public const int SaltSizeBytes = 16;
+        public const int KeySizeBytes = 32;
+    }
+
+
+
     /// <summary>
     /// Provides secure password hashing and verification functionality using PBKDF2.
     /// Includes configurable peppering, salt generation, logging, and support for SHA256/SHA512 algorithms.
@@ -69,7 +80,7 @@ namespace xyToolz.Security
         /// <summary>
         /// Number of iterations used in PBKDF2 password hashing.
         /// </summary>
-        public static readonly int Iterations = 100_000;
+        public static readonly int Iterations = 200_000;
         /// <summary>
         /// Key length in bytes for SHA256-based hashes.
         /// </summary>
@@ -211,10 +222,45 @@ namespace xyToolz.Security
             }
         }
 
+        public static string HashPbkdf2(string plaintext)
+           => HashPbkdf2(plaintext, xySecurityDefaults.Pbkdf2Iterations, xySecurityDefaults.SaltSizeBytes, xySecurityDefaults.KeySizeBytes);
+
+        public static string HashPbkdf2(string plaintext, int iterations, int saltSizeBytes, int keySizeBytes)
+        {
+            ArgumentNullException.ThrowIfNull(plaintext);
+            var salt = RandomNumberGenerator.GetBytes(saltSizeBytes);
+            var key = Rfc2898DeriveBytes.Pbkdf2(
+                plaintext,
+                salt,
+                iterations,
+                HashAlgorithmName.SHA256,
+                keySizeBytes);
+
+            // Format: pbkdf2-sha256$iter$saltBase64$keyBase64
+            return $"pbkdf2-sha256${iterations}${Convert.ToBase64String(salt)}${Convert.ToBase64String(key)}";
+        }
+
         #endregion
 
         #region Password Verification
 
+        public static bool VerifyPbkdf2(string plaintext, string hash)
+        {
+            ArgumentNullException.ThrowIfNull(plaintext);
+            ArgumentNullException.ThrowIfNull(hash);
+
+            var parts = hash.Split('$');
+            if (parts.Length != 4 || parts[0] != "pbkdf2-sha256") return false;
+
+            var iterations = int.Parse(parts[1], CultureInfo.InvariantCulture);
+            var salt = Convert.FromBase64String(parts[2]);
+            var expected = Convert.FromBase64String(parts[3]);
+
+            var actual = Rfc2898DeriveBytes.Pbkdf2(
+                plaintext, salt, iterations, HashAlgorithmName.SHA256, expected.Length);
+
+            return CryptographicOperations.FixedTimeEquals(actual, expected);
+        }
         /// <summary>
         /// Verifies a plaintext password against a stored salted hash in the format "salt:hash".
         /// </summary>

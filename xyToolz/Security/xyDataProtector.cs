@@ -30,8 +30,8 @@ namespace xyToolz.Security
     /// </summary>
     public static class xyDataProtector
     {
-
-            private static IxyDataProtector? _override;
+        #region "Tests"
+        private static IxyDataProtector? _override;
       
         /// <summary>
         /// Replaces the default implementation with a mocked version .
@@ -44,6 +44,10 @@ namespace xyToolz.Security
         /// </summary>
         public static void ResetOverride()
             => _override = null;
+
+        #endregion
+
+
 
         /// <summary>
         /// Unprotect and read the values from a key from a file
@@ -65,12 +69,9 @@ namespace xyToolz.Security
                     return await UnprotectAsync<T>(encrypted);
                 }
             }
+
             return default;
-
         }
-
-
-
 
         /// <summary>
         /// Protects an object by serializing and encrypting it with DPAPI.
@@ -103,6 +104,7 @@ namespace xyToolz.Security
                 return Array.Empty<byte>();
             }
         }
+
         /// <summary>
         /// String wrapper for generic method
         /// </summary>

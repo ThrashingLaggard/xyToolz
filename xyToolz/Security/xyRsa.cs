@@ -240,5 +240,9 @@ namespace xyToolz.Security
         }
 
 
+        public static byte[] Encrypt(byte[] data, RSA rsa) => rsa.Encrypt(data, RSAEncryptionPadding.OaepSHA256);
+
+        public static byte[] Decrypt(byte[] cipher, RSA rsa) => rsa.Decrypt(cipher, RSAEncryptionPadding.OaepSHA256);
+
     }
 }
