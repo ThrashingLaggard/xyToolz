@@ -27,9 +27,9 @@ namespace xyToolz.Renderer
         private static PdfDocument CreatePdfDocumentWithBasicValues(TypeDoc td_Root_)
         {
             PdfDocument document = new();
-            document.Info.Title = $"{td_Root_.DisplayName} API Documentation";
-            document.Info.Author = $"xyDocumentor@{Environment.CurrentDirectory}";
-            document.Info.Subject = "C# API Reference";
+            document.Info.Title = $"{td_Root_.DisplayName}";
+            document.Info.Author = $"xyToolz@{Environment.CurrentDirectory}";
+            document.Info.Subject = "Your advertisement here";
             document.Options.NoCompression = false;
             document.Options.CompressContentStreams = true;
 
