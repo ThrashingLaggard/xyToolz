@@ -1,5 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿
+using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using xyToolz.Helper.Logging;
+using xyToolz.Logging.Helper.Formatters;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace xyToolz.Logging.Helper
 {
@@ -223,16 +229,16 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <returns></returns>
         public string WrongUserNameOrPassword() => "Entered username or password is wrong, please correct input!";
-            /// <summary>
+        /// <summary>
         /// Username is wrong
         /// </summary>
         /// <returns></returns>
-            public string WrongUserName() => "Entered username is wrong, please input correct username!";
-            /// <summary>
+        public string WrongUserName() => "Entered username is wrong, please input correct username!";
+        /// <summary>
         /// Password is wrong
         /// </summary>
         /// <returns></returns>
-            public string WrongPassword() => "Entered password is wrong, please input correct password!";
+        public string WrongPassword() => "Entered password is wrong, please input correct password!";
 
         #endregion
             
@@ -411,9 +417,6 @@ namespace xyToolz.Logging.Helper
         #endregion
 
 
-
-
-
         #region "Key & Token Handling"
         /// <summary>
         /// Successfully managed to set the value of the target key
@@ -516,10 +519,16 @@ namespace xyToolz.Logging.Helper
         /// User failed to provide valid data for login
         /// </summary>
         /// <returns></returns>
-        public string LoginFail() => "The userdata is invalid and/ or incorrect, please check the entered dataset";
+        public string LoginFail(string? email) => email is null?"The userdata is invalid and/ or incorrect, please check the entered dataset" : $"Login failed for user: {email}.";
         
+        public string LoginStart(string url) => $"Attempting login at: {url}.";
+
+        public string LoginTimeout(int seconds) => $"Login process timed out after {seconds} seconds.";
+
+        public string LoginUnexpected(Exception ex) => $"Unexpected error during login: {xyLogFormatter.FormatExceptionDetails(ex,LogLevel.Warning)}";
+
         #endregion
-        
+
 
         #region "Security Messages"
         public string EncryptionFailed(string? target = null) => target is null? "Encryption failed!!!": $"Encryption failed for '{target}'!!!";
@@ -530,16 +539,302 @@ namespace xyToolz.Logging.Helper
         #endregion
 
 
+        #region "System"
+
+
+        #region "Window & Tab Handling"
+
+        public string WindowSwitch(string handle) => $"Switched to window with handle: {handle}";
+
+        public string WindowClosed(string handle) => $"Window closed: {handle}";
+
+        public string WindowOpened(string name) => $"New window opened: {name}";
+
+        #endregion
+
+        #region "Keyboard & Mouse Events"
+
+        public string KeyPressed(string key) =>
+            $"Pressed key: '{key}'";
+
+        public string KeyCombinationPressed(string combo) =>
+            $"Pressed key combination: '{combo}'";
+
+        public string MouseMovedTo(string description) =>
+            $"Mouse moved to: {description}";
+
+        public string MouseClicked(string description) =>
+            $"Mouse clicked on: {description}";
+
+        public string MouseDoubleClicked(string description) =>
+            $"Mouse double-clicked on: {description}";
+
+        public string MouseRightClicked(string description) =>
+            $"Mouse right-clicked on: {description}";
+
+        public string MouseActionFailed(string action, string reason) =>
+            $"Mouse action '{action}' failed: {reason}";
+
+        #endregion
+
         #region "System Messages"
         public string OperationFailed(string? operation = null) =>operation is null? "Operation failed!!!": $"Operation '{operation}' failed!!!";
 
         public string ConfigurationError(string? config = null) =>config is null? "Configuration error detected!!!": $"Configuration error detected for '{config}'!!!";
 
         public string UnknownError(string? details = null) =>details is null? "An unknown error occurred!!!": $"An unknown error occurred: {details}";
+
+        #endregion
+        
+
+        #endregion
+
+        #region "Browser automatization"
+
+        #region "Navigation"
+        public string NavigationStart(string url) => $"Navigating to URL: {url}";
+
+        public string NavigationTimeout(string url, int seconds) => $"Timeout while loading URL: {url} (after {seconds} seconds)";
+
+        public string NavigationUnexpected(string url) => $"Unexpected error while navigating to URL: {url}";
+
+        public string NavigationSuccess(string url) => $"Navigation to '{url}' completed.";
+        #endregion
+
+        #region "Elements"
+
+        #endregion
+
+        #region "Clicking"
+        public string ClickSuccess(string textOrTag) => $"Clicked on the element: {textOrTag}.";
+
+        public string ClickTimeout(By by, int seconds) => $"Timeout: Element '{by}' was not clickable within {seconds} seconds...";
+
+        public string ClickStale(By by) => $"Stale reference: Element '{by}' is no longer attached to the DOM.";
+
+        public string ClickUnexpected(By by) => $"Unexpected error while trying to click on element '{by}'!";
+
+        public string ClickFail(By by) => $"Failed to click element '{by}'.";
+        #endregion
+
+        #region "Enter Stuff"
+        public string EnterPassword(By by, string tag, string type) => $"Entering password into element '{by}' ({tag}, type={type}).";
+
+        public string EnterText(By by, string input, string tag, string type) => $"Entering text '{input}' into element '{by}' ({tag}, type={type}).";
+
+        public string EnterSkipButton(By by, string type) => $"Skipped: Element '{by}' is a button or submit input (type={type}).";
+
+        public string EnterTimeout(By by, int seconds) => $"Timeout: Element '{by}' was not visible within {seconds} seconds.";
+
+        public string EnterStale(By by) => $"Stale reference: Element '{by}' is no longer attached to the DOM.";
+
+        public string EnterUnexpected(By by) => $"Unexpected error while trying to enter text into element '{by}'.";
+
+        public string EnterFail(By by) => $"Failed to enter text into element '{by}'.";
+        #endregion
+
+        #region "Screenshots"
+
+        public string ScreenshotSuccess(string filePath) => $"Screenshot successfully saved to: {filePath}.";
+
+        public string ScreenshotFail(Exception ex) => $"Failed to take screenshot: {ex.Message}";
+
+        #endregion
+
+        #region "Downloads"
+
+        public string DownloadStarted(string url) => $"Started download from: {url}.";
+
+        public string DownloadSuccess(string filePath) => $"Download completed and saved to: {filePath}.";
+
+        public string DownloadTimeout(string url, int seconds) => $"Timeout while downloading from '{url}' after {seconds} seconds.";
+
+        public string DownloadFail(string url) => $"Failed to download from: {url}.";
+
+        #endregion
+
+        #region "Uploads"
+
+        public string UploadStart(string filePath) => $"Starting upload of file: {filePath}.";
+
+        public string UploadSuccess(string filePath) => $"File uploaded successfully: {filePath}.";
+
+        public string UploadFail(string filePath) => $"Failed to upload file: {filePath}.";
+
+        public string UploadElementNotFound(By by) => $"Upload element not found: {by}.";
+
+        #endregion
+
+        #region "Submitting FORMs"
+
+        public string FormSubmitStart(By by) => $"Submitting form using element: {by}.";
+
+        public string FormSubmitSuccess(By by) => $"Form submitted successfully using element: {by}.";
+
+        public string FormSubmitFail(By by) => $"Form submission failed using element: {by}.";
+
+        public string FormSubmitTimeout(By by, int seconds) => $"Timeout during form submission with element '{by}' after {seconds} seconds.";
+
+        #endregion
+
+        #region "Element lookup & validation"
+        public string ElementVisible(By by) => $"Element '{by}' is visible.";
+
+        public string ElementInvisible(By by) => $"Element '{by}' is not visible.";
+
+        public string ElementClickable(By by) => $"Element '{by}' is clickable.";
+
+        public string ElementNotClickable(By by) => $"Element '{by}' is not clickable.";
+
+        public string ElementNotFound(By by) => $"Element '{by}' not found.";
+
+        public string ElementFound(By by) => $"Element found: {by}.";
+
+        public string ElementMissing(By by) => $"Element not found: {by}.";
+
+        public string ElementValidationPass(By by) => $"Element '{by}' passed validation.";
+
+        public string ElementValidationFail(By by) => $"Element '{by}' failed validation.";
+
+        public string ElementAttributeMismatch(By by, string attr, string expected, string actual) => $"Validation failed: Attribute '{attr}' of element '{by}' expected '{expected}', but found '{actual}'.";
+
+        #endregion
+
+        #region "Cookie management"
+
+        public string CookieAdded(string name) => $"Cookie '{name}' was added successfully.";
+
+        public string CookieRetrieved(string name, string value) => $"Cookie '{name}' retrieved with value: {value}.";
+
+        public string CookieNotFound(string name) => $"Cookie '{name}' was not found.";
+
+        public string CookieDeleted(string name) => $"Cookie '{name}' was deleted.";
+
+        public string CookieOperationFailed(string name, string action) => $"Cookie '{name}' could not be {action}.";
+
+        #endregion
+
+        #region "Window handling"
+
+        public string WindowSwitched(string title) => $"Switched to window with title: {title}.";
+
+        public string WindowNotFound(string title) => $"Window with title '{title}' not found.";
+
+        public string WindowCloseSuccess(string title) => $"Closed window with title: {title}.";
+
+        public string WindowCloseFail(string title) => $"Failed to close window with title: {title}.";
+
+        #endregion
+
+        #region "Switching tabs"
+
+        public string TabSwitched(int index) => $"Switched to browser tab at index: {index}.";
+
+        public string TabSwitchFailed(int index) => $"Failed to switch to tab at index: {index}.";
+
+        public string TabClosed(int index) => $"Closed browser tab at index: {index}.";
+
+        #endregion
+
+        #region "JavaScript stuff"
+
+        public string JsExecuted(string description) => $"Executed JavaScript: {description}.";
+
+        public string JsExecutionFailed(string description) => $"Failed to execute JavaScript: {description}.";
+
+        public string JsReturnedNull(string description) => $"JavaScript returned null or undefined: {description}.";
+
+        public string JsReturnedValue(string description, string value) => $"JavaScript result for '{description}': {value}.";
+
+        #endregion
+
+        #region "Alerts aka ALARMs"
+
+        public string AlertPresent(string text) => $"Alert with message: {text}.";
+
+        public string AlertNotPresent() => $"No alert present.";
+
+        public string AlertAccepted() => $"Alert was accepted.";
+
+        public string AlertDismissed() => $"Alert was dismissed.";
+
+        public string AlertHandlingFailed(string reason) => $"Failed to handle alert: {reason}.";
+
+        #endregion
+
+        #region "Drag and Drop"
+
+        public string DragAndDropSuccess(By source, By target) => $"Dragged element '{source}' and dropped onto '{target}'.";
+
+        public string DragAndDropFail(By source, By target) => $"Failed to drag element '{source}' onto '{target}'.";
+
+        #endregion
+
+        #region "Scrolling"
+
+        public string ScrolledToElement(By by) => $"Scrolled to element '{by}'.";
+
+        public string ScrollToElementFailed(By by) => $"Failed to scroll to element '{by}'.";
+
+        public string ScrolledByOffset(int x, int y) => $"Scrolled page by offset (x={x}, y={y}).";
+
+        #endregion
+
+        #region "Wait conditions"
+
+        public string WaitUntilVisible(By by, int seconds) => $"Waiting until element '{by}' is visible (timeout: {seconds} seconds).";
+
+        public string WaitUntilClickable(By by, int seconds) => $"Waiting until element '{by}' is clickable (timeout: {seconds} seconds).";
+
+        public string WaitConditionFail(By by, string condition) => $"Wait failed: Element '{by}' did not meet condition: {condition}.";
+
+        #endregion
+
+        #region "Modal Dialogs"
+
+        public string ModalDetected(By by) => $"Modal dialog detected: '{by}'";
+
+        public string ModalHandled(By by) => $"Modal dialog handled successfully: '{by}'";
+
+        public string ModalNotFound(By by) => $"Modal dialog not found: '{by}'";
+
+        public string ModalHandlingFailed(By by) => $"Failed to handle modal dialog: '{by}'";
+
+        #endregion
+
+        #region "Frame Switching"
+
+        public string FrameSwitch(By by) => $"Switched to frame: '{by}'";
+
+        public string SwitchedToDefaultContent() => $"Switched back to default content from frame.";
+
+        public string FrameNotFound(By by) => $"Frame not found: '{by}'";
+
+        public string FrameSwitchFailed(By by) => $"Failed to switch to frame: '{by}'";
+
+        #endregion
+
+        #region "Result and status messages"
+
+        public string ActionSuccess(string description) => $"Success: {description}";
+
+        public string ActionFailed(string description) => $"Failure: {description}";
+
+        public string HttpStatusCode(int statusCode) => $"HTTP status code received: {statusCode}";
+
+        public string OperationCompleted(string name) => $"Operation completed: {name}";
+
         #endregion
 
 
-    #endregion
+
+
+
+
+
+        #endregion
+
+        #endregion
     }
 
 

@@ -352,7 +352,7 @@ namespace xyToolz.Filesystem
         /// </summary>
         /// <remarks>
         /// <para><b>Behavior:</b></para>
-        /// Verifies that the file exists using <see cref="EnsurePathExistsAsync"/>. If the file is available, it reads all lines asynchronously.
+        /// the file is available, it reads all lines asynchronously.
         /// Returns an empty collection if the file is missing or an error occurs.
         ///
         /// <para><b>Thread Safety:</b></para>
