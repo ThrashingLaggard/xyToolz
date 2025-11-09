@@ -69,7 +69,7 @@ namespace xyToolz.Serialization
 
         #region File‑Utilities
 
-       
+
 
         #endregion
 
@@ -81,9 +81,10 @@ namespace xyToolz.Serialization
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
         /// <param name="fileName"></param>
+        /// <param name="ct"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions? options = null)
+        public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", CancellationToken ct = default,JsonSerializerOptions ? options = null)
         {
             string errorMessage = $"Failed to serialize data to JSON file: '{fileName}'.";
 
@@ -92,7 +93,7 @@ namespace xyToolz.Serialization
                 if ( await xyFiles.EnsurePathExistsAsync(fileName))
                 {
                     string jsonData = JsonSerializer.Serialize(data, options ?? defaultJsonOptions);
-                    await File.WriteAllTextAsync(fileName, jsonData);                  
+                    await File.WriteAllTextAsync(fileName, jsonData, cancellationToken: ct);                  
                     return true;
                 }
             }
