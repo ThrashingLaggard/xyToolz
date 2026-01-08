@@ -181,7 +181,8 @@ namespace xyToolz.Serialization
             {
                 dynamic? stream = await xyFiles.GetStreamFromFileAsync(filePath);
                 if (stream == null) return null;
-                return await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(stream, defaultJsonOptions);
+
+                 return await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(stream, defaultJsonOptions);
             }
             catch (Exception ex)
             {
@@ -189,6 +190,49 @@ namespace xyToolz.Serialization
                 return null;
             }
         }
+
+        /// <summary>
+        /// Reads the entire JSON file and deserializes it into a Dictionary, a List or an Array!.
+        /// </summary>
+        /// <param name="filePath">Path to the JSON file.</param>
+        /// <param name="outputFormat">Choose datatype for output</param>
+        /// <returns>Deserialized dictionary or null if reading fails.</returns>
+        public static async Task<T?> DeserializeFromFile<T>(string filePath, int outputFormat)
+        {
+            try
+            {
+                dynamic? stream = await xyFiles.GetStreamFromFileAsync(filePath);
+                if (stream == null) return default(T);
+
+                switch (outputFormat)
+                {
+                    case 0:
+                    {
+                        return  JsonSerializer.DeserializeAsync<Dictionary<string, T>>(stream, defaultJsonOptions).ToDictionary();
+                    }
+                    case 1:
+                    {
+                        return await JsonSerializer.DeserializeAsync<List<T>>(stream, defaultJsonOptions);
+                    }
+                    case 2: 
+                    {
+                        return await JsonSerializer.DeserializeAsync<T[]>(stream, defaultJsonOptions);    
+                    }
+                    default:
+                    {
+                            goto END;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+            }
+            END:
+                return default(T);
+
+        }
+
 
         /// <summary>
         /// Reads the value from a single key from the JSON file and returns it as an object.

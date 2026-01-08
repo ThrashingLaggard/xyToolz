@@ -1,11 +1,4 @@
-﻿// xyToolz – PDF Options model (v1)
-// Intent: unify the public configuration surface for all PDF features while keeping the "xy" branding.
-// Drop-in ready as a single file. You can later split by topic (Core/Theme/Layout/etc.).
-
-using System;
-using System.Collections.Generic;
-
-namespace xyToolz.Pdf
+﻿namespace xyToolz.Pdf
 {
     // =====================================================================
     // Core primitives
