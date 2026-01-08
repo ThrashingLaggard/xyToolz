@@ -193,6 +193,10 @@ namespace xyToolz.Serialization
 
         /// <summary>
         /// Reads the entire JSON file and deserializes it into a Dictionary, a List or an Array!.
+        /// 
+        /// 0 --> Dictionary
+        /// 1 --> List
+        /// 2 --> Array
         /// </summary>
         /// <param name="filePath">Path to the JSON file.</param>
         /// <param name="outputFormat">Choose datatype for output</param>
