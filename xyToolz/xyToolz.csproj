@@ -14,14 +14,16 @@
 		Little toolz to save some precious seconds with my doggo.
 		Providing helper classes and utility stuff:
 		
-		file handling, 
+		file handling,
+		filesystem helper,
 		logging, 
 		encryption, 
-		JSON processing,
+		JSON and XML (de-)serialization,
 		PDF manipulation, 
-		browser automation,
+		browser automation WIP,
 		and other QOL stuff
 
+		Database manipulation stuff needs fixing i think,
 
 		</Description>
 		<Copyright>Do with this, as you please. Go home to your dog   </Copyright>
@@ -37,15 +39,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Outsourcing\**" />
 	  <Compile Remove="READMEs\**" />
+	  <Compile Remove="Renderer\**" />
+	  <EmbeddedResource Remove="Outsourcing\**" />
 	  <EmbeddedResource Remove="READMEs\**" />
+	  <EmbeddedResource Remove="Renderer\**" />
+	  <None Remove="Outsourcing\**" />
 	  <None Remove="READMEs\**" />
+	  <None Remove="Renderer\**" />
 
 		<None Include="readme.md" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
