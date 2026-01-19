@@ -1,10 +1,7 @@
-﻿
-using Microsoft.Extensions.Logging;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using xyToolz.Helper.Logging;
-using xyToolz.Logging.Helper.Formatters;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace xyToolz.Logging.Helper

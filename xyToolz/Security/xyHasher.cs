@@ -1,8 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Security.Cryptography;
-using System.Text;
 using xyToolz.Helper.Logging;
 using xyToolz.QOL;
 
