@@ -1,7 +1,7 @@
 ﻿
 using PdfSharp.Pdf;
 
-namespace xyToolz.PDF
+namespace xyToolz.Pdf
 {
     /// <summary>
     /// Symbolizing an indexing Card for learning or ....

@@ -4,7 +4,7 @@ using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using xyToolz.Helper.Logging;
 
-namespace xyToolz.PDF
+namespace xyToolz.Pdf
 {
     /// <summary>
     /// QOL stuff for handling pdf files
