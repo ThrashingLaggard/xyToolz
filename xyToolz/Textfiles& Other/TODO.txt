@@ -1,2 +1,3 @@
 ﻿- Global suppressions für Namensrichtline
 
+- Loggers auslagern und fertigstellen!!!
