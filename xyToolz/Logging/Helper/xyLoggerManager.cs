@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using xyToolz.List;
+using xyToolz.Lists;
 using xyToolz.Logging.Helper.Formatters;
 using xyToolz.Logging.Interfaces;
 
@@ -13,7 +13,7 @@ namespace xyToolz.Logging.Helper
     /// <summary>
     /// Manages a collection of loggers (ILogging) and provides methods for logging messages and exceptions.
     /// 
-    ///                                                                                                                                                                                     Stuff for Eventhandlers is planned!
+    ///                                                                                                                  Stuff for Eventhandlers is planned!
     /// </summary>
     public class xyLoggerManager 
     {
