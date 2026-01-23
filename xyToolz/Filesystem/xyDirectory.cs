@@ -7,7 +7,7 @@ namespace xyToolz.Filesystem
     /// Directory helpers
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<I want it that way>")]
-    public static class xyDirectoryHelper
+    public static class xyDirectory
     {
         /// <summary>
         /// Get the full path of the directory containing this programs     .sln    file
