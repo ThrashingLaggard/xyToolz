@@ -1,11 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using xyToolz.Filesystem;
 using xyToolz.Helper.Logging;
 
@@ -145,7 +139,7 @@ namespace xyToolz.Database.Basix
         {
             try
             {
-                String appFolder = xyDirectoryHelper.GetInnerApplicationFolder();
+                String appFolder = xyDirectory.GetInnerApplicationFolder();
                 xyLog.Log(PathForDB = Path.Join(appFolder, pathDB));
             }
             catch (Exception ex)
