@@ -53,20 +53,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
-		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="PDFsharp" Version="6.2.2" />
-		<PackageReference Include="PdfSharpCore" Version="1.3.67" />
-		<PackageReference Include="Selenium.Support" Version="4.38.0" />
-		<PackageReference Include="Selenium.WebDriver" Version="4.38.0" />
-		<PackageReference Include="System.Drawing.Common" Version="9.0.10" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
-		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.10" />
-		<PackageReference Include="System.Text.Json" Version="9.0.10" />
+	  <ProjectReference Include="..\BrowserAutomatisation\BrowserAutomatisation.csproj" />
+	  <ProjectReference Include="..\Filesystem\Filesystem.csproj" />
+	  <ProjectReference Include="..\Lists\Lists.csproj" />
+	  <ProjectReference Include="..\Logging\Logging.csproj" />
+	  <ProjectReference Include="..\Misc\Misc.csproj" />
+	  <ProjectReference Include="..\PDF\PDF.csproj" />
+	  <ProjectReference Include="..\QOL\QOL.csproj" />
+	  <ProjectReference Include="..\Security\Security.csproj" />
 	</ItemGroup>
 
 
