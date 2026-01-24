@@ -141,28 +141,6 @@ Custom wrapper classes for card-style data transport or templating.
 
 ---
 
-## ✅ Requirements
-
-- .NET 6 or newer (.NET 8 ready)
-- Zero external dependencies
-- Optional Android and Avalonia support via submodules
-
----
-
-## 📜 License
-
-Licensed under **GNU GPLv3**  
-See: [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)
-
----
-
-## 👤 Author
-
-Created by the ThrashingLaggard
-> Part of the `xyToolz` ecosystem  
-> Created for internal tooling, education, and experimentation.
----
-
 ### 🪵 `xyLog`, `xyLogFormatter`, `xyLogTargets`, `xyLogArchiver`
 
 A full-featured logging system supporting multiple outputs, formatting, and optional archiving.
@@ -284,4 +262,25 @@ bool exists = xyDirUtils.CheckForDirectories("myfolder");
 var all = xyDirUtils.Inventory("myfolder");
 ```
 
-Not enough!!!!!!!!!!!!
+
+## ✅ Requirements
+
+- .NET 6 or newer (.NET 8 ready)
+- Zero external dependencies
+- Optional Android and Avalonia support via submodules
+
+---
+
+## 📜 License
+
+Licensed under **GNU GPLv3**  
+See: [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+---
+
+## 👤 Author
+
+Created by the ThrashingLaggard
+> Part of the `xyToolz` ecosystem  
+> Created for internal tooling, education, and experimentation.
+---
