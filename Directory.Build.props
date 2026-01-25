@@ -1,0 +1,20 @@
+<Project>
+	
+<PropertyGroup>
+  <TargetFramework>net8.0</TargetFramework>
+  <LangVersion>latest</LangVersion>
+  <Nullable>enable</Nullable>
+  <ImplicitUsings>enable</ImplicitUsings>
+  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  <AnalysisLevel>latest</AnalysisLevel>
+  <Deterministic>true</Deterministic>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  <NoWarn>$(NoWarn);1591</NoWarn>
+  <Copyright>Do with this, as you please. Go home to your dog   </Copyright>
+</PropertyGroup>
+
+<ItemGroup>
+  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" PrivateAssets="all" />
+</ItemGroup>
+
+</Project>
