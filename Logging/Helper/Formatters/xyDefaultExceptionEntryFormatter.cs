@@ -12,6 +12,12 @@ namespace xyToolz.Helper.Formatters
         private readonly xyLoggerManager _log;
         private readonly xyMessageFactory _fac;
 
+        public xyDefaultExceptionEntryFormatter(xyLoggerManager log_ , xyMessageFactory fac_)
+        {
+            _log = log_ ?? new();
+            _fac = fac_ ?? new();
+        }
+
         public xyExceptionEntry PackAndFormatIntoEntity(Exception exception, DateTime? timestamp = null,string? message = null,  uint? id = null, string? description = null)
         {
             xyExceptionEntry entry = new(exception)
