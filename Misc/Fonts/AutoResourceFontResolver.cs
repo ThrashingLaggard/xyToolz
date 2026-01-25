@@ -223,13 +223,13 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
     }
 
     [GeneratedRegex("(inter|roboto|open.?sans|noto.?sans(?!.*mono)|dejavu.?sans(?!.*mono)|source.?sans|montserrat|lato|arial|helvetica|liberation.?sans)", RegexOptions.IgnoreCase, "de-DE")]
-    internal static partial Regex SansRegex();
+    public static partial Regex SansRegex();
     [GeneratedRegex("(comic.?mono|comic.?sans|comic|monospace|cascadia|fira.?mono|dejavu.?sans.?mono|noto.?sans.?mono|inconsolata|source.?code|courier|consolas|menlo|mono|code)", RegexOptions.IgnoreCase, "de-DE")]
-    private static partial Regex MonoRegex();
+    public static partial Regex MonoRegex();
     [GeneratedRegex("(bold|semi.?bold|demi|black)", RegexOptions.IgnoreCase, "de-DE")]
-    internal static partial Regex BoldRegex();
+    public static partial Regex BoldRegex();
     [GeneratedRegex("comic", RegexOptions.IgnoreCase, "de-DE")]
-    internal static partial Regex MatchComicRegex();
+    public static partial Regex MatchComicRegex();
     [GeneratedRegex("monospace", RegexOptions.IgnoreCase, "de-DE")]
-    internal static partial Regex MatchMonospaceRegex();
+    public static partial Regex MatchMonospaceRegex();
 }
