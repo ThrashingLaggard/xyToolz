@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
+using xyToolz.Misc;
 using xyToolz.QOL;
 using xyToolz.Serialization;
 using xyToolz.StaticLogging;
@@ -90,7 +91,7 @@ namespace xyToolz.Security
             try
             {
                 string json = JsonSerializer.Serialize(obj);
-                byte[] raw = xy.StringToBytes(json);
+                byte[] raw = xyConversion.StringToBytes(json);
                 byte[] protectedData = ProtectedData.Protect(raw, null, DataProtectionScope.CurrentUser);
 
                 await xyLog.AsxLog(logSuccess);
@@ -131,7 +132,7 @@ namespace xyToolz.Security
             try
             {
                 byte[] raw = ProtectedData.Unprotect(encrypted, null, DataProtectionScope.CurrentUser);
-                string json = xy.BytesToString(raw);
+                string json = xyConversion.BytesToString(raw);
                 T? result = JsonSerializer.Deserialize<T>(json);
 
                 await xyLog.AsxLog(success);
@@ -175,7 +176,7 @@ namespace xyToolz.Security
                 if (encBytes.Length == 0) return false;
                 else
                 {
-                    string encString = xy.BytesToBase(encBytes);
+                    string encString = xyConversion.BytesToBase(encBytes);
                     await xyFiles.SaveToFile(encString, filename);
                     await xyLog.AsxLog(success);
                     return true;
