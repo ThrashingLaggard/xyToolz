@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Buffers.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
-
-using xyToolz.QOL;
+using xyToolz.Logging.Helper;
 using xyToolz.StaticLogging;
 
 namespace xyToolz.Serialization
 {
+
 
     /// <summary>
     /// Static utility class for handling various JSON operations used throughout the application.
@@ -49,6 +49,8 @@ namespace xyToolz.Serialization
     /// </summary>
     public class xyJson
     {
+        private static readonly xyMessageFactory _msg = new();
+
         #region Json Configuration
 
         /// <summary>
@@ -91,7 +93,10 @@ namespace xyToolz.Serialization
 
             try
             {
-                if ( await xyFiles.EnsurePathExistsAsync(fileName))
+                if (!File.Exists(fileName))
+                {
+                    File.Create(fileName);
+                }
                 {
                     string jsonData = JsonSerializer.Serialize(data, options ?? defaultJsonOptions);
                     await File.WriteAllTextAsync(fileName, jsonData, cancellationToken: ct);                  
@@ -180,7 +185,7 @@ namespace xyToolz.Serialization
         {
             try
             {
-                dynamic? stream = await xyFiles.GetStreamFromFileAsync(filePath);
+                dynamic? stream = await GetStreamFromFileAsync(filePath);
                 if (stream == null) return null;
 
                  return await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(stream, defaultJsonOptions);
@@ -191,6 +196,40 @@ namespace xyToolz.Serialization
                 return null;
             }
         }
+
+        private static async Task<Stream?> GetStreamFromFileAsync(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                await xyLog.AsxLog(_msg.PathNotFound(filePath));
+                return null;
+            }
+
+            if (!File.Exists(filePath))
+            {
+                await xyLog.AsxLog(_msg.FileNotFound(filePath));
+                return null; ;
+            }
+
+            byte[] buffer;
+            MemoryStream memoryStream;
+            try
+            {
+                buffer = await File.ReadAllBytesAsync(filePath);
+                memoryStream = new MemoryStream(buffer) { Position = 0 };
+
+                await xyLog.AsxLog($"{buffer.Length} bytes");
+                return memoryStream;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxLog(_msg.FileStreamError());
+                await xyLog.AsxExLog(ex);
+                return null;
+            }
+        }
+
+
 
         /// <summary>
         /// Reads the entire JSON file and deserializes it into a Dictionary, a List or an Array!.
@@ -206,7 +245,7 @@ namespace xyToolz.Serialization
         {
             try
             {
-                dynamic? stream = await xyFiles.GetStreamFromFileAsync(filePath);
+                dynamic? stream = await GetStreamFromFileAsync(filePath);
                 if (stream == null) return default(T);
 
                 switch (outputFormat)
@@ -266,7 +305,7 @@ namespace xyToolz.Serialization
             string errorMessage = $"Key '{key}' could not be decoded to bytes from '{filePath}'.";
             if (await TryDeserializeKey<string>(filePath, key) is string base64)
             {
-                byte[]? decoded = xy.BaseToBytes(base64);
+                byte[]? decoded = Convert.FromBase64String(base64); 
                 if (decoded == null)
                 {
                     await xyLog.AsxLog(errorMessage);
@@ -390,7 +429,7 @@ namespace xyToolz.Serialization
 
             if (!string.IsNullOrEmpty(b64))
             {
-                if( xy.BaseToBytes(b64) is byte[] decoded)
+                if(Convert.FromBase64String(b64) is byte[] decoded)
                 {
                     return decoded;
                 }

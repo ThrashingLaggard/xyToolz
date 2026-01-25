@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
-using xyToolz.Helper.Logging;
 using xyToolz.QOL;
 using xyToolz.Serialization;
 using xyToolz.StaticLogging;
@@ -104,6 +104,7 @@ namespace xyToolz.Security
             }
         }
 
+     
         /// <summary>
         /// String wrapper for generic method
         /// </summary>

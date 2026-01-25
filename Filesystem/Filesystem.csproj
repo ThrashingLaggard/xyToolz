@@ -8,7 +8,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Logging\Logging.csproj" />
-		<ProjectReference Include="..\QOL\QOL.csproj" />
 	</ItemGroup>
 
 </Project>
