@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
+using xyToolz.Logging.Helper;
 using xyToolz.QOL;
 
 namespace xyToolz.Serialization
@@ -48,6 +49,8 @@ namespace xyToolz.Serialization
     /// </summary>
     public class xyJson
     {
+        private static xyMessageFactory _fac=new ();
+
         #region Json Configuration
 
         /// <summary>
@@ -101,6 +104,57 @@ namespace xyToolz.Serialization
             {
                 await xyLog.AsxExLog(ex);
                 await xyLog.AsxLog(errorMessage);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Serializing (multiple) objects to a target file, this version does not work with generics 
+        /// </summary>
+        /// <param name="isVerbose"></param>
+        /// <param name="fileName"></param>
+        /// <param name="ct"></param>
+        /// <param name="options"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static async Task<bool> SaveDataToJsonAsync(bool isVerbose, string fileName = "config.json", CancellationToken ct = default, JsonSerializerOptions? options = null, params object[] data)
+        {
+            string name = "target";
+
+            if(data.Count() == 0) 
+            {
+                await xyLog.AsxLog(_fac.EmptyArray());
+            }
+            try
+            {
+                if (await xyFiles.EnsurePathExistsAsync(fileName))
+                {
+                    foreach (object target in data)
+                    {
+                        if (isVerbose)
+                        {
+                            name = nameof(target) +"    :    "+ target.ToString();
+                        }
+
+                        string jsonData = JsonSerializer.Serialize(target, options ?? defaultJsonOptions);
+                        await File.WriteAllTextAsync(fileName, jsonData, cancellationToken: ct);
+                    }
+
+                    if (isVerbose)
+                    {
+                        xyLog.Log(_fac.SerializationSuccess(fileName,data));
+                    }
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                if (isVerbose)
+                {
+                    await xyLog.AsxLog(_fac.SerializationFail(fileName, name));
+                }
             }
             return false;
         }
