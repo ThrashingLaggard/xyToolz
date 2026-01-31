@@ -34,12 +34,41 @@ namespace xyToolz.Logging.Helper
         #region "ListigeCollectionen
 
         /// <summary>
+        /// IEnumerable is empty
+        /// </summary>
+        /// <param name="nameOfTheIEnumerable"></param>
+        /// <returns></returns>
+        public string EmptyIEnumerable(string? nameOfTheIEnumerable = null) => nameOfTheIEnumerable == null ? "The target IEnumerable is empty! Please check recent operations and logs!" : $"{nameOfTheIEnumerable} is EMPTY!";
+
+
+        /// <summary>
+        /// Collection is empty
+        /// </summary>
+        /// <param name="nameOfTheCollection"></param>
+        /// <returns></returns>
+        public string EmptyCollection(string? nameOfTheCollection = null) => nameOfTheCollection == null ? "The target Collection is empty! Please check recent operations and logs!" : $"{nameOfTheCollection} is EMPTY!";
+
+
+        /// <summary>
         /// List is empty
         /// </summary>
         /// <param name="nameOfTheList"></param>
         /// <returns></returns>
         public string EmptyList(string? nameOfTheList = null) => nameOfTheList== null? "The target list is empty! Please check recent operations and logs!":$"{nameOfTheList} is EMPTY!";
 
+        /// <summary>
+        /// Array is empty
+        /// </summary>
+        /// <param name="nameOfTheArray"></param>
+        /// <returns></returns>
+        public string EmptyArray(string? nameOfTheArray = null) => nameOfTheArray == null ? "The target array is empty! Please check recent operations and logs!" : $"{nameOfTheArray} is EMPTY!";
+
+        /// <summary>
+        /// Dictionary is empty
+        /// </summary>
+        /// <param name="nameOfDictionary"></param>
+        /// <returns></returns>
+        public string EmptyDictionary(string? nameOfDictionary = null) => nameOfDictionary == null ? "The target dictionary is empty! Please check recent operations and logs!" : $"{nameOfDictionary} is EMPTY!";
 
         #endregion
 
@@ -81,29 +110,69 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public string SerializationSuccess(object? target = null) => target is null ? $"The target has been serialized!" : $"{target.ToString()} has been serialized!";
+        public string SerializationSuccess(object? target = null) => target is null ? $"The target has been serialized!" : $"{nameof(target)}    :    {target.ToString()} has been serialized!";
+
+        /// <summary>
+        /// Successfully serialized the target to file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public string SerializationSuccess(string fileName,object? target = null) => target is null ? $"The target has been serialized to JSON file: '{fileName}'!" : $"{nameof(target)}    :    {target.ToString()} has been serializedto JSON file: '{fileName}'!";
+
+        /// <summary>
+        /// Successfully serialized the target
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="targets"></param>
+        /// <returns></returns>
+        public string SerializationSuccess(string fileName, params object[] targets )
+        {
+            StringBuilder sb_targets = new();
+            foreach (object target in targets)
+            {
+                sb_targets.AppendLine($"{nameof(target)}    :    { target.ToString()}");
+            }
+            string output =$"The targets {sb_targets.ToString()} have been serialized to JSON file: '{fileName}' successfully!";
+            return output;
+        }
 
         /// <summary>
         /// Failed to serialize the target
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string SerializationFail(string? name = null) => name is null ? $"An error occured while trying to serialize the target" : $"An error occured while trying to serialize {nameof(name)}";
-        
-        
+        public string SerializationFail(string? name = null) => name is null ? $"An error occured while trying to serialize the target" : $"An error occured while trying to serialize {name}";
+
+        /// <summary>
+        /// Failed to serialize the target to file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string SerializationFail(string fileName, string? name = null) => name is null ? $"An error occured while trying to serialize the target to JSON file: '{fileName}'. " : $"An error occured while trying to serialize {name} to JSON file: '{fileName}'.";
+
         /// <summary>
         /// Successfully deserialized the target
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public string DeserializationSuccess(object?  target = null) => target is null? $"{target} has been deserialized!" : $"{target.ToString()} has been deserialized!";
+        public string DeserializationSuccess(object?  target = null) => target is null? $"{target} has been deserialized!" : $"{nameof(target)}    :    {target.ToString()} has been deserialized!";
 
         /// <summary>
         /// Failed to deserialize the target
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string DeserializationFail(string? name = null) => name is null ? $"An error occured while trying to deserialize the target" : $"An error occured while trying to deserialize {nameof(name)}";
+        public string DeserializationFail(string? name = null) => name is null ? $"An error occured while trying to deserialize the target" : $"An error occured while trying to deserialize {name}";
+
+        /// <summary>
+        /// Failed to deserialize the target to file
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public string DeserializationFail(string fileName, string? name = null) => name is null ? $"An error occured while trying to deserialize the target from {fileName}" : $"An error occured while trying to deserialize {name} from {fileName}";
 
         #endregion
 
