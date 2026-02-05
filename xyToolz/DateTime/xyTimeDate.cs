@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace xyToolz.TimeDate
 {
-    public class xyDateTime
+    public class xyTimeDate
     {
         /// <summary>
         /// Get the hash code for 'DateTime.Now()'
         /// </summary>
         /// <returns>int hashCode</returns>
-        public static int GetHashFromNow() => DateTime.Now.GetHashCode();
+        public static int GetHasHNow() => DateTime.Now.GetHashCode();
+
+
     }
 }
