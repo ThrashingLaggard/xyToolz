@@ -24,3 +24,9 @@ git merge target-branch
 
 
 --------------------------------------------
+
+
+### Merge Branches into master
+git checkout master
+git pull origin master
+git merge target-branch
