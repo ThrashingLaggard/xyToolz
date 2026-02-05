@@ -270,11 +270,11 @@ namespace xyToolz.Serialization
                     }
                     case 1:
                     {
-                        return await JsonSerializer.DeserializeAsync<T>(stream, defaultJsonOptions).ToList();
+                        return (await JsonSerializer.DeserializeAsync<T>(stream, defaultJsonOptions)).ToList();
                     }
                     case 2: 
                     {
-                        return await JsonSerializer.DeserializeAsync<T>(stream, defaultJsonOptions).ToArray();    
+                        return (await JsonSerializer.DeserializeAsync<T>(stream, defaultJsonOptions)).ToArray();    
                     }
                     default:
                     {
