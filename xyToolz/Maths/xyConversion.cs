@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static xyToolz.QOL.xy;
 
-namespace xyToolz
+namespace xyToolz.Maths
 {
         /// <summary>
         /// Hier könnte ihre Werbung stehen!
@@ -26,7 +26,7 @@ namespace xyToolz
             {
                   int _ergebnis = 0, _ergebnis_DEC = 0, _rest, _stelle_von_rechts = 0;
                   string eingabe = DeLetterer(ausgangszahl);
-                  int[] _zahlen_ = eingabe.Split(' ')?.Select(Int32.Parse)?.ToArray()!;
+                  int[] _zahlen_ = eingabe.Split(' ')?.Select(int.Parse)?.ToArray()!;
 
                   if (_aktuelle_Basis != 10)
                   {
@@ -217,7 +217,7 @@ namespace xyToolz
 
                         // beide Funktionen machen das gleiche!!! daher nur eine aktivieren 
                         //endergebnis  +=  Letterer (  (ausgangszahl % basis_des_neuen_Zahlensystems).ToString()); 
-                        endergebnis = Letterer("" + (Number % baseOfTargetNumberSystem));      // KEIN Leerzeichen zwischen den  -->""<-- !!!         
+                        endergebnis = Letterer("" + Number % baseOfTargetNumberSystem);      // KEIN Leerzeichen zwischen den  -->""<-- !!!         
 
                         Number = ergebnis;
 
@@ -264,7 +264,7 @@ namespace xyToolz
             {
                   int ergebnis = 0;
                   string ausgabe = DeLetterer(number);
-                  int[] bst = ausgabe.Split(' ')?.Select(Int32.Parse)?.ToArray()!;
+                  int[] bst = ausgabe.Split(' ')?.Select(int.Parse)?.ToArray()!;
 
                   int expo = 0;
                   for (int i = bst.Length - 1; i >= 0; i--)             //zahlen[-1] *= 16^0;
@@ -318,7 +318,7 @@ namespace xyToolz
             public static string Bin_to_Dec(string number)
             {
                   string ausgabe = DeLetterer(number);
-                  int[] zahlen = ausgabe.Split(' ')?.Select(Int32.Parse)?.ToArray()!;
+                  int[] zahlen = ausgabe.Split(' ')?.Select(int.Parse)?.ToArray()!;
                   int ergebnis = 0;
                   int expo = 0;
 
