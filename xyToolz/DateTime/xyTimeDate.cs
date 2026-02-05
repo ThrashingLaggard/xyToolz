@@ -12,7 +12,7 @@ namespace xyToolz.TimeDate
         /// Get the hash code for 'DateTime.Now()'
         /// </summary>
         /// <returns>int hashCode</returns>
-        public static int GetHasHNow() => DateTime.Now.GetHashCode();
+        public static int GetNowHash() => DateTime.Now.GetHashCode();
 
 
     }
