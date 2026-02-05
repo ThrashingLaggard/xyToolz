@@ -633,7 +633,7 @@ namespace xyToolz.Maths
         /// Heavily optimized with specialized code paths for common bases.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SumOfDigitsInBase(ulong value, int baseSystem)
+        public static int SumOfAnyDigits(ulong value, int baseSystem)
         {
             // Branchless lookup for power-of-2 bases (2, 4, 8, 16, 32)
             // These can use pure bit operations
@@ -878,10 +878,10 @@ namespace xyToolz.Maths
         public static int SumOfDigitsInBase(long value, int baseSystem)
         {
             if (value == long.MinValue)
-                return SumOfDigitsInBase(9223372036854775808UL, baseSystem);
+                return SumOfAnyDigits(9223372036854775808UL, baseSystem);
 
             ulong v = value < 0 ? (ulong)-value : (ulong)value;
-            return SumOfDigitsInBase(v, baseSystem);
+            return SumOfAnyDigits(v, baseSystem);
         }
 
         /// <summary>
@@ -891,7 +891,7 @@ namespace xyToolz.Maths
         public static int SumOfDigitsInBase(int value, int baseSystem)
         {
             if (value == int.MinValue)
-                return SumOfDigitsInBase(2147483648UL, baseSystem);
+                return SumOfAnyDigits(2147483648UL, baseSystem);
 
             uint v = value < 0 ? (uint)-value : (uint)value;
             return SumOfDigitsInBase(v, baseSystem);
