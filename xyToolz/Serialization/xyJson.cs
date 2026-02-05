@@ -70,12 +70,6 @@ namespace xyToolz.Serialization
 
         #endregion
 
-        #region File‑Utilities
-
-
-
-        #endregion
-
         #region Serialization
 
         /// <summary>
@@ -246,48 +240,26 @@ namespace xyToolz.Serialization
         }
 
         /// <summary>
-        /// Reads the entire JSON file and deserializes it into a Dictionary, a List or an Array!.
-        /// 
-        /// 0 --> Dictionary
-        /// 1 --> List
-        /// 2 --> Array
+        /// Reads the entire JSON file and deserializes it into an Enumerable like a Dictionary, a List or an Array!.
         /// </summary>
         /// <param name="filePath">Path to the JSON file.</param>
         /// <param name="outputFormat">Choose datatype for output</param>
         /// <returns>Deserialized dictionary or null if reading fails.</returns>
-        public static async Task<T?> DeserializeFromFile<T>(string filePath, int outputFormat)
+        public static async Task<T?> DeserializeFromFile<T>(string filePath)
         {
             try
             {
-                dynamic? stream = await xyFiles.GetStreamFromFileAsync(filePath);
-                if (stream == null) return default(T);
+                await using var stream = await xyFiles.GetStreamFromFileAsync(filePath);
+                if (stream == null) return default;
 
-                switch (outputFormat)
-                {
-                    case 0:
-                    {
-                        return  JsonSerializer.DeserializeAsync<Dictionary<string, T>>(stream, defaultJsonOptions).ToDictionary();
-                    }
-                    case 1:
-                    {
-                        return (await JsonSerializer.DeserializeAsync<T>(stream, defaultJsonOptions)).ToList();
-                    }
-                    case 2: 
-                    {
-                        return (await JsonSerializer.DeserializeAsync<T>(stream, defaultJsonOptions)).ToArray();    
-                    }
-                    default:
-                    {
-                            goto END;
-                    }
-                }
+                return await JsonSerializer.DeserializeAsync<T>(stream,defaultJsonOptions);
+                
             }
             catch (Exception ex)
             {
                 await xyLog.AsxExLog(ex);
+                return default;
             }
-            END:
-                return default(T);
 
         }
 
