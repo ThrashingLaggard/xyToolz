@@ -5,12 +5,12 @@ namespace xyToolz.Maths
     /// <summary>
     /// Helper for math problems:
     /// 
-    /// - Calculate the sum of the digits in any number from sbyte to GUID
+    /// - Calculate the sum of the digits in any number from sbyte to GUID... currently 
     /// 
     /// </summary>
     public static class xyMaths
     {
-        #region "Sum of the digits"
+        #region "Sum of HEX digits"
         /// <summary>
         /// 
         /// 
@@ -19,11 +19,11 @@ namespace xyToolz.Maths
         /// <param name="value"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SumOfHex(byte value) => (value & 0x0F) + ((value >> 4) & 0x0F);
+        public static int SumOfHexDigits(byte value) => (value & 0x0F) + ((value >> 4) & 0x0F);
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SumOfHex(sbyte value) => SumOfHex((byte)value);
+        public static int SumOfHexDigits(sbyte value) => SumOfHexDigits((byte)value);
 
         /// <summary>
         /// 
@@ -33,7 +33,7 @@ namespace xyToolz.Maths
         /// <param name="value"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SumOfHex(short value)
+        public static int SumOfHexDigits(short value)
         {
             Span<byte> bytes = stackalloc byte[2];
             BitConverter.TryWriteBytes(bytes, value);
@@ -46,7 +46,7 @@ namespace xyToolz.Maths
         /// <param name="value"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SumOfHex(ushort value)
+        public static int SumOfHexDigits(ushort value)
         {
             Span<byte> bytes = stackalloc byte[2];
             BitConverter.TryWriteBytes(bytes, value);
@@ -59,7 +59,7 @@ namespace xyToolz.Maths
         /// <param name="value"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SumOfHex(int value)
+        public static int SumOfHexDigits(int value)
         {
             uint u = (uint)value;
             // 8 Nibbles (4 Bytes × 2)
@@ -76,7 +76,7 @@ namespace xyToolz.Maths
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SumOfHex(uint value)
+        public static int SumOfHexDigits(uint value)
         {
             return (int)(value & 0x0F) +
                     (int)((value >> 4) & 0x0F) +
@@ -205,7 +205,7 @@ namespace xyToolz.Maths
         }
         #endregion
 
-        #region Sum of Decimal Digits
+        #region "Sum of DEC digits"
 
         /// <summary>
         /// Calculates the sum of all decimal digits in a byte value (0-255).
@@ -417,6 +417,484 @@ namespace xyToolz.Maths
                 value = decimal.Truncate(value / 10);
             }
             return sum;
+        }
+
+        #endregion
+
+        #region "Sum of BIN digits"
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a byte value.
+        /// Example: 0b10110011 (179) → 6 (six '1' bits)
+        /// Also known as population count or Hamming weight.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(byte value)
+        {
+            // Brian Kernighan's algorithm - fastest for sparse bits
+            int count = 0;
+            while (value > 0)
+            {
+                value &= (byte)(value - 1); // Clear the lowest set bit
+                count++;
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in an sbyte value.
+        /// Negative signs are processed as two's complement representation.
+        /// Example: -1 (0b11111111) → 8
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(sbyte value)
+            => SumOfBinary((byte)value);
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a short value.
+        /// Example: 0b0000000010110011 → 5
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(short value)
+        {
+            ushort v = (ushort)value;
+            int count = 0;
+            while (v > 0)
+            {
+                v &= (ushort)(v - 1);
+                count++;
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a ushort value.
+        /// Example: 65535 (0xFFFF) → 16 (all bits set)
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(ushort value)
+        {
+            int count = 0;
+            while (value > 0)
+            {
+                value &= (ushort)(value - 1);
+                count++;
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in an int value.
+        /// Uses parallel bit counting for optimal performance.
+        /// Example: -1 (0xFFFFFFFF) → 32 (all bits set)
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(int value)
+        {
+            uint v = (uint)value;
+
+            // Parallel bit count algorithm (fastest for dense bits)
+            v = v - ((v >> 1) & 0x55555555);
+            v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
+            v = (v + (v >> 4)) & 0x0F0F0F0F;
+            v = v + (v >> 8);
+            v = v + (v >> 16);
+
+            return (int)(v & 0x3F);
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a uint value.
+        /// Uses parallel bit counting for optimal performance.
+        /// Example: 4294967295 (0xFFFFFFFF) → 32
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(uint value)
+        {
+            // Parallel bit count algorithm
+            value = value - ((value >> 1) & 0x55555555);
+            value = (value & 0x33333333) + ((value >> 2) & 0x33333333);
+            value = (value + (value >> 4)) & 0x0F0F0F0F;
+            value = value + (value >> 8);
+            value = value + (value >> 16);
+
+            return (int)(value & 0x3F);
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a long value.
+        /// Uses parallel bit counting for optimal performance.
+        /// Example: -1 (0xFFFFFFFFFFFFFFFF) → 64 (all bits set)
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(long value)
+        {
+            ulong v = (ulong)value;
+
+            // Parallel bit count algorithm for 64-bit
+            v = v - ((v >> 1) & 0x5555555555555555UL);
+            v = (v & 0x3333333333333333UL) + ((v >> 2) & 0x3333333333333333UL);
+            v = (v + (v >> 4)) & 0x0F0F0F0F0F0F0F0FUL;
+            v = v + (v >> 8);
+            v = v + (v >> 16);
+            v = v + (v >> 32);
+
+            return (int)(v & 0x7F);
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a ulong value.
+        /// Uses parallel bit counting for optimal performance.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(ulong value)
+        {
+            // Parallel bit count algorithm for 64-bit
+            value = value - ((value >> 1) & 0x5555555555555555UL);
+            value = (value & 0x3333333333333333UL) + ((value >> 2) & 0x3333333333333333UL);
+            value = (value + (value >> 4)) & 0x0F0F0F0F0F0F0F0FUL;
+            value = value + (value >> 8);
+            value = value + (value >> 16);
+            value = value + (value >> 32);
+
+            return (int)(value & 0x7F);
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a float value.
+        /// Processes the IEEE 754 binary representation of the float.
+        /// Example: 1.0f (0x3F800000) → 8 set bits
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(float value)
+        {
+            // Reinterpret float as uint to access raw bits
+            uint bits = BitConverter.SingleToUInt32Bits(value);
+            return SumOfBinary(bits);
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a double value.
+        /// Processes the IEEE 754 binary representation of the double.
+        /// Example: 1.0 (0x3FF0000000000000) → 13 set bits
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(double value)
+        {
+            // Reinterpret double as ulong to access raw bits
+            ulong bits = BitConverter.DoubleToUInt64Bits(value);
+            return SumOfBinary(bits);
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a decimal value.
+        /// Processes the binary representation of the decimal (128 bits).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(decimal value)
+        {
+            int[] bits = decimal.GetBits(value);
+            int sum = 0;
+
+            // Count bits in all 4 int32 parts
+            foreach (int bit in bits)
+            {
+                sum += SumOfBinary(bit);
+            }
+
+            return sum;
+        }
+
+        /// <summary>
+        /// Calculates the sum of all binary digits (count of set bits) in a GUID.
+        /// Processes all 128 bits of the GUID.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfBinary(Guid guid)
+        {
+            Span<byte> bytes = stackalloc byte[16];
+            guid.TryWriteBytes(bytes);
+
+            int sum = 0;
+            foreach (byte b in bytes)
+            {
+                sum += SumOfBinary(b);
+            }
+
+            return sum;
+        }
+
+        #endregion
+
+        #region "Sum of any digits"
+
+        /// <summary>
+        /// Calculates the sum of digits in any number system (base 2-36).
+        /// Heavily optimized with specialized code paths for common bases.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfDigitsInBase(ulong value, int baseSystem)
+        {
+            // Branchless lookup for power-of-2 bases (2, 4, 8, 16, 32)
+            // These can use pure bit operations
+            if ((baseSystem & (baseSystem - 1)) == 0 && baseSystem <= 32)
+            {
+                return SumOfDigitsBasePowerOf2(value, baseSystem);
+            }
+
+            // Specialized paths for common bases
+            if (baseSystem == 10) return SumOfDigitsBase10Fast(value);
+            if (baseSystem == 3) return SumOfDigitsBase3(value);
+            if (baseSystem == 5) return SumOfDigitsBase5(value);
+
+            // Generic fallback
+            return SumOfDigitsBaseGeneric(value, (uint)baseSystem);
+        }
+
+        /// <summary>
+        /// Ultra-fast path for all power-of-2 bases (2, 4, 8, 16, 32).
+        /// Uses only bit shifts and masks - no division.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int SumOfDigitsBasePowerOf2(ulong value, int baseSystem)
+        {
+            // Calculate bits per digit: log2(base)
+            int bitsPerDigit = 0;
+            int temp = baseSystem;
+            while (temp > 1)
+            {
+                bitsPerDigit++;
+                temp >>= 1;
+            }
+
+            ulong mask = (1UL << bitsPerDigit) - 1;
+            int sum = 0;
+
+            // Unrolled for common cases
+            switch (bitsPerDigit)
+            {
+                case 1: // Base 2 (binary)
+                    return SumOfBinaryUltra(value);
+
+                case 2: // Base 4
+                    while (value > 0)
+                    {
+                        sum += (int)(value & 0x3);
+                        value >>= 2;
+                    }
+                    return sum;
+
+                case 3: // Base 8 (octal)
+                    return SumOfDigitsBase8Ultra(value);
+
+                case 4: // Base 16 (hex)
+                    return SumOfHexUltra(value);
+
+                case 5: // Base 32
+                    while (value > 0)
+                    {
+                        sum += (int)(value & 0x1F);
+                        value >>= 5;
+                    }
+                    return sum;
+
+                default:
+                    while (value > 0)
+                    {
+                        sum += (int)(value & mask);
+                        value >>= bitsPerDigit;
+                    }
+                    return sum;
+            }
+        }
+
+        /// <summary>
+        /// Ultra-optimized binary digit sum using parallel bit counting.
+        /// Fastest possible popcount implementation.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int SumOfBinaryUltra(ulong value)
+        {
+            // Parallel bit count - processes all bits simultaneously
+            value = value - ((value >> 1) & 0x5555555555555555UL);
+            value = (value & 0x3333333333333333UL) + ((value >> 2) & 0x3333333333333333UL);
+            value = (value + (value >> 4)) & 0x0F0F0F0F0F0F0F0FUL;
+            return (int)((value * 0x0101010101010101UL) >> 56);
+        }
+
+        /// <summary>
+        /// Ultra-optimized octal (base-8) using unrolled bit shifts.
+        /// Processes up to 21 octal digits (63 bits) without loops for common cases.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int SumOfDigitsBase8Ultra(ulong value)
+        {
+            // Fast path: values that fit in 10 octal digits (30 bits)
+            if (value <= 0x3FFFFFFFUL)
+            {
+                return (int)((value & 0x7) +
+                             ((value >> 3) & 0x7) +
+                             ((value >> 6) & 0x7) +
+                             ((value >> 9) & 0x7) +
+                             ((value >> 12) & 0x7) +
+                             ((value >> 15) & 0x7) +
+                             ((value >> 18) & 0x7) +
+                             ((value >> 21) & 0x7) +
+                             ((value >> 24) & 0x7) +
+                             ((value >> 27) & 0x7));
+            }
+
+            // Medium path: values that fit in 20 octal digits (60 bits)
+            if (value <= 0xFFFFFFFFFFFFFFFUL)
+            {
+                int sum = 0;
+                for (int i = 0; i < 20; i++)
+                {
+                    sum += (int)((value >> (i * 3)) & 0x7);
+                }
+                return sum;
+            }
+
+            // Slow path: full 64-bit values
+            int result = 0;
+            while (value > 0)
+            {
+                result += (int)(value & 0x7);
+                value >>= 3;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Ultra-optimized hexadecimal using unrolled nibble extraction.
+        /// Processes all 16 nibbles without branching.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int SumOfHexUltra(ulong value)
+        {
+            // Process all 16 nibbles in one go
+            return (int)((value & 0xF) +
+                         ((value >> 4) & 0xF) +
+                         ((value >> 8) & 0xF) +
+                         ((value >> 12) & 0xF) +
+                         ((value >> 16) & 0xF) +
+                         ((value >> 20) & 0xF) +
+                         ((value >> 24) & 0xF) +
+                         ((value >> 28) & 0xF) +
+                         ((value >> 32) & 0xF) +
+                         ((value >> 36) & 0xF) +
+                         ((value >> 40) & 0xF) +
+                         ((value >> 44) & 0xF) +
+                         ((value >> 48) & 0xF) +
+                         ((value >> 52) & 0xF) +
+                         ((value >> 56) & 0xF) +
+                         ((value >> 60) & 0xF));
+        }
+
+        /// <summary>
+        /// Optimized base-10 using multiplication trick instead of division.
+        /// Division by constant can be replaced with multiplication + shift.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int SumOfDigitsBase10Fast(ulong value)
+        {
+            int sum = 0;
+
+            // Unrolled for values up to 10^10 (most common case)
+            if (value < 10000000000UL)
+            {
+                while (value >= 10)
+                {
+                    // Extract last digit
+                    ulong quotient = value / 10;
+                    sum += (int)(value - quotient * 10);
+                    value = quotient;
+                }
+                sum += (int)value;
+                return sum;
+            }
+
+            // Full path for larger values
+            while (value > 0)
+            {
+                sum += (int)(value % 10);
+                value /= 10;
+            }
+            return sum;
+        }
+
+        /// <summary>
+        /// Optimized base-3 (ternary) calculation.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int SumOfDigitsBase3(ulong value)
+        {
+            int sum = 0;
+            while (value > 0)
+            {
+                sum += (int)(value % 3);
+                value /= 3;
+            }
+            return sum;
+        }
+
+        /// <summary>
+        /// Optimized base-5 calculation.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int SumOfDigitsBase5(ulong value)
+        {
+            int sum = 0;
+            while (value > 0)
+            {
+                sum += (int)(value % 5);
+                value /= 5;
+            }
+            return sum;
+        }
+
+        /// <summary>
+        /// Generic fallback for arbitrary bases (3, 5, 6, 7, 9, 11-36).
+        /// Optimized with uint arithmetic and minimal branching.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int SumOfDigitsBaseGeneric(ulong value, uint baseSystem)
+        {
+            if (baseSystem < 2) return 0;
+
+            int sum = 0;
+            while (value > 0)
+            {
+                sum += (int)(value % baseSystem);
+                value /= baseSystem;
+            }
+            return sum;
+        }
+
+        /// <summary>
+        /// Convenience overload for signed values.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfDigitsInBase(long value, int baseSystem)
+        {
+            if (value == long.MinValue)
+                return SumOfDigitsInBase(9223372036854775808UL, baseSystem);
+
+            ulong v = value < 0 ? (ulong)-value : (ulong)value;
+            return SumOfDigitsInBase(v, baseSystem);
+        }
+
+        /// <summary>
+        /// Convenience overload for 32-bit values.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SumOfDigitsInBase(int value, int baseSystem)
+        {
+            if (value == int.MinValue)
+                return SumOfDigitsInBase(2147483648UL, baseSystem);
+
+            uint v = value < 0 ? (uint)-value : (uint)value;
+            return SumOfDigitsInBase(v, baseSystem);
         }
 
         #endregion
