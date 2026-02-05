@@ -17,3 +17,9 @@ xydocgen --root . --out docs/api --exclude ".git;bin;obj;node_modules;.vs;TestRe
 
 
 --------------------------------------------
+
+
+### Merge Branches into master
+git checkout master
+git pull origin master
+git merge target-branch
