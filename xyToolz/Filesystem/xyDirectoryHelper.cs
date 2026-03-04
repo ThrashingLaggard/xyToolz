@@ -13,7 +13,7 @@ namespace xyToolz.Filesystem
         /// Get the full path of the directory containing this programs     .sln    file
         /// </summary>
         /// <returns></returns>
-        public static string GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolder())!.FullName;
+        public static string GetSolutionFolder() => Directory.GetParent(GetInnerApplicationFolderDebug())!.FullName;
 
         /// <summary>
         /// Get the directory containing the application
@@ -25,7 +25,7 @@ namespace xyToolz.Filesystem
         /// While debugging in C# use this to get the app directory
         /// </summary>
         /// <returns></returns>
-        public static string GetInnerApplicationFolder()
+        public static string GetInnerApplicationFolderDebug()
         {
             string net8_0 = Environment.CurrentDirectory; xyLog.Log(net8_0);
 
@@ -39,8 +39,8 @@ namespace xyToolz.Filesystem
         }
 
         /// <summary>
-        /// Löscht den angegebenen Ordner mitsamt allen Inhalten (rekursiv).
-        /// Gibt true zurück, wenn der Ordner erfolgreich gelöscht wurde, andernfalls false.
+        /// Deleting the target folder and its contents (recursive).
+        /// True: deleted, false : not deleted.
         /// </summary>
         /// <param name="folderPath">Pfad des zu löschenden Ordners.</param>
         public static bool DeleteFolder(string folderPath)
@@ -210,30 +210,27 @@ namespace xyToolz.Filesystem
         }
 
         /// <summary>
-        /// Gibt alle Unterordner des angegebenen Ordners zurück.
+        /// Returns all subfolders
         /// </summary>
-        /// <param name="folderPath">Der Ordner, dessen Unterordner gesucht werden.</param>
-        /// <returns>Array der Unterordnerpfade.</returns>
+        /// <param name="folderPath">Target folder.</param>
+        /// <returns>Array of subfolders or empty array if none</returns>
         public static string[] GetSubfolders(string folderPath)
         {
-            if (Directory.Exists(folderPath))
+            try
             {
-                try
-                {
-                    return Directory.GetDirectories(folderPath);
-                }
-                catch (Exception e)
-                {
-                    xyLog.ExLog(e);
-                }
+                return (Directory.Exists(folderPath))? Directory.GetDirectories(folderPath) : Array.Empty<string>();
             }
-            return Array.Empty<string>();
+            catch (Exception e)
+            {
+                xyLog.ExLog(e);
+                return Array.Empty<string>();
+            }
         }
 
         /// <summary>
-        /// Berechnet die Gesamtgröße eines Ordners inklusive aller Unterordner und Dateien.
+        /// Calculates the total size of a folder, including all subfolders and files.
         /// </summary>
-        /// <param name="folderPath">Der zu messende Ordnerpfad.</param>
+        /// <param name="folderPath">Target folder</param>
         /// <returns>Die Gesamtgröße in Bytes.</returns>
         public static long GetFolderSize(string folderPath)
         {
@@ -241,12 +238,10 @@ namespace xyToolz.Filesystem
             if (Directory.Exists(folderPath))
             {
                 try
-                {
-                    // Alle Dateien im aktuellen Ordner summieren
+                {                    
                     size += Directory.GetFiles(folderPath).Sum(file => new FileInfo(file).Length);
 
-                    // Rekursiv Größe der Unterordner ermitteln
-                    foreach (var dir in Directory.GetDirectories(folderPath))
+                    foreach (string dir in Directory.GetDirectories(folderPath))
                     {
                         size += GetFolderSize(dir);
                     }
@@ -260,26 +255,20 @@ namespace xyToolz.Filesystem
         }
 
         /// <summary>
-        /// Komprimiert den angegebenen Quellordner in eine ZIP-Datei.
-        /// Falls die ZIP-Datei bereits existiert, wird sie überschrieben.
+        /// Compress fodler into ZIP-file.
+        /// Overwrites old 
         /// </summary>
-        /// <param name="sourceFolder">Der Ordner, der komprimiert werden soll.</param>
-        /// <param name="zipFilePath">Der vollständige Pfad der zu erstellenden ZIP-Datei.</param>
-        /// <param name="includeBaseDirectory">
-        /// Gibt an, ob der Basisordner (also der Name des Quellordners) in der ZIP-Struktur enthalten sein soll.
-        /// </param>
+        /// <param name="sourceFolder">Target folder.</param>
+        /// <param name="zipFilePath">Path of the ZIP-file.</param>
+        /// <param name="includeBaseDirectory">Choose whether to include the parent directory in zip structure </param>
         public static void CompressFolder(string sourceFolder, string zipFilePath, bool includeBaseDirectory = false)
         {
             try
             {
-                if (!Directory.Exists(sourceFolder))
-                    throw new DirectoryNotFoundException($"Source folder not found: {sourceFolder}");
+                if (!Directory.Exists(sourceFolder))    throw new DirectoryNotFoundException($"Source folder not found: {sourceFolder}");
+                
+                if (File.Exists(zipFilePath))   File.Delete(zipFilePath);
 
-                // Überschreibt ggf. eine vorhandene ZIP-Datei
-                if (File.Exists(zipFilePath))
-                    File.Delete(zipFilePath);
-
-                // Erstelle die ZIP-Datei
                 ZipFile.CreateFromDirectory(sourceFolder, zipFilePath, CompressionLevel.Fastest, includeBaseDirectory);
             }
             catch (Exception ex)
@@ -289,24 +278,20 @@ namespace xyToolz.Filesystem
         }
 
         /// <summary>
-        /// Extrahiert eine ZIP-Datei in den angegebenen Zielordner.
-        /// Existiert der Zielordner nicht, wird er erstellt.
+        /// Extract a ZIP-file into the target folder.
+        /// Creates the folder, if necessary.
         /// </summary>
-        /// <param name="zipFilePath">Der Pfad der ZIP-Datei.</param>
-        /// <param name="extractFolder">Der Ordner, in den die ZIP-Datei extrahiert werden soll.</param>
+        /// <param name="zipFilePath">Path of ZIP-file.</param>
+        /// <param name="extractFolder">Target folder to extract the ZIP in</param>
         public static void ExtractFolder(string zipFilePath, string extractFolder)
         {
             try
             {
-                if (!File.Exists(zipFilePath))
-                    throw new FileNotFoundException($"Zip file not found: {zipFilePath}");
+                if (!File.Exists(zipFilePath))  throw new FileNotFoundException($"Zip file not found: {zipFilePath}");
 
-                // Erstelle den Zielordner, falls er nicht existiert.
                 Directory.CreateDirectory(extractFolder);
-#if !NETSTANDARD2_0
-                // Extrahiere den Inhalt der ZIP-Datei
+
                 ZipFile.ExtractToDirectory(zipFilePath, extractFolder, overwriteFiles: true);
-#endif
             }
             catch (Exception ex)
             {
@@ -315,21 +300,14 @@ namespace xyToolz.Filesystem
         }
 
         /// <summary>
-        /// Überwacht einen Ordner (und optional alle Unterordner) auf Änderungen.
-        /// Die Methode richtet einen FileSystemWatcher ein, der bei Dateiänderungen, -erstellungen, -löschungen oder -umbenennungen
-        /// das angegebene Callback (onChanged) aufruft.
+        /// Monitors a folder (and optionally all subfolders) for changes. 
+        /// The method invokes the specified callback (onChanged) on file changes, creations, deletions, or renamings.
         /// </summary>
-        /// <param name="folderPath">Der zu überwachende Ordnerpfad.</param>
-        /// <param name="filter">
-        /// Das Filtermuster für zu überwachende Dateien (z. B. "*.json" oder "*.*"). 
-        /// Standard ist "*.*".
-        /// </param>
-        /// <param name="onChanged">
-        /// Callback, das aufgerufen wird, wenn eine Änderung festgestellt wird. 
-        /// Parameter: sender (object), FileSystemEventArgs.
-        /// </param>
+        /// <param name="folderPath">Path of target folder.</param>
+        /// <param name="filter">(z. B. "*.json" oder "*.*") ==> Standard is "*.*" </param>
+        /// <param name="onChanged"> Callback, in case of changes </param>
         /// <returns>
-        /// Den eingerichteten FileSystemWatcher. Wichtig: Der Aufrufer ist dafür verantwortlich, den Watcher bei Nichtgebrauch wieder zu Dispose()en.
+        /// Ready FileSystemWatcher... Dispose it, when not needed anymore!!!
         /// </returns>
         public static FileSystemWatcher MonitorFolder(string folderPath, string filter = "*.*", Action<object, FileSystemEventArgs>? onChanged = null)
         {
@@ -345,7 +323,6 @@ namespace xyToolz.Filesystem
                     EnableRaisingEvents = true
                 };
 
-                // Standardmäßige Event-Handler, die alle vier Eventtypen behandeln
                 watcher.Changed += (s, e) => onChanged?.Invoke(s, e);
                 watcher.Created += (s, e) => onChanged?.Invoke(s, e);
                 watcher.Deleted += (s, e) => onChanged?.Invoke(s, e);

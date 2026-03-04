@@ -11,6 +11,9 @@ using xyToolz.Helper.Logging;
 
 namespace xyToolz.Driver
 {
+    /// <summary>
+    /// Intended for browser automatisation... eventually
+    /// </summary>
     internal class xyWebDriver
     {
 

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace xyToolz.TimeDate
 {
+    /// <summary>
+    /// Helper Methods for time operations
+    /// </summary>
     public class xyTime
     {
         /// <summary>

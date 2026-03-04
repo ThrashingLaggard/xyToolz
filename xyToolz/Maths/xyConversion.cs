@@ -14,7 +14,6 @@ namespace xyToolz.Maths
       {
             private static string endergebnis = "", endausgabe = "";
 
-            // Wandelt jew Zahl ins gewünschte Zahlensystem um und gibt den Rechenweg aus
             /// <summary>
             /// Convert any number into any system
             /// </summary>
@@ -97,7 +96,6 @@ namespace xyToolz.Maths
                   return endergebnis;
             }
 
-            // entfernt ggf die Buchstaben aus dem String und ersetzt sie durch Zahlen
             /// <summary>
             /// Removes letters from the string and replaces them with numbers
             /// </summary>
@@ -136,13 +134,13 @@ namespace xyToolz.Maths
                         }
                   }
 
-                  string numbers = string.Join(" ", digits);              // String aus Array zusammensetzen
+                  string numbers = string.Join(" ", digits);              
 
                   Console.WriteLine("Eingegeben: " + new string(input));
                   Console.WriteLine("übersetzt: " + numbers);
                   return numbers;
             }
-            //ersetzt alle Zahlen über 9 durch die jeweiligen Buchstaben --> Switch_Case kann Strings ittarieren?!
+
             /// <summary>
             /// Switches all the numbers > 9 with letters
             /// </summary>
@@ -190,7 +188,6 @@ namespace xyToolz.Maths
 
 
 
-            // Dezimalzahlen in andere Zahlensysteme konvertieren
             /// <summary>
             /// Convert decimal to target system
             /// </summary>
@@ -215,13 +212,12 @@ namespace xyToolz.Maths
                         Console.Write(Number + " % " + baseOfTargetNumberSystem + " = " + rest + "\t" + "\t");
                         Console.WriteLine(Number + " / " + baseOfTargetNumberSystem + " = " + ergebnis);
 
-                        // beide Funktionen machen das gleiche!!! daher nur eine aktivieren 
+                         // Beide machen Dasselbe
                         //endergebnis  +=  Letterer (  (ausgangszahl % basis_des_neuen_Zahlensystems).ToString()); 
                         endergebnis = Letterer("" + Number % baseOfTargetNumberSystem);      // KEIN Leerzeichen zwischen den  -->""<-- !!!         
 
                         Number = ergebnis;
 
-                        // passt das Ende der Ausgabe an das gewählte Zahlensystem an
                         switch (baseOfTargetNumberSystem)
                         {
                               case 2:
@@ -254,7 +250,6 @@ namespace xyToolz.Maths
                   }
             }
 
-            // Hexadezimalzahlen in andere Zahlensysteme konvertieren
             /// <summary>
             /// Convert Hexa to decimal
             /// </summary>
@@ -267,9 +262,9 @@ namespace xyToolz.Maths
                   int[] bst = ausgabe.Split(' ')?.Select(int.Parse)?.ToArray()!;
 
                   int expo = 0;
-                  for (int i = bst.Length - 1; i >= 0; i--)             //zahlen[-1] *= 16^0;
-                  {                                                      //zahlen[-2] *= 16^1;
-                        bst[i] *= (int)Math.Pow(16, expo++);              //zahlen[-3] *= 16^2;
+                  for (int i = bst.Length - 1; i >= 0; i--)             
+                  {
+                        bst[i] *= (int)Math.Pow(16, expo++);              
                   }
 
                   foreach (int i in bst)
@@ -309,7 +304,6 @@ namespace xyToolz.Maths
                   return result;
             }
 
-            // Binärzahlen in andere Zahlensysteme konvertieren
             /// <summary>
             /// Convert binary to decimal
             /// </summary>
@@ -322,9 +316,9 @@ namespace xyToolz.Maths
                   int ergebnis = 0;
                   int expo = 0;
 
-                  for (int i = zahlen.Length - 1; i >= 0; i--)            //zahlen[-1] *= 16^0;
-                  {                                                       //zahlen[-2] *= 16^1;
-                        zahlen[i] *= (int)Math.Pow(2, expo++);              //zahlen[-3] *= 16^2;
+                  for (int i = zahlen.Length - 1; i >= 0; i--)            
+                  {                                                       
+                        zahlen[i] *= (int)Math.Pow(2, expo++);              
                   }
 
                   foreach (int i in zahlen)

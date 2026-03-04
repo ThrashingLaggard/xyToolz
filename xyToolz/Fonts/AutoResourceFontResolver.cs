@@ -63,7 +63,6 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
 
         if (names.Length == 0)
         {
-            // Fallback: try the entry assembly (CLI)
             var entry = Assembly.GetEntryAssembly();
             if (entry != null)
             {
@@ -75,38 +74,24 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
         foreach (var n in typeof(AutoResourceFontResolver).Assembly.GetManifestResourceNames().Take(10))
             System.Diagnostics.Debug.WriteLine("RES: " + n);
 
-        // Consider only .ttf/.otf
-        string[] fontRes = [.. names.Where(n => n.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase) || 
-                                                                  n.EndsWith(".otf", StringComparison.OrdinalIgnoreCase))];
+        string[] fontRes = [.. names.Where(n => n.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase) || n.EndsWith(".otf", StringComparison.OrdinalIgnoreCase))];
 
-        // Heuristics for picking sans/mono/bold faces
         Regex sansRegex = SansRegex();
         Regex monoRegex = MonoRegex();
         Regex boldRegex = BoldRegex();
 
-        // Pick a sans regular
-        _resSansReg = fontRes.FirstOrDefault(n => sansRegex.IsMatch(n))
-                   ?? fontRes.FirstOrDefault(); // fallback: any font if no sans candidate is found
+        _resSansReg = fontRes.FirstOrDefault(n => sansRegex.IsMatch(n))?? fontRes.FirstOrDefault(); 
 
-        // Try to find a matching bold for the chosen sans (same stem + bold marker)
         if (_resSansReg != null)
         {
             string stem = GetFontStem(_resSansReg);
             _resSansBold = fontRes.FirstOrDefault(n => n != _resSansReg &&
                 GetFontStem(n) == stem && boldRegex.IsMatch(n))
-                ?? fontRes.FirstOrDefault(n => boldRegex.IsMatch(n)); // generic bold as a fallback
+                ?? fontRes.FirstOrDefault(n => boldRegex.IsMatch(n)); 
         }
-
-        // Pick a mono regular
-        // _resMonoReg = fontRes.FirstOrDefault(n => monoRegex.IsMatch(n));
-
-        // Pick a mono regular (Comic bevorzugen)
         _resMonoReg = fontRes.Where(n => monoRegex.IsMatch(n)).OrderByDescending(n => MatchComicRegex().IsMatch(n) ? 
             2 : MatchMonospaceRegex().IsMatch(n) ? 1 : 0).FirstOrDefault();
 
-
-
-        // Optional diagnostics: set XYDOCGEN_LOG_FONTS=1 to log selected resources
         if (Environment.GetEnvironmentVariable("XYDOCGEN_LOG_FONTS") == "1")
         {
             Console.WriteLine("[AutoResourceFontResolver] Embedded fonts:");
@@ -131,13 +116,11 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
     {
         var fam = (familyName ?? "").Trim().ToLowerInvariant();
 
-        // Mono family? (+Comic & Monospace)
         if (fam.Contains("comic") || fam.Contains("monospace") ||
             fam.Contains("mono") || fam.Contains("cascadia") ||
             fam.Contains("consolas") || fam.Contains("courier") || fam.Contains("code")) 
             return new FontResolverInfo(FaceMonoRegular);
 
-        // Sans family
         if (isBold && _resSansBold != null)
             return new FontResolverInfo(FaceSansBold);
 
@@ -172,14 +155,11 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
     /// <exception cref="FileNotFoundException"></exception>
     public static byte[] GetBytesFromAssemblyManifest(Assembly asm, string manifestName)
     {
-        // Read the target resource from this assembly
         using Stream DataStreamFromManifestResource = asm.GetManifestResourceStream(manifestName)?? 
             throw new FileNotFoundException($"Embedded font not found: {manifestName} \nCheck <EmbeddedResource> items and the project's default namespace.");
         
-        // Copy the data into a MemoryStream 
         using MemoryStream ms_RessourceStream = new ();         DataStreamFromManifestResource.CopyTo(ms_RessourceStream);
 
-        // Convert and return it
         byte[]  bytesFromResourceStream =ms_RessourceStream.ToArray();      
         return bytesFromResourceStream;
     }
@@ -196,13 +176,10 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
         string styleTokensToRemove = "(regular|bold|italic|oblique|medium|semi.?bold|black|light|thin|extra|ultra)";
         string emptyStringForReplacement="";
        
-        // Split the filename up by the dot and reverse the order 
         IEnumerable<string> splitUpReversedFontFileName = fontFileName_.Split('.').Reverse();
 
-        // Get the second last word from the the filename
         if (splitUpReversedFontFileName.Skip(1).FirstOrDefault() is string stemFromFileName)
         {
-            // Override the whole name with only the stem
             fontStem = stemFromFileName;
         }
         else

@@ -635,19 +635,15 @@ namespace xyToolz.Maths
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SumOfAnyDigits(ulong value, int baseSystem)
         {
-            // Branchless lookup for power-of-2 bases (2, 4, 8, 16, 32)
-            // These can use pure bit operations
             if ((baseSystem & (baseSystem - 1)) == 0 && baseSystem <= 32)
             {
                 return SumOfDigitsBasePowerOf2(value, baseSystem);
             }
 
-            // Specialized paths for common bases
             if (baseSystem == 10) return SumOfDigitsBase10Fast(value);
             if (baseSystem == 3) return SumOfDigitsBase3(value);
             if (baseSystem == 5) return SumOfDigitsBase5(value);
 
-            // Generic fallback
             return SumOfDigitsBaseGeneric(value, (uint)baseSystem);
         }
 

@@ -17,11 +17,7 @@ namespace xyToolz.Lists
     /// <typeparam name="T"></typeparam>
     public ref struct xyList<T>
     {
-        // <summary>
-        // This is a thread-safe resource pool that enables reusing instances of type T[].
-        // Rent and return the buffers for better performance
-        // </summary>
-        //privat e Arra yPoo l pool
+   
      
         /// <summary>
         /// Initializes a new instance of the <see cref="xyList{T}"/> class with the specified initial buffer and
@@ -141,13 +137,10 @@ namespace xyToolz.Lists
             }
             else
             {
-                // Select the targeted part of the span
                 Span<T> tail = _viewPointerSpan.Slice(start: index + 1, length: _count - index - 1);
 
-                // Move over
                 tail.CopyTo(_viewPointerSpan.Slice(start: index));
 
-                // Count down the number of elements
                 _count--;
 
                 // Delete reference!!!
@@ -166,7 +159,6 @@ namespace xyToolz.Lists
             // Select all elements and clear them out
             _viewPointerSpan.Slice(start: 0, length: _count).Clear();
 
-            // Set the element count to zero
             _count = 0;
         }
 
@@ -227,16 +219,12 @@ namespace xyToolz.Lists
         /// buffer reference is set to its default value.</remarks>
         public void Dispose()
         {
-            // if there is an array that is rented from the pool
             if (_rentedBufferArrayFromPool != null)
             {
-                // Give the array back to the pool
                 ArrayPool<T>.Shared.Return(array: _rentedBufferArrayFromPool, clearArray: true);
 
-                // Delete the data 
                 _viewPointerSpan = default!;
 
-                // Delete the reference
                 _rentedBufferArrayFromPool = default!;
 
             }
@@ -257,19 +245,15 @@ namespace xyToolz.Lists
             // Rent a new & bigger array from the pool
             T[] newPooledArray = ArrayPool<T>.Shared.Rent(minimumLength: newSize);
 
-            // Select the specified part of the span and copy it into the newly rented array
             _viewPointerSpan.Slice(start: 0, length: _count).CopyTo(destination: newPooledArray);
 
-            // if there is already an array, return it into the pool and delete the data
             if (_rentedBufferArrayFromPool != null)
             {
                 ArrayPool<T>.Shared.Return(array: _rentedBufferArrayFromPool, clearArray: true);
             }
 
-            // Copy the data
             _rentedBufferArrayFromPool = newPooledArray;
 
-            // Set the reference
             _viewPointerSpan = newPooledArray;
 
         }
@@ -286,13 +270,10 @@ namespace xyToolz.Lists
         /// the span.</returns>
         public T[] ToArray()
         {
-            // Create a new array with the same length as the span
             T[]? result = new T[_count];
 
-            // Select all items from the span and copy them into the new array 
             _viewPointerSpan.Slice(0, _count).CopyTo(result);
 
-            // Show result
             return result;
         }
     }

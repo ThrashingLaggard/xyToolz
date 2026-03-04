@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace xyToolz.QOL
 {
+    /// <summary>
+    /// Output all sorts of collections
+    /// </summary>
     public class xySpiller
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using xyToolz.Filesystem;
@@ -22,30 +24,12 @@ namespace xyToolz.Serialization
     /// <item><description>Built-in structured logging via xyLog for errors and operations.</description></item>
     /// </list>
     ///
-    /// <para><b>Thread Safety:</b></para>
-    /// This class is fully static and does not maintain any instance-level state.
-    ///
-    /// <para><b>Limitations:</b></para>
-    /// - Only top-level and single-level subkey access supported explicitly.
-    /// - Not optimized for complex nested arrays or mixed-content JSON structures.
-    ///
-    /// <para><b>Performance:</b></para>
-    /// Performance depends on file size and structure; optimized for configuration-style JSON files (few KB).
-    ///
-    /// <para><b>Configuration:</b></para>
-    /// Uses consistent serializer options for formatting and allows override via optional parameters.
-    ///
     /// <para><b>Example Usage:</b></para>
     /// <code>
     /// string value = await xyJson.GetStringFromJsonFile("settings.json", "jwtPublicKey");
     /// var settings = await xyJson.DeserializeFromFile("appconfig.json");
     /// await xyJson.AddOrUpdateEntry("userprefs.json", "theme", "dark");
     /// </code>
-    ///
-    /// <para><b>Related:</b></para>
-    /// <see cref="System.Text.Json"/>
-    /// <see cref="JObject"/>
-    /// <see cref="xyLog"/>
     /// </summary>
     public class xyJson
     {
@@ -242,6 +226,13 @@ namespace xyToolz.Serialization
         /// <summary>
         /// Reads the entire JSON file and deserializes it into an Enumerable like a Dictionary, a List or an Array!.
         /// </summary>
+        /// <remarks>
+        /// var alarms = await xyJson.DeserializeFromFile<List<AlarmDefinition>>(path);
+        ///
+        /// var alarms = await xyJson.DeserializeFromFile<AlarmDefinition[]>(path);
+        /// 
+        /// var alarms = await xyJson.DeserializeFromFile<Dictionary<string, AlarmDefinition>>(path);
+        /// </remarks>
         /// <param name="filePath">Path to the JSON file.</param>
         /// <param name="outputFormat">Choose datatype for output</param>
         /// <returns>Deserialized dictionary or null if reading fails.</returns>

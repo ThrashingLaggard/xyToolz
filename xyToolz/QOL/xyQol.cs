@@ -6,7 +6,7 @@ using xyToolz.Logging.Loggers;
 namespace xyToolz.QOL
 {
     /// <summary>
-    /// Quality-of-life helper functions around reflection and object-dictionary conversion.
+    /// QOL helper functions around reflection and object-dictionary conversion.
     /// </summary>
     /// <remarks>
     /// This class provides convenience methods to:
@@ -158,7 +158,6 @@ namespace xyToolz.QOL
         /// </remarks>
         public T GetEntityFromDictionary<T, TKey, TValue>(Dictionary<TKey, TValue> keyValuePairs) where T : class where TKey :class
         {
-            // Creating a target-type instance
             T target = Activator.CreateInstance<T>();// CSI Gnarzraha, das habe ich gebraucht, lol!!1!!!!!!!!!!!1!!!!!111!!!!!!!  
 
             if (keyValuePairs is not null)
