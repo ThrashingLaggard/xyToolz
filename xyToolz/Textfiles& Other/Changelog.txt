@@ -1,3 +1,5 @@
-﻿### 31.01.2026
+﻿### 06.03.2026
+- xyLog						  -> Added LogLevel to the standard logging methods
+### 31.01.2026
 - xyMessageFactory  -> new Messages
 - xyJson					  -> new Method without generics, to handle multiple, closed off targets

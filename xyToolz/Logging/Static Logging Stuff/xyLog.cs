@@ -135,9 +135,9 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Logs a simple text message synchronously.
         /// </summary>
-        public static string Log(string message, [CallerMemberName] string? callerName = null)
+        public static string Log(string message ,[CallerMemberName] string? callerName = null, LogLevel? logLevel = LogLevel.Debug)
         {
-            string formattedMsg = FormatMsg(message, callerName, LogLevel.Debug);
+            string formattedMsg = FormatMsg(message, callerName, logLevel);
             Output(formattedMsg, callerName);
             return formattedMsg;
         }
@@ -145,9 +145,9 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Logs a simple text message asynchronously.
         /// </summary>
-        public static async Task<string> AsxLog(string message, [CallerMemberName] string? callerName = null)
+        public static async Task<string> AsxLog(string message, [CallerMemberName] string? callerName = null, LogLevel? logLevel = LogLevel.Debug)
         {
-            string formattedMsg = await Task.Run(() => FormatMsg(message, callerName, LogLevel.Debug));
+            string formattedMsg = await Task.Run(() => FormatMsg(message, callerName, logLevel));
             if (formattedMsg.Length == 0)
             {
                 return "What in the fucking hell happened here?";
