@@ -8,7 +8,7 @@ namespace xyToolz.Maths
     /// - Calculate the sum of the digits in any number from sbyte to GUID... currently 
     /// 
     /// </summary>
-    public static class xyMaths
+    public static class SumOfDigits
     {
         #region "Sum of HEX digits"
         /// <summary>
