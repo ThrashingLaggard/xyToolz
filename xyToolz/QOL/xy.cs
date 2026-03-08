@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using OpenQA.Selenium.DevTools.V140.HeapProfiler;
+using System.Diagnostics;
 using System.Text;
 using xyToolz.Helper.Logging;
 
@@ -214,7 +215,7 @@ namespace xyToolz.QOL
         /// Repeats a given string a specified number of times.
         /// </summary>
         /// <param name="text">The text to repeat.</param>
-        /// <param name="count">How many times to repeat the string.</param>
+        /// <param name="count">The end amount.</param>
         /// <returns>The repeated string.</returns>
         public static string Repeat(string text, ushort count)
         {
@@ -225,6 +226,14 @@ namespace xyToolz.QOL
             }
             return sb_Repeater.ToString();
         }
+
+        /// <summary>
+        /// Repeats a given char for the specified amount
+        /// </summary>
+        /// <param name="text">The target character</param>
+        /// <param name="count">The end amount</param>
+        /// <returns>The new string</returns>
+        public static string Repeat(char text, int count) => new (text, count);
 
         /// <summary>
         /// Reverses the characters in a given string.
