@@ -212,8 +212,11 @@ namespace xyToolz.QOL
         #region QOL – String Utilities
 
         /// <summary>
-        /// Repeats a given string a specified number of times.
+        /// Repeating a given string a specified number of times.
         /// </summary>
+        /// <remarks>
+        /// Use char overload for way better performance
+        /// </remarks>
         /// <param name="text">The text to repeat.</param>
         /// <param name="count">The end amount.</param>
         /// <returns>The repeated string.</returns>
@@ -228,8 +231,11 @@ namespace xyToolz.QOL
         }
 
         /// <summary>
-        /// Repeats a given char for the specified amount
+        /// Repeating a given char for the specified amount
         /// </summary>
+        /// <remarks>
+        ///
+        /// </remarks>
         /// <param name="text">The target character</param>
         /// <param name="count">The end amount</param>
         /// <returns>The new string</returns>
@@ -238,14 +244,34 @@ namespace xyToolz.QOL
         /// <summary>
         /// Reverses the characters in a given string.
         /// </summary>
+        /// <remarks>
+        /// This variant appearently (*Stack Overflow) also reverses the unicode modifiers in character, thus if in doubt, use the Unicode variant of this, utilizing a StringBuilder
+        /// </remarks>
         /// <param name="input">The string to reverse.</param>
         /// <returns>The reversed string.</returns>
         public static string Reverse(string input)
         {
             char[] arr_InputChars = input.ToCharArray();
             Array.Reverse(arr_InputChars);
-            string output =new (arr_InputChars);
-            return output; 
+            return new (arr_InputChars);
+        }
+
+        /// <summary>
+        /// Reverses the characters in a given string.
+        /// </summary>
+        /// <remarks>
+        /// This variant is appearently safe for usage with unicode
+        /// </remarks>
+        /// <param name="input">The string to reverse.</param>
+        /// <returns>The reversed string.</returns>
+        public static string ReverseUnicode(string input)
+        {
+            StringBuilder reverseBuilder = new (input.Length);
+            for (int i = input.Length; i >= 0; i--)
+            {
+                reverseBuilder.Append(input[i]);
+            }
+            return reverseBuilder.ToString();
         }
 
         /// <summary>
