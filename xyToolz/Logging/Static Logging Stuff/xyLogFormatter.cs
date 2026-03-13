@@ -73,7 +73,7 @@ namespace xyToolz.Helper.Logging
         /// <param name="callerName">Optional: The method or class name that triggered the exception.</param>
         /// <param name="depth">Internal recursion depth counter (default 1).</param>
         /// <returns>A full textual description of the exception hierarchy.</returns>
-        public static string FormatExceptionDetails(Exception ex, LogLevel level, string? message = null,string? callerName = null, int depth = 1)
+        public static string FormatExceptionDetails(Exception ex, LogLevel? level = LogLevel.Error, string? message = null,string? callerName = null, int depth = 1)
         {
             StringBuilder sb = new();
             string exceptionId = Guid.NewGuid().ToString();

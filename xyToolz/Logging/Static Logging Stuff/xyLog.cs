@@ -160,7 +160,7 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Logs details of an exception synchronously.
         /// </summary>
-        public static void ExLog(Exception ex, LogLevel level = LogLevel.Error, string? message =  null, [CallerMemberName] string? callerName = null)
+        public static void ExLog(Exception ex, string? message = null, LogLevel? level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
             string exMessage = FormatEx(ex, level,message, callerName);
             Output(exMessage, callerName);
@@ -169,7 +169,7 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Logs details of an exception asynchronously.
         /// </summary>
-        public static async Task AsxExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
+        public static async Task AsxExLog(Exception ex, LogLevel? level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
             string exMessage =  await Task.Run(() =>FormatEx(ex, level, callerName));
             
@@ -250,7 +250,7 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Synchronous: Writes details for the given exception to into console and file
         /// </summary>
-        public static bool WriteExLog(Exception ex, LogLevel level = LogLevel.Error, [CallerMemberName] string? callerName = null)
+        public static bool WriteExLog(Exception ex, LogLevel? level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
             lock (_threadSafetyLock)
             {
@@ -265,7 +265,7 @@ namespace xyToolz.Helper.Logging
                 }
                 catch (Exception innerEx)
                 {
-                    ExLog(innerEx, LogLevel.Warning, callerName);
+                    ExLog(innerEx, level: LogLevel.Warning, callerName: callerName);
                 }
                 return false;
             }
@@ -275,7 +275,7 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Synchronous: Writes details serialized as JSON  to into console and file for the given exception
         /// </summary>
-        public static bool WriteJsonExLog(Exception ex, LogLevel? level = LogLevel.Error, [CallerMemberName] string? callerName = null)
+        public static bool WriteJsonExLog(Exception ex, string? message = default,LogLevel? level = LogLevel.Error, [CallerMemberName] string? callerName = null)
         {
             lock (_threadSafetyLock)
             {
@@ -290,7 +290,7 @@ namespace xyToolz.Helper.Logging
                 }
                 catch (Exception innerEx)
                 {
-                    ExLog(innerEx,level?? LogLevel.Warning, callerName);
+                    ExLog(innerEx,message,level?? LogLevel.Warning, callerName: callerName);
                 }
                 return false;
             }
@@ -316,7 +316,7 @@ namespace xyToolz.Helper.Logging
             {
                 if (string.IsNullOrWhiteSpace(actionName))
                 {
-                    ExLog(new ArgumentException("ActionName invalid"), LogLevel.Error);
+                    ExLog(new ArgumentException(actionName), "ActionName invalid", LogLevel.Error);
                 }
                 string go = $"Start: {actionName}";
                 string yes = $"Erfolgreich: {actionName} abgeschlossen.";
@@ -338,7 +338,7 @@ namespace xyToolz.Helper.Logging
             catch (Exception ex)
             {
                 logOnError?.Invoke(ex);// Den im Aufruf per Lambda-Ausdruck generierten Delegaten (in diesem Fall sogar mit Parameter) ansprechen, falls dieser != null 
-                ExLog(ex, LogLevel.Critical, actionName);  // Wenn die Exception nicht anders definiert ist, als die des Delegaten, kommt ggf zweimal die gleiche Nachricht, mit unterschiedlichen Callern
+                ExLog(ex, "",LogLevel.Critical, actionName);  // Wenn die Exception nicht anders definiert ist, als die des Delegaten, kommt ggf zweimal die gleiche Nachricht, mit unterschiedlichen Callern
             }
 
             return default!;
@@ -429,7 +429,7 @@ namespace xyToolz.Helper.Logging
         /// <summary>
         /// Formats the Exception´s details for consistent logging.
         /// </summary>
-        private static string FormatEx(Exception ex, LogLevel level, string? message = null, string? callerName = null)
+        private static string FormatEx(Exception ex, LogLevel? level = LogLevel.Error, string? message = null, string? callerName = null)
         {
             return xyLogFormatter.FormatExceptionDetails(ex, level, message,callerName);
         }

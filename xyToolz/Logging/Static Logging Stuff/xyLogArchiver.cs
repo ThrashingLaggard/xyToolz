@@ -37,7 +37,7 @@ namespace xyToolz.Helper.Logging
                         }
                         catch (IOException ioEx)
                         {
-                              xyLog.ExLog(ioEx, LogLevel.Error);
+                              xyLog.ExLog(ioEx);
                         }
                   }
             }
