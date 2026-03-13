@@ -1,5 +1,13 @@
-﻿### 06.03.2026
-- xyLog						  -> Added LogLevel to the standard logging methods
+﻿# Changelog 
+
+### 
+
+### 13.03.2026
+- xyLog and helpers		-> Moved the external message to the second spot and set ERROR as default level for ExLog
+
+### 06.03.2026
+- xyLog							-> Added LogLevel to the standard logging methods
+
 ### 31.01.2026
-- xyMessageFactory  -> new Messages
-- xyJson					  -> new Method without generics, to handle multiple, closed off targets
+- xyMessageFactory		-> new Messages
+- xyJson						-> new Method without generics, to handle multiple closed off targets
