@@ -19,9 +19,8 @@ namespace xyToolz.Helper.Logging
 
             public string FormatForArchive(string filePath)
             {
-                  xyLog.Log("Formatting for archive:");
                   string archivePath = $"{filePath}_{DateTime.Now}.log";
-                  xyLog.Log(archivePath);
+                  xyLog.Log("Formatting for archive: "+ archivePath);
                   return archivePath;
             }
 
@@ -35,7 +34,7 @@ namespace xyToolz.Helper.Logging
                               File.Move(filepath_, newPath);
                               xyLog.Log("Moving the log to archive was successfull");
                         }
-                        catch (IOException ioEx)
+                        catch (Exception ioEx)
                         {
                               xyLog.ExLog(ioEx);
                         }
@@ -53,10 +52,6 @@ namespace xyToolz.Helper.Logging
                               await Task.Run(() => File.Move(filepath_, newPath));
                               xyLog.Log("Moving the log to archive was successfull");
 
-                        }
-                        catch (IOException ioEx)
-                        {
-                              xyLog.ExLog(ioEx);
                         }
                         catch (Exception Ex)
                         {
