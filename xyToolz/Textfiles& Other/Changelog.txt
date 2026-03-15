@@ -1,6 +1,9 @@
 ﻿# Changelog 
 
-### 
+###
+
+### 16.03.2026
+- xyLog and helpers		-> Performance optimizations and comments
 
 ### 13.03.2026
 - xyLog and helpers		-> Moved the external message to the second spot and set ERROR as default level for ExLog
