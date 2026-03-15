@@ -1,9 +1,13 @@
-﻿using System;
-using System.Net.Mail;
-using System.Text;
-using Microsoft.Extensions.Logging;
-using System.Text.Json;
+﻿using Microsoft.Extensions.Logging;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Net.Mail;
+using System.Reflection.Emit;
+using System.Text;
+using System.Text.Json;
+using static PdfSharp.Capabilities;
 
 namespace xyToolz.Helper.Logging
 {
@@ -18,44 +22,28 @@ namespace xyToolz.Helper.Logging
     ///   <item><description>Performance tracing by formatting operation durations</description></item>
     ///   <item><description>Optional structured JSON output for exception data</description></item>
     /// </list>
-    ///
-    /// <para><b>Thread Safety:</b></para>
-    /// Fully thread-safe as all members are static and do not mutate shared state.
-    ///
-    /// <para><b>Limitations:</b></para>
-    /// Intended for logging purposes only – does not support parsing or structured JSON input.
-    ///
-    /// <para><b>Performance:</b></para>
-    /// Lightweight operations using StringBuilder, suitable for use in high-frequency log pipelines.
-    ///
-    /// <para><b>Configuration:</b></para>
-    /// Log level and caller name are optional and customizable on each method call.
-    ///
-    /// <para><b>Example Usage:</b></para>
-    /// <code>
-    /// var ex = new InvalidOperationException("Something went wrong!");
-    /// string formatted = xyLogFormatter.FormatExceptionDetails(ex, LogLevel.Error);
-    /// Console.WriteLine(formatted);
-    /// </code>
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "mimimimimimimimiimmiimmiimi")]
     public static class xyLogFormatter
     {
         #region Constants
 
-        private const string TimestampLabel = "Timestamp:";
-        private const string FromLabel = "From:";
-        private const string SenderLabel = "Sender:";
-        private const string ToLabel = "To:";
-        private const string SubjectLabel = "Subject:";
-        private const string AttachmentsLabel = "AttachmentsCount:";
-        private const string HeaderLabel = "Header:";
-        private const string BodyLabel = "Body:";
-        private const string OperationLabel = "Operation:";
-        private const string DurationLabel = "Duration:";
+        private const string TimestampLabel = "Timestamp: ";
+        private const string FromLabel = "From :";
+        private const string SenderLabel = "Sender: ";
+        private const string ToLabel = "To: ";
+        private const string SubjectLabel = "Subject: ";
+        private const string AttachmentsLabel = "AttachmentsCount: ";
+        private const string HeaderLabel = "Header: ";
+        private const string BodyLabel = "Body: ";
+        private const string OperationLabel = "Operation: ";
+        private const string DurationLabel = "Duration: ";
+        private const string CcLabel = "Cc:";
+        private const string BccLabel= "Bcc: ";
+        private const int MaxDepth = 69;
 
 
-        public static JsonSerializerOptions jsonOptions = new JsonSerializerOptions() 
+        public static JsonSerializerOptions jsonOptions = new JsonSerializerOptions()
         {
             WriteIndented = true,
         };
@@ -73,40 +61,55 @@ namespace xyToolz.Helper.Logging
         /// <param name="callerName">Optional: The method or class name that triggered the exception.</param>
         /// <param name="depth">Internal recursion depth counter (default 1).</param>
         /// <returns>A full textual description of the exception hierarchy.</returns>
-        public static string FormatExceptionDetails(Exception ex, LogLevel? level = LogLevel.Error, string? message = null,string? callerName = null, int depth = 1)
+        public static string FormatExceptionDetails(Exception ex, LogLevel? level = LogLevel.Error, string? message = null, string? callerName = null, int depth = 1)
         {
-            StringBuilder sb = new();
-            string exceptionId = Guid.NewGuid().ToString();
-            sb.AppendLine($"{DateTime.Now} [{callerName ?? "Unknown"}] [{level}] ");
+            StringBuilder sb = new(1024);
+            string id = Guid.NewGuid().ToString();
+            FormattingExceptionDetails(sb, ex, id, level, message, callerName, depth);
+
+            return sb.ToString();
+        }
+
+        private static void FormattingExceptionDetails(StringBuilder sb, Exception ex, string id, LogLevel? level = LogLevel.Error, string? message = null, string? callerName = null, int depth = 1)
+        {
+
+
+            if (depth > MaxDepth)
+            {
+                sb.AppendLine("### Safety break!!! ###");
+                sb.AppendLine("The depth of ").Append(MaxDepth).AppendLine(" Exceptions has been exceeded. Please seek help from a better programmer!");
+                return;
+            }
 
             if (!string.IsNullOrEmpty(message))
             {
-                sb.AppendLine($"External Message: {message}  \n");
+                sb.Append("External Message: ").Append(message).AppendLine().AppendLine(); ;
             }
 
+            sb.Append(DateTime.UtcNow).Append("  [").Append(callerName ?? "Unknown").Append("]  [").Append(level).AppendLine("]");
+
             sb.AppendLine($"====================[ EXCEPTION ]====================");
-            sb.AppendLine($"Exception-ID: {exceptionId}");
-            sb.AppendLine($"Depth: {depth}");
-            sb.AppendLine($"Type: {ex.GetType().Name}");
-            sb.AppendLine($"Message: {ex.Message}");
-            sb.AppendLine($"TargetSite: {ex.TargetSite}");
-            sb.AppendLine($"Source: {ex.Source}");
-            sb.AppendLine($"StackTrace: {ex.StackTrace}");
+            sb.Append("Exception-ID: ").AppendLine(id);
+            sb.Append("Depth: ").Append(depth).AppendLine();
+            sb.Append("Type: ").AppendLine(ex.GetType().Name);
+            sb.Append("Message: ").AppendLine(ex.Message);
+            sb.Append("TargetSite: ").AppendLine(ex.TargetSite?.ToString());
+            sb.Append("Source: ").AppendLine(ex.Source);
+            sb.Append("StackTrace: ").AppendLine(ex.StackTrace);
 
             if (ex.Data?.Count > 0)
             {
                 sb.AppendLine("Custom Data:");
-                foreach (var key in ex.Data.Keys)
-                    sb.AppendLine($"  {key}: {ex.Data[key]}");
+                foreach (DictionaryEntry key in ex.Data)
+                    sb.Append("     ").Append(key.Key).Append("  :  ").AppendLine(key.Value?.ToString());
             }
 
             if (ex.InnerException != null)
             {
                 sb.AppendLine("Inner Exception Details:");
-                sb.AppendLine(FormatExceptionDetails(ex.InnerException, level,null, callerName, depth + 1));
+                FormattingExceptionDetails(sb, ex.InnerException, id, level, callerName, depth: depth + 1);
             }
-
-            return sb.ToString();
+            return;
         }
 
         /// <summary>
@@ -116,20 +119,45 @@ namespace xyToolz.Helper.Logging
         /// <returns>A JSON string representation of the exception.</returns>
         public static string FormatExceptionAsJson(Exception ex)
         {
-            var exceptionInfo = new Dictionary<string, object?>
+            try
             {
-                ["Type"] = ex.GetType().FullName,
-                ["Message"] = ex.Message,
-                ["TargetSite"] = ex.TargetSite?.ToString(),
-                ["Source"] = ex.Source,
-                ["StackTrace"] = ex.StackTrace,
-                ["Timestamp"] = DateTime.UtcNow.ToString("o"),
-                ["Data"] = ex.Data?.Count > 0 ? ex.Data : null,
-                ["InnerException"] = ex.InnerException?.Message
-            };
-
-            return JsonSerializer.Serialize(exceptionInfo, jsonOptions);
+                if (BuildExceptionDictionary(ex) is Dictionary<string, object?> exceptionInfo)
+                    return JsonSerializer.Serialize(exceptionInfo, jsonOptions);
+                else return JsonSerializer.Serialize(ex);
+            }
+            catch (Exception serEx) 
+            {
+                xyLog.ExLog(serEx);
+                return new StringBuilder(256).Append("{\"Error\":\"JSON serialization failed\",\"OriginalMessage\":").Append(JsonSerializer.Serialize(ex.Message)).Append(",\"SerializerError\":").Append(JsonSerializer.Serialize(serEx.Message)).Append("}").ToString();
+            }
         }
+
+        private static Dictionary<string, object?>? BuildExceptionDictionary(Exception ex, int depth = 1) 
+        {
+            Dictionary<string, object?> exceptionInfo;
+            try
+            {
+                exceptionInfo = new()
+                {
+                    ["Type"] = ex.GetType().FullName,
+                    ["Message"] = ex.Message,
+                    ["TargetSite"] = ex.TargetSite?.ToString(),
+                    ["Source"] = ex.Source,
+                    ["StackTrace"] = ex.StackTrace,
+                    ["Timestamp"] = DateTime.UtcNow.ToString("o"),
+                    ["Data"] = ex.Data?.Count > 0 ? ex.Data.Cast<DictionaryEntry>().ToDictionary(e => e.Key.ToString()!, e => e.Value?.ToString()) : null,
+                    ["InnerException"] = ex.InnerException is not null && depth <= MaxDepth ? BuildExceptionDictionary(ex.InnerException, depth + 1) : null
+                };
+                return exceptionInfo;
+            }
+            catch (Exception dicEx)
+            {
+                xyLog.ExLog(dicEx,"An Error occured while trying to build a dictionary for serialization!");
+            }
+            return null;
+        }
+
+
 
         #endregion
 
@@ -144,10 +172,11 @@ namespace xyToolz.Helper.Logging
         /// <returns>A formatted string for logging.</returns>
         public static string FormatMessageForLogging(string message, string? callerName = null, LogLevel? level = null)
         {
-            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            string logLevel = level?.ToString() ?? "Debug";
-            string caller = string.IsNullOrEmpty(callerName) ? "UnknownCaller" : callerName;
-            return $"[{timestamp}] [{logLevel}] [{caller}] {message}";
+#if NET6_0_OR_GREATER
+            return string.Create(CultureInfo.InvariantCulture,$"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss.fff}] [{level ?? LogLevel.Debug}] [{(string.IsNullOrEmpty(callerName) ? "UnknownCaller" : callerName)}] {message}");
+#else
+        return new StringBuilder(128).Append('[').Append(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff")).Append("] [").Append(level?.ToString() ?? "Debug").Append("] [").Append(string.IsNullOrEmpty(callerName) ? "UnknownCaller" : callerName).Append("] ").Append(message).ToString();
+#endif
         }
 
         /// <summary>
@@ -160,12 +189,14 @@ namespace xyToolz.Helper.Logging
         /// <returns>A formatted JSON string for logging.</returns>
         public static string FormatMessageAsJson(string message, string? callerName = null, LogLevel? level = null)
         {
-            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            string logLevel = level?.ToString() ?? "Debug";
-            string caller = string.IsNullOrEmpty(callerName) ? "UnknownCaller" : callerName;
-
-            string test = $"[{timestamp}] [{logLevel}] [{caller}] {message}";
-            return JsonSerializer.Serialize(test, jsonOptions);
+            Dictionary<string, string?> payload = new ()
+            {
+                ["Timestamp"] = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff"),
+                ["Level"] = level?.ToString() ?? "Debug",
+                ["Caller"] = string.IsNullOrEmpty(callerName) ? "UnknownCaller" : callerName,
+                ["Message"] = message
+            };
+            return JsonSerializer.Serialize(payload, jsonOptions);
         }
 
 
@@ -181,34 +212,42 @@ namespace xyToolz.Helper.Logging
         /// <returns>A formatted string containing email details.</returns>
         public static string FormatMailDetails(MailMessage mailMessage)
         {
-            StringBuilder sb = new();
-            sb.AppendLine($"{TimestampLabel} {DateTime.Now}");
-            sb.AppendLine($"{FromLabel} {mailMessage.From?.Address}");
-            sb.AppendLine($"{SenderLabel} {mailMessage.Sender}");
-            sb.AppendLine($"{ToLabel} {string.Join(", ", mailMessage.To.Select(m => m.Address))}");
-            sb.AppendLine($"{SubjectLabel} {mailMessage.Subject}");
-            sb.AppendLine($"{AttachmentsLabel} {mailMessage.Attachments.Count}");
-            sb.AppendLine($"{HeaderLabel} {mailMessage.Headers}");
-            sb.AppendLine($"{BodyLabel} {mailMessage.Body}");
-            return sb.ToString();
-        }
+            StringBuilder sb = new(512);
 
-        #endregion
+            sb.Append(TimestampLabel).Append(' ').AppendLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            sb.Append(FromLabel).Append(' ').AppendLine(mailMessage.From?.Address);
+            sb.Append(SenderLabel).Append(' ').AppendLine(mailMessage.Sender?.Address);
 
-        #region Performance Formatting
+            sb.Append(ToLabel).Append(' ')
+              .AppendLine(string.Join(", ", mailMessage.To.Select(m => m.Address)));
 
-        /// <summary>
-        /// Creates a log string summarizing a named operation and its execution duration.
-        /// </summary>
-        /// <param name="operationName">Descriptive name of the operation or task measured.</param>
-        /// <param name="duration">The elapsed time in a <see cref="TimeSpan"/> object.</param>
-        /// <returns>A formatted string suitable for performance logging.</returns>
-        public static string FormatPerformanceLog(string operationName, TimeSpan duration)
-        {
-            StringBuilder sb = new();
-            sb.AppendLine($"{TimestampLabel} {DateTime.Now}");
-            sb.AppendLine($"{OperationLabel} {operationName}");
-            sb.AppendLine($"{DurationLabel} {duration.TotalMilliseconds} ms");
+            if (mailMessage.CC.Count > 0)sb.Append(CcLabel).Append(' ').AppendLine(string.Join(", ", mailMessage.CC.Select(m => m.Address)));
+
+            if (mailMessage.Bcc.Count > 0)sb.Append(BccLabel).Append(' ').AppendLine(string.Join(", ", mailMessage.Bcc.Select(m => m.Address)));
+
+            sb.Append(SubjectLabel).Append(' ').AppendLine(mailMessage.Subject);
+            sb.Append("IsBodyHtml: ").AppendLine(mailMessage.IsBodyHtml.ToString());
+            sb.Append(BodyLabel).Append(' ').AppendLine(mailMessage.Body);
+
+            sb.Append(AttachmentsLabel).Append(' ').AppendLine(mailMessage.Attachments.Count.ToString());
+            if (mailMessage.Attachments.Count > 0)
+            {
+                foreach (var att in mailMessage.Attachments)
+                {
+                    sb.Append("  ").AppendLine(att.Name);
+                }
+            }
+
+            if (mailMessage.Headers.Count > 0)
+            {
+                sb.AppendLine(HeaderLabel);
+                foreach (string key in mailMessage.Headers.Keys)
+                {
+                    sb.Append("  ").Append(key).Append(": ")
+                      .AppendLine(mailMessage.Headers[key]);
+                }
+            }
+
             return sb.ToString();
         }
 
