@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.Extensions.Localization;
+using OpenQA.Selenium;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using xyToolz.Helper.Logging;
@@ -14,22 +15,12 @@ namespace xyToolz.Logging.Helper
     /// Really nice, lol
     /// </summary>
     [SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Mimimiimimimimimimimimimimimii")]
-    public class xyMessageFactory 
+    public class xyMessageFactory
     {
         /// <summary>
         /// Add usefull information
         /// </summary>
         public string[]? Description { get; set; }
-
-
-        #region "Debug"
-
-        #region "Misc"
-
-
-
-        #endregion
-
 
         #region "ListigeCollectionen
 
@@ -54,7 +45,7 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="nameOfTheList"></param>
         /// <returns></returns>
-        public string EmptyList(string? nameOfTheList = null) => nameOfTheList== null? "The target list is empty! Please check recent operations and logs!":$"{nameOfTheList} is EMPTY!";
+        public string EmptyList(string? nameOfTheList = null) => nameOfTheList == null ? "The target list is empty! Please check recent operations and logs!" : $"{nameOfTheList} is EMPTY!";
 
         /// <summary>
         /// Array is empty
@@ -73,34 +64,32 @@ namespace xyToolz.Logging.Helper
         #endregion
 
 
-
         #region "Database"
         /// <summary>
         /// No connection string found in config
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string ConnectionStringNotFound(string? name = null) => name is null? $"No connection string found, unable to connect to database!!!" :  $"No connection string found for {name}, unable to connect to the target database!!!";
+        public string ConnectionStringNotFound(string? name = null) => name is null ? $"No connection string found, unable to connect to database!!!" : $"No connection string found for {name}, unable to connect to the target database!!!";
 
-        public string DatabaseConnectionFailed(string? dbName = null) => dbName is null? "Database connection failed!!!": $"Database connection to '{dbName}' failed!!!";
+        public string DatabaseConnectionFailed(string? dbName = null) => dbName is null ? "Database connection failed!!!" : $"Database connection to '{dbName}' failed!!!";
 
-        public string DatabaseQueryError(string? query = null) => query is null? "Database query execution failed!!!": $"Database query execution failed for query: {query}";
+        public string DatabaseQueryError(string? query = null) => query is null ? "Database query execution failed!!!" : $"Database query execution failed for query: {query}";
 
         #endregion
 
 
         #region "ModelState"
 
-        public string ModelUnvalidated(string? modelName = null) => modelName is null? $"Model validation has not been performed yet!": $"Model '{modelName}' validation has not been performed yet!";
+        public string ModelUnvalidated(string? modelName = null) => modelName is null ? $"Model validation has not been performed yet!" : $"Model '{modelName}' validation has not been performed yet!";
 
-            public string ModelValid(string? modelName = null) => modelName is null ? $"Model is valid.": $"Model '{modelName}' is valid.";
+        public string ModelValid(string? modelName = null) => modelName is null ? $"Model is valid." : $"Model '{modelName}' is valid.";
 
-            public string ModelInvalid(string? modelName = null) => modelName is null ? $"Model validation failed! Invalid model state.": $"Model '{modelName}' validation failed! Invalid state.";
+        public string ModelInvalid(string? modelName = null) => modelName is null ? $"Model validation failed! Invalid model state." : $"Model '{modelName}' validation failed! Invalid state.";
 
-            public string ModelSkipped(string? modelName = null) =>modelName is null? $"Model validation has been skipped.": $"Model '{modelName}' validation has been skipped.";
+        public string ModelSkipped(string? modelName = null) => modelName is null ? $"Model validation has been skipped." : $"Model '{modelName}' validation has been skipped.";
 
         #endregion
-
 
 
         #region "Serialization"
@@ -118,7 +107,7 @@ namespace xyToolz.Logging.Helper
         /// <param name="fileName"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public string SerializationSuccess(string fileName,object? target = null) => target is null ? $"The target has been serialized to JSON file: '{fileName}'!" : $"{nameof(target)}    :    {target.ToString()} has been serializedto JSON file: '{fileName}'!";
+        public string SerializationSuccess(string fileName, object? target = null) => target is null ? $"The target has been serialized to JSON file: '{fileName}'!" : target.GetType().Name + " has been serialized to JSON file:" + fileName + "!";
 
         /// <summary>
         /// Successfully serialized the target
@@ -126,14 +115,14 @@ namespace xyToolz.Logging.Helper
         /// <param name="fileName"></param>
         /// <param name="targets"></param>
         /// <returns></returns>
-        public string SerializationSuccess(string fileName, params object[] targets )
+        public string SerializationSuccess(string fileName, params object[] targets)
         {
             StringBuilder sb_targets = new();
             foreach (object target in targets)
             {
-                sb_targets.AppendLine($"{nameof(target)}    :    { target.ToString()}");
+                sb_targets.AppendLine($"{nameof(target)}    :    {target.ToString()}");
             }
-            string output =$"The targets {sb_targets.ToString()} have been serialized to JSON file: '{fileName}' successfully!";
+            string output = $"The targets {sb_targets.ToString()} have been serialized to JSON file: '{fileName}' successfully!";
             return output;
         }
 
@@ -157,7 +146,7 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public string DeserializationSuccess(object?  target = null) => target is null? $"{target} has been deserialized!" : $"{nameof(target)}    :    {target.ToString()} has been deserialized!";
+        public string DeserializationSuccess(object? target = null) => target is null ? $"Target has been deserialized!" : $"{nameof(target)}    :    {target.GetType().Name} has been deserialized!";
 
         /// <summary>
         /// Failed to deserialize the target
@@ -177,7 +166,6 @@ namespace xyToolz.Logging.Helper
         #endregion
 
 
-
         #region "Parameter"
 
         /// <summary>
@@ -185,22 +173,22 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public string ParameterValid(string? paramName = null) => paramName == null ? $"Data from parameter is valid! ": $"{paramName} is valid";
+        public string ParameterValid(string? paramName = null) => paramName == null ? $"Data from parameter is valid! " : $"{paramName} is valid";
         /// <summary>
         /// Parameter is incorrect
         /// </summary>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public string ParameterInvalid(string? paramName = null) => paramName == null? "Invalid data! Please check your input!": $"{paramName} is INVALID! Please check your input!";
+        public string ParameterInvalid(string? paramName = null) => paramName == null ? "Invalid data! Please check your input!" : $"{paramName} is INVALID! Please check your input!";
 
         /// <summary>
         /// Lists the given parameters below each other
         /// </summary>
         /// <param name="paramNames"></param>
         /// <returns></returns>
-        public string ParametersInvalid( string[]? paramNames = null)
+        public string ParametersInvalid(string[]? paramNames = null)
         {
-            if ( paramNames == null)
+            if (paramNames == null)
             {
                 return "Invalid parameter in the parameter checking function!";
             }
@@ -208,7 +196,7 @@ namespace xyToolz.Logging.Helper
             {
                 StringBuilder sb_Params = new();
                 sb_Params.Append("The following parameters are INVALID:\n");
-                foreach (var param in paramNames) 
+                foreach (var param in paramNames)
                 {
                     sb_Params.AppendLine(param);
                 }
@@ -216,7 +204,7 @@ namespace xyToolz.Logging.Helper
                 return sb_Params.ToString();
             }
         }
-            
+
 
         /// <summary>
         /// Parameter is null
@@ -255,8 +243,8 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="paramName"></param>
         /// <returns></returns>
-        public string ParameterNullOrInvalid(string? paramName = null) => paramName == null ? 
-            $"Input data is NULL or INVALID! Please check your input!" : 
+        public string ParameterNullOrInvalid(string? paramName = null) => paramName == null ?
+            $"Input data is NULL or INVALID! Please check your input!" :
             $"{paramName} is NULL or INVALID! Please check your input!";
 
         /// <summary>
@@ -307,8 +295,6 @@ namespace xyToolz.Logging.Helper
         public string WrongPassword() => "Entered password is wrong, please input correct password!";
 
         #endregion
-            
-
 
 
         #region "CRUD"
@@ -318,7 +304,7 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public string Created([MaybeNull]int? ID = null) => ID == null ? "Successfully created the target!":$"Successfully created the target with the ID {ID}!";
+        public string Created([MaybeNull] int? ID = null) => ID == null ? "Successfully created the target!" : $"Successfully created the target with the ID {ID}!";
         /// <summary>
         /// Created target -> name
         /// </summary>
@@ -330,7 +316,7 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <returns></returns>
         public string NotCreated() => "Failed to create the target! Please check your input!";
-        
+
         /// <summary>
         /// Read data from DB success
         /// </summary>
@@ -340,7 +326,7 @@ namespace xyToolz.Logging.Helper
         /// Failed to read the target data from DB
         /// </summary>
         /// <returns></returns>
-        public string NotRead(int? ID = null) => ID == null? "Found no valid equivalent for the entered data!" : $"No corresponding entry/ valid data found for ID{ID}";
+        public string NotRead(int? ID = null) => ID == null ? "Found no valid equivalent for the entered data!" : $"No corresponding entry/ valid data found for ID{ID}";
 
 
         /// <summary>
@@ -355,18 +341,26 @@ namespace xyToolz.Logging.Helper
         /// <param name="name"></param>
         /// <returns></returns>
         public string Updated([MaybeNull] string? name = null) => name == null ? "Successfully updated the target!" : $"Successfully updated {name}!";
+
         /// <summary>
         /// Failed to update
         /// </summary>
         /// <returns></returns>
-        public string Updated() => "Failed to update the target! Please check your input!";
+        public string NotUpdated([MaybeNull] int? ID = null) => ID == null ? "Failed to update the target! Please check your input!" : $"Failed to update the target with the ID {ID}!";
+        /// <summary>
+        /// Failed to update
+        /// </summary>
+        /// <returns></returns>
+        public string NotUpdated([MaybeNull] string? name = null) => name == null ? "Failed to update the target! Please check your input!" : "Failed to update the target: " + name;
+
+
 
         /// <summary>
         /// Deleted target from DB
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public string Deleted([MaybeNull] int? ID = null) => ID  == null ? $"Target was deleted from the database": $"target with the ID {ID} was removed from the database";
+        public string Deleted([MaybeNull] int? ID = null) => ID == null ? $"Target was deleted from the database" : $"target with the ID {ID} was removed from the database";
         /// <summary>
         /// Failed to delete target
         /// </summary>
@@ -375,7 +369,6 @@ namespace xyToolz.Logging.Helper
         public string NotDeleted([MaybeNull] int? ID = null) => ID == null ? $"Error! Target was not deleted from the database" : $"Error! The target with the ID {ID} was NOT deleted from the database";
 
         #endregion
-
 
 
         #region "EF-CORE CRUD"
@@ -402,19 +395,19 @@ namespace xyToolz.Logging.Helper
         /// </summary>
         /// <returns></returns>
         public string EntryNotCreated() => "Failed to create the target! Please check your input!";
-       
+
 
         /// <summary>
         /// Entry added to context
         /// </summary>
         /// <returns></returns>
-        public string EntryAdded(string? contextName = null) => contextName == null ?"Successfully added the entry to the underlying DB-Context implementation!": $"Successfully added the entry to the {contextName}!";
+        public string EntryAdded(string? contextName = null) => contextName == null ? "Successfully added the entry to the underlying DB-Context implementation!" : $"Successfully added the entry to the {contextName}!";
         /// <summary>
         /// Entry created and added to context
         /// </summary>
         /// <param name="contextName"></param>
         /// <returns></returns>
-        public string EntryCreatedAndAdded(string? contextName = null) => contextName == null ? "Successfully created and added the entry to the DB-Context!": $"Successfully created and added the entry to the {contextName}!";
+        public string EntryCreatedAndAdded(string? contextName = null) => contextName == null ? "Successfully created and added the entry to the DB-Context!" : $"Successfully created and added the entry to the {contextName}!";
 
 
         /// <summary>
@@ -423,7 +416,7 @@ namespace xyToolz.Logging.Helper
         /// <param name="ID"></param>
         /// <returns></returns>
         public string EntryNotFound(object ID) => $"Couldnt find the corresponding entrie for the ID {ID}";
-                ///// <summary>
+        ///// <summary>
         ///// No entry found
         ///// </summary>
         ///// <param name="ID"></param>
@@ -449,14 +442,14 @@ namespace xyToolz.Logging.Helper
         /// <param name="name"></param>
         /// <returns></returns>
         public string EntryNotUpdated([MaybeNull] string? name = null) => name == null ? $"Error! Entry in DB-Context was not updated!" : $"{name} was not updated in the context!";
-        
+
 
         /// <summary>
         /// Removed entry  from context
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string EntryRemoved([MaybeNull]string? name = null) => name == null?$"Entry was removed from DB-Context successfully": $"{name} was removed from DB-Context successfully";
+        public string EntryRemoved([MaybeNull] string? name = null) => name == null ? $"Entry was removed from DB-Context successfully" : $"{name} was removed from DB-Context successfully";
         /// <summary>
         /// Unable to remove entry from context
         /// </summary>
@@ -472,7 +465,7 @@ namespace xyToolz.Logging.Helper
         /// <param name="name"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public string ContextSaved(string name, int count) => ( name is null && string.IsNullOrEmpty(count+"") )? $"Target DB-Context was saved successfully!" : $"All {count} changes in {name} have been saved successfully!";
+        public string ContextSaved(string name, int? count) => (name is null && string.IsNullOrEmpty(count + "")) ? $"Target DB-Context was saved successfully!" : $"All {count} changes in {name} have been saved successfully!";
         /// <summary>
         /// Context didnt save
         /// </summary>
@@ -507,31 +500,31 @@ namespace xyToolz.Logging.Helper
         /// No key found
         /// </summary>
         /// <returns></returns>
-        public string KeyNotFound(string? key = null) =>key == null?  "Target key was not found!": $"{key} not found!";
+        public string KeyNotFound(string? key = null) => key == null ? "Target key was not found!" : $"{key} not found!";
 
         /// <summary>
         /// Token generated 
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public string TokenGenerated(string? token = null) =>  token ==null? $"Token was generated successfully" : $"Token generated:{token}";
+        public string TokenGenerated(string? token = null) => token == null ? $"Token was generated successfully" : $"Token generated:{token}";
         /// <summary>
         /// Token generation failed
         /// </summary>
         /// <returns></returns>
         public string TokenNotGenerated() => "Critical Failure in the token generation process!";
 
-        public string TokenExpired(string? tokenId = null) => tokenId is null? "Authentication token has expired!!!" : $"Authentication token '{tokenId}' has expired!!!";
+        public string TokenExpired(string? tokenId = null) => tokenId is null ? "Authentication token has expired!!!" : $"Authentication token '{tokenId}' has expired!!!";
 
         #endregion
 
 
         #region "Network"
-        public string NetworkUnavailable(string? host = null) =>  host is null? "Target network is unavailable!!!": $"Network unavailable for host '{host}'!!!";
+        public string NetworkUnavailable(string? host = null) => host is null ? "Target network is unavailable!!!" : $"Network unavailable for host '{host}'!!!";
 
-        public string TimeoutOccurred(string? operation = null) =>operation is null? "A network timeout occurred!!!": $"A timeout occurred while performing '{operation}'!!!";
+        public string TimeoutOccurred(string? operation = null) => operation is null ? "A network timeout occurred!!!" : $"A timeout occurred while performing '{operation}'!!!";
 
-        public string HostUnreachable(string? host = null) =>host is null? "Host unreachable!!!" : $"Host '{host}' is unreachable!!!";
+        public string HostUnreachable(string? host = null) => host is null ? "Host unreachable!!!" : $"Host '{host}' is unreachable!!!";
 
         #endregion
 
@@ -540,11 +533,12 @@ namespace xyToolz.Logging.Helper
 
 
         #region "FileStream"
-        public string FileStreamError(string? file = null) => file is null ? "An Error occured while reading a file into stream" :$"An Error occured while reading '{file}' into a stream!!!";
+        public string FileStreamError(string? file = null) => file is null ? "An Error occured while reading a file into stream" : $"An Error occured while reading '{file}' into a stream!!!";
 
-        public string FileStreamSuccess(string? file = null) => file is null ? "Successfully read a file into the stream" : $"Successfully loaded {file} into the stream." ;
+        public string FileStreamSuccess(string? file = null) => file is null ? "Successfully read a file into the stream" : $"Successfully loaded {file} into the stream.";
         #endregion
         #endregion
+
 
         #region "Paths" 
         public string PathNotFound(string? path = null) => path is null ? "The given path is null or empty." : $"The given path '{path}' is null or empty.";
@@ -552,24 +546,25 @@ namespace xyToolz.Logging.Helper
 
         #endregion
 
+
         #region "File Operations"
-        public string FileNotFound(string? file = null) =>file is null? "File not found!!!": $"File '{file}' not found!!!";
+        public string FileNotFound(string? file = null) => file is null ? "File not found!!!" : $"File '{file}' not found!!!";
 
-        public string FileAccessDenied(string? file = null) =>file is null? "File access denied!!!": $"Access denied for file '{file}'!!!";
+        public string FileAccessDenied(string? file = null) => file is null ? "File access denied!!!" : $"Access denied for file '{file}'!!!";
 
-        public string FileReadError(string? file = null) =>file is null? "File read error!!!": $"Error while reading file '{file}'!!!";
+        public string FileReadError(string? file = null) => file is null ? "File read error!!!" : $"Error while reading file '{file}'!!!";
 
         public string FileContentError(string? file = null) => file is null ? "File content is empty or unreadable." : $"File content from '{file}' is unreadable or empty!!!";
-     
+
         #endregion
 
 
         #region "User Messages"
-        public string UserNotFound(string? user = null) =>user is null? "User not found!!!": $"User '{user}' not found!!!";
+        public string UserNotFound(string? user = null) => user is null ? "User not found!!!" : $"User '{user}' not found!!!";
 
-        public string UserAlreadyExists(string? user = null) =>user is null? "User already exists!!!": $"User '{user}' already exists!!!";
+        public string UserAlreadyExists(string? user = null) => user is null ? "User already exists!!!" : $"User '{user}' already exists!!!";
 
-        public string UserLockedOut(string? user = null) =>user is null? "User account is locked out!!!": $"User '{user}' is locked out!!!";
+        public string UserLockedOut(string? user = null) => user is null ? "User account is locked out!!!" : $"User '{user}' is locked out!!!";
         #endregion
 
 
@@ -579,37 +574,33 @@ namespace xyToolz.Logging.Helper
         /// Login-data is valid
         /// </summary>
         /// <returns></returns>
-        public string LoginSuccess(string? username)=> username is null? "The entered userdata seems valid and correct, you may proceed" : $"Login for {username} successfull";
-        
+        public string LoginSuccess(string? username) => username is null ? "The entered userdata seems valid and correct, you may proceed" : $"Login for {username} successfull";
+
         /// <summary>
         /// User failed to provide valid data for login
         /// </summary>
         /// <returns></returns>
-        public string LoginFail(string? email) => email is null?"The userdata is invalid and/ or incorrect, please check the entered dataset" : $"Login failed for user: {email}.";
-        
+        public string LoginFail(string? email) => email is null ? "The userdata is invalid and/ or incorrect, please check the entered dataset" : $"Login failed for user: {email}.";
+
         public string LoginStart(string url) => $"Attempting login at: {url}.";
 
         public string LoginTimeout(int seconds) => $"Login process timed out after {seconds} seconds.";
 
-        public string LoginUnexpected(Exception ex) => $"Unexpected error during login: {xyLogFormatter.FormatExceptionDetails(ex,LogLevel.Warning)}";
+        public string LoginUnexpected(Exception ex) => $"Unexpected error during login: {xyLogFormatter.FormatExceptionDetails(ex, LogLevel.Warning)}";
 
         #endregion
 
 
         #region "Security Messages"
-        public string EncryptionFailed(string? target = null) => target is null? "Encryption failed!!!": $"Encryption failed for '{target}'!!!";
+        public string EncryptionFailed(string? target = null) => target is null ? "Encryption failed!!!" : $"Encryption failed for '{target}'!!!";
 
-        public string DecryptionFailed(string? target = null) =>target is null? "Decryption failed!!!": $"Decryption failed for '{target}'!!!";
+        public string DecryptionFailed(string? target = null) => target is null ? "Decryption failed!!!" : $"Decryption failed for '{target}'!!!";
 
-        public string InvalidCertificate(string? cert = null) =>cert is null? "Invalid certificate detected!!!": $"Invalid certificate '{cert}' detected!!!";
+        public string InvalidCertificate(string? cert = null) => cert is null ? "Invalid certificate detected!!!" : $"Invalid certificate '{cert}' detected!!!";
         #endregion
 
 
-        #region "System"
-
-
         #region "Window & Tab Handling"
-
         public string WindowSwitch(string handle) => $"Switched to window with handle: {handle}";
 
         public string WindowClosed(string handle) => $"Window closed: {handle}";
@@ -617,6 +608,7 @@ namespace xyToolz.Logging.Helper
         public string WindowOpened(string name) => $"New window opened: {name}";
 
         #endregion
+
 
         #region "Keyboard & Mouse Events"
 
@@ -643,17 +635,17 @@ namespace xyToolz.Logging.Helper
 
         #endregion
 
+
         #region "System Messages"
-        public string OperationFailed(string? operation = null) =>operation is null? "Operation failed!!!": $"Operation '{operation}' failed!!!";
 
-        public string ConfigurationError(string? config = null) =>config is null? "Configuration error detected!!!": $"Configuration error detected for '{config}'!!!";
+        public string OperationFailed(string? operation = null) => operation is null ? "Operation failed!!!" : $"Operation '{operation}' failed!!!";
 
-        public string UnknownError(string? details = null) =>details is null? "An unknown error occurred!!!": $"An unknown error occurred: {details}";
+        public string ConfigurationError(string? config = null) => config is null ? "Configuration error detected!!!" : $"Configuration error detected for '{config}'!!!";
 
-        #endregion
-        
+        public string UnknownError(string? details = null) => details is null ? "An unknown error occurred!!!" : $"An unknown error occurred: {details}";
 
         #endregion
+
 
         #region "Browser automatization"
 
@@ -900,7 +892,7 @@ namespace xyToolz.Logging.Helper
 
         #endregion
 
-        #endregion
+
     }
 
 
