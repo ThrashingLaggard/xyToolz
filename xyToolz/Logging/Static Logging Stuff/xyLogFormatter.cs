@@ -1,13 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Mail;
-using System.Reflection.Emit;
 using System.Text;
 using System.Text.Json;
-using static PdfSharp.Capabilities;
 
 namespace xyToolz.Helper.Logging
 {
@@ -251,6 +247,6 @@ namespace xyToolz.Helper.Logging
             return sb.ToString();
         }
 
-        #endregion
+        #endregion 
     }
 }

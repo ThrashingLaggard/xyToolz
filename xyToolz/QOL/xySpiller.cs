@@ -35,7 +35,7 @@ namespace xyToolz.QOL
         /// </param>
         /// <returns>A single string containing all elements separated by the configured delimiter.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Spill<T>(IEnumerable<T> targetValues, bool hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
+        public static string Spill<T>(IEnumerable<T> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
             => Join(targetValues, hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace xyToolz.QOL
         /// separated by the configured delimiter.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Spill<TKey, TValue>(Dictionary<TKey, TValue> targetValues, bool hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
+        public static string Spill<TKey, TValue>(Dictionary<TKey, TValue> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
             => Join(targetValues.Select(kvp => $"{kvp.Key}:{kvp.Value}"), hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
@@ -123,9 +123,8 @@ namespace xyToolz.QOL
         /// <see langword="true"/>. Defaults to <c>","</c>.
         /// </param>
         /// <returns>A single string of all elements joined by the resolved delimiter.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string Join<T>(IEnumerable<T> values, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
-            => string.Join((((bool)hasSeperator) ? seperator : string.Empty) + (((bool)hasWhitespace) ? " " : string.Empty), values);
+            => string.Join((hasSeperator ??true? seperator : string.Empty) + (((bool)hasWhitespace) ? " " : string.Empty), values);
 
         /// <summary>
         /// Joins the elements of a sequence into a single string using the specified delimiter and spacing options.
@@ -146,7 +145,7 @@ namespace xyToolz.QOL
         /// Pass <see langword="null"/> to fall back to the default.
         /// </param>
         /// <returns>A single string of all elements joined by the resolved delimiter.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static string JoinDebug<T>(IEnumerable<T> values, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
         {
             string empty = string.Empty;

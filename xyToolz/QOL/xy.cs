@@ -1,5 +1,4 @@
-﻿using OpenQA.Selenium.DevTools.V140.HeapProfiler;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using xyToolz.Helper.Logging;
@@ -139,7 +138,6 @@ namespace xyToolz.QOL
         /// </summary>
         /// <param name="input">The UTF-8 string to convert.</param>
         /// <returns>A byte array representation of the input string.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static byte[] StringToBytes(string input)
         {
             try
@@ -158,7 +156,6 @@ namespace xyToolz.QOL
         /// </summary>
         /// <param name="base64">The Base64-encoded input string.</param>
         /// <returns>The decoded byte array.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static byte[] BaseToBytes(string base64)
         {
             try
@@ -177,7 +174,6 @@ namespace xyToolz.QOL
         /// </summary>
         /// <param name="bytes">The input byte array.</param>
         /// <returns>A UTF-8 string representation of the byte array.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string BytesToString(byte[] bytes)
         {
             try
@@ -196,7 +192,6 @@ namespace xyToolz.QOL
         /// </summary>
         /// <param name="bytes">The input byte array.</param>
         /// <returns>A Base64 string representation of the byte array.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string BytesToBase(byte[] bytes)
         {
             try
@@ -225,7 +220,6 @@ namespace xyToolz.QOL
         /// <param name="text">The text to repeat.</param>
         /// <param name="count">The end amount.</param>
         /// <returns>The repeated string.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Repeat(string text, ushort count)
         {
             StringBuilder sb_Repeater = new();
@@ -240,7 +234,7 @@ namespace xyToolz.QOL
         /// Repeating a given char for the specified amount
         /// </summary>
         /// <remarks>
-        ///
+        /// Use this overload for better performance!
         /// </remarks>
         /// <param name="text">The target character</param>
         /// <param name="count">The end amount</param>
@@ -256,7 +250,6 @@ namespace xyToolz.QOL
         /// </remarks>
         /// <param name="input">The string to reverse.</param>
         /// <returns>The reversed string.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Reverse(string input)
         {
             char[] arr_InputChars = input.ToCharArray();
@@ -272,11 +265,10 @@ namespace xyToolz.QOL
         /// </remarks>
         /// <param name="input">The string to reverse.</param>
         /// <returns>The reversed string.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReverseUnicode(string input)
         {
             StringBuilder reverseBuilder = new (input.Length);
-            for (int i = input.Length; i >= 0; i--)
+            for (int i = input.Length -1; i >= 0; i--)  // unter vorbehalt
             {
                 reverseBuilder.Append(input[i]);
             }
