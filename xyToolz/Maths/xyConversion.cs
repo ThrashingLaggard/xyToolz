@@ -8,7 +8,7 @@ using static xyToolz.QOL.xy;
 namespace xyToolz.Maths
 {
         /// <summary>
-        /// Hier könnte ihre Werbung stehen!
+        /// This class is used to convert numbers between different systems, like hex -> bin
         /// </summary>
       public static class xyConversion
       {
