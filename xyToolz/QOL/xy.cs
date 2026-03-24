@@ -15,9 +15,8 @@ namespace xyToolz.QOL
     /// ---
     /// Print  on Console
     /// ---
-    /// String to Bytes     
-    /// ---
-    /// Bytes to String
+    /// 
+    /// 
     /// ---
     /// Open Editor 
     ///         -> also with file
@@ -31,6 +30,9 @@ namespace xyToolz.QOL
     /// Crash
     /// 
     /// </summary>
+    /// <remarks>
+    ///### I changed all the string and byte conversion methods to be extension methods and outsourced them into xyToolz.Extension namespace!!!!! ####
+    /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs yet.")]
 #pragma warning disable CS8981 // Der Typname enthält nur ASCII-Zeichen in Kleinbuchstaben. Solche Namen können möglicherweise für die Sprache reserviert werden.
     public static partial class xy

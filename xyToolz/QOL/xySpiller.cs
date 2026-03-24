@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 namespace xyToolz.QOL
 {
     /// <summary>
+    /// 
     /// Provides static helper methods for converting collections into formatted, delimiter-separated strings.
     /// </summary>
     /// <remarks>
+    ///                 ### I changed all these methods to be extension methods!!!! ####
+    /// 
+    /// 
     /// All public overloads are thin wrappers around an internal <c>Join</c> method and are marked
     /// <see cref="MethodImplOptions.AggressiveInlining"/> to eliminate call overhead in hot paths.
     /// A step-by-step debug variant (<c>JoinDebug</c>) is available for diagnostic purposes.

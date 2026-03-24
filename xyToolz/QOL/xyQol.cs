@@ -201,13 +201,7 @@ namespace xyToolz.QOL
         /// </remarks>
         public static string PropertiesToString< TKey, TValue,T>(Dictionary<TKey, TValue>  keyValuePairs) where T : class where TKey :class
         {
-            StringBuilder stringBuilder = new();
-            foreach (var keyValue in keyValuePairs)
-            {
-                stringBuilder.AppendLine($"{keyValue.Key.ToString()} : {keyValue.Value +""}");
-            }
-
-            return stringBuilder.ToString();
+            return keyValuePairs.Spill();
         }
 
     }
