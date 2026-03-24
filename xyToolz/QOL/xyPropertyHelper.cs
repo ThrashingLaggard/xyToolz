@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
-using System.Text;
 using xyToolz.Helper.Logging;
 using xyToolz.Logging.Helper;
-using xyToolz.Logging.Loggers;
 
 namespace xyToolz.QOL
 {
@@ -21,7 +19,7 @@ namespace xyToolz.QOL
     /// methods generally return empty results instead of throwing.
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "...")]
-    public class xyQol
+    public class xyPropertyHelper
     {
         
         private static readonly xyMessageFactory _fac = new xyMessageFactory();
