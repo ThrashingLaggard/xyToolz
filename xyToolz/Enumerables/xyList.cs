@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 
-namespace xyToolz.Lists
+namespace xyToolz.Enumerables
 {
 
 
