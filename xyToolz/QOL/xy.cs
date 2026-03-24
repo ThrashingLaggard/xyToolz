@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
 using xyToolz.Helper.Logging;
 
 
@@ -34,7 +33,7 @@ namespace xyToolz.QOL
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs yet.")]
 #pragma warning disable CS8981 // Der Typname enthält nur ASCII-Zeichen in Kleinbuchstaben. Solche Namen können möglicherweise für die Sprache reserviert werden.
-    public static class xy
+    public static partial class xy
 #pragma warning restore CS8981 // Der Typname enthält nur ASCII-Zeichen in Kleinbuchstaben. Solche Namen können möglicherweise für die Sprache reserviert werden.
     {
         #region TryCatch – Error-handling helpers
@@ -131,104 +130,8 @@ namespace xyToolz.QOL
 
         #endregion
 
-        #region Encoding – String and Byte Conversion
-
-        /// <summary>
-        /// Converts a UTF-8 string into a byte array.
-        /// </summary>
-        /// <param name="input">The UTF-8 string to convert.</param>
-        /// <returns>A byte array representation of the input string.</returns>
-        public static byte[] StringToBytes(string input)
-        {
-            try
-            {
-                return Encoding.UTF8.GetBytes(input);
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null!;
-            }
-        }
-
-        /// <summary>
-        /// Converts a Base64-encoded string into a byte array.
-        /// </summary>
-        /// <param name="base64">The Base64-encoded input string.</param>
-        /// <returns>The decoded byte array.</returns>
-        public static byte[] BaseToBytes(string base64)
-        {
-            try
-            {
-                return Convert.FromBase64String(base64);
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null!;
-            }
-        }
-
-        /// <summary>
-        /// Converts a byte array into a UTF-8 string.
-        /// </summary>
-        /// <param name="bytes">The input byte array.</param>
-        /// <returns>A UTF-8 string representation of the byte array.</returns>
-        public static string BytesToString(byte[] bytes)
-        {
-            try
-            {
-                return Encoding.UTF8.GetString(bytes);
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null!;
-            }
-        }
-
-        /// <summary>
-        /// Converts a byte array into a Base64-encoded string.
-        /// </summary>
-        /// <param name="bytes">The input byte array.</param>
-        /// <returns>A Base64 string representation of the byte array.</returns>
-        public static string BytesToBase(byte[] bytes)
-        {
-            try
-            {
-                return Convert.ToBase64String(bytes);
-            }
-            catch (Exception ex)
-            {
-                xyLog.ExLog(ex);
-                return null!;
-            }
-        }
-
-
-
-        #endregion
-
         #region QOL – String Utilities
 
-        /// <summary>
-        /// Repeating a given string a specified number of times.
-        /// </summary>
-        /// <remarks>
-        /// Use char overload for way better performance
-        /// </remarks>
-        /// <param name="text">The text to repeat.</param>
-        /// <param name="count">The end amount.</param>
-        /// <returns>The repeated string.</returns>
-        public static string Repeat(string text, ushort count)
-        {
-            StringBuilder sb_Repeater = new();
-            for (int i = 0; i < count; i++)
-            {
-                sb_Repeater.Append(text);
-            }
-            return sb_Repeater.ToString();
-        }
 
         /// <summary>
         /// Repeating a given char for the specified amount
@@ -242,44 +145,19 @@ namespace xyToolz.QOL
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Repeat(char text, int count) => new (text, count);
 
-        /// <summary>
-        /// Reverses the characters in a given string.
-        /// </summary>
-        /// <remarks>
-        /// This variant appearently (*Stack Overflow) also reverses the unicode modifiers in character, thus if in doubt, use the Unicode variant of this, utilizing a StringBuilder
-        /// </remarks>
-        /// <param name="input">The string to reverse.</param>
-        /// <returns>The reversed string.</returns>
-        public static string Reverse(string input)
-        {
-            char[] arr_InputChars = input.ToCharArray();
-            Array.Reverse(arr_InputChars);
-            return new (arr_InputChars);
-        }
 
         /// <summary>
-        /// Reverses the characters in a given string.
-        /// </summary>
-        /// <remarks>
-        /// This variant is appearently safe for usage with unicode
-        /// </remarks>
-        /// <param name="input">The string to reverse.</param>
-        /// <returns>The reversed string.</returns>
-        public static string ReverseUnicode(string input)
-        {
-            StringBuilder reverseBuilder = new (input.Length);
-            for (int i = input.Length -1; i >= 0; i--)  // unter vorbehalt
-            {
-                reverseBuilder.Append(input[i]);
-            }
-            return reverseBuilder.ToString();
-        }
-
-        /// <summary>
-        /// Prints the given message to the console using xyLog.
+        /// Prints the given message to the console using Console.Writeline()
         /// </summary>
         /// <param name="message">The message to print.</param>
-        public static void Print(string message) => xyLog.Log(message);
+        public static void Print(this string message) => Console.WriteLine(message);
+
+        /// <summary>
+        /// Prints the given message to the console using xyLog.Log()
+        /// </summary>
+        /// <param name="message"></param>
+        public static void Log(this string message) => xyLog.Log(message);
+
 
         #endregion
 
