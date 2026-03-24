@@ -35,7 +35,7 @@ namespace xyToolz.QOL
         /// </param>
         /// <returns>A single string containing all elements separated by the configured delimiter.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Spill<T>(IEnumerable<T> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
+        public static string Spill<T>(this IEnumerable<T> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
             => Join(targetValues, hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace xyToolz.QOL
         /// </param>
         /// <returns>A single string containing all elements separated by the configured delimiter.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Spill<T>(T[] targetValues, bool hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
+        public static string Spill<T>(this T[] targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
             => Join(targetValues, hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace xyToolz.QOL
         /// </param>
         /// <returns>A single string containing all elements separated by the configured delimiter.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Spill<T>(IList<T> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
+        public static string Spill<T>(this IList<T> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
             => Join(targetValues, hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace xyToolz.QOL
         /// separated by the configured delimiter.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Spill<TKey, TValue>(Dictionary<TKey, TValue> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
+        public static string Spill<TKey, TValue>(this Dictionary<TKey, TValue> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
             => Join(targetValues.Select(kvp => $"{kvp.Key}:{kvp.Value}"), hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace xyToolz.QOL
 
         /// <summary>
         /// Joins the elements of a sequence into a single string using the specified delimiter and spacing options.
-        /// Intended for diagnostic use; implements the same logic as <see cref="Join{T}"/> with
+        /// Intended for diagnostic use; implements the same logic as <see cref="Spill{IEnumerable}"/> with
         /// explicit intermediate steps to aid debugging.
         /// </summary>
         /// <typeparam name="T">The element type of the sequence.</typeparam>
@@ -146,7 +146,7 @@ namespace xyToolz.QOL
         /// </param>
         /// <returns>A single string of all elements joined by the resolved delimiter.</returns>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static string JoinDebug<T>(IEnumerable<T> values, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
+        public static string JoinDebug<T>(this IEnumerable<T> values, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
         {
             string empty = string.Empty;
             string whiteSpace = " ";
