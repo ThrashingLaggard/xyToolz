@@ -5,20 +5,21 @@ using xyToolz.Helper.Logging;
 
 namespace xyToolz.Extensions
 {
-      /// <summary>
-      /// Helpers for Enumerables:
-      /// 
-      /// Fill with integer
-      ///             -> with even
-      ///             -> with odd
-      ///             
-      /// Print whole thingy
-      ///         --> also with Carriage return
-      /// 
-      /// Fill with a time for every quarter hour of the day 
-      ///     
-      /// </summary>
-      public static class xyListExtensions
+    #region "filling"
+    /// <summary>
+    /// Helpers for Enumerables:
+    /// 
+    /// Fill with integer
+    ///             -> with even
+    ///             -> with odd
+    ///             
+    /// Print whole thingy
+    ///         --> also with Carriage return
+    /// 
+    /// Fill with a time for every quarter hour of the day 
+    ///     
+    /// </summary>
+    public static class xyListExtensions
       {
             public static IList<int> FillWithNumbers( this IList<int> list, int limit )
             {
@@ -83,5 +84,8 @@ namespace xyToolz.Extensions
                   return presets;
             }
 
-      }
+        #endregion
+
+
+    }
 }
