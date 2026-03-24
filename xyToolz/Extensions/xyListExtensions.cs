@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Text;
 using xyToolz.Helper.Logging;
 
-namespace xyToolz.QOL
+namespace xyToolz.Extensions
 {
       /// <summary>
       /// Helpers for Enumerables:
@@ -18,7 +18,7 @@ namespace xyToolz.QOL
       /// Fill with a time for every quarter hour of the day 
       ///     
       /// </summary>
-      public static class xyColQol
+      public static class xyListExtensions
       {
             public static IList<int> FillWithNumbers( this IList<int> list, int limit )
             {
