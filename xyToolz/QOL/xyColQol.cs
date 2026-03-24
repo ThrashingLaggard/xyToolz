@@ -20,135 +20,35 @@ namespace xyToolz.QOL
       /// </summary>
       public static class xyColQol
       {
-            public static IEnumerable<int> FillTheList( int limit )
+            public static IList<int> FillWithNumbers( this IList<int> list, int limit )
             {
-                  var list = new List<int>();
-
-                  for (int i = 0; i < limit; i++)
+                  for (int i = 0; i <= limit; i++)
                   {
                         list.Add(i);
                   }
                   return list;
             }
 
-            public static IEnumerable<int> FillEvenList( int limit )
+            public static IList<int> AddEvenNumbers(this IList<int>list, int limit )
             {
-                  var lst_EvenNumbers = new List<int>();
-
-                  for (int i = 2; i < limit; i += 2)
+                  for (int i = 2; i <= limit; i += 2)
                   {
-                        lst_EvenNumbers.Add(i);
+                        list.Add(i);
                   }
-                  return lst_EvenNumbers;
+                  return list;
             }
 
-            public static IEnumerable<int> FillOddList( int limit )
-            {
-                  var lst_OddNumbers = new List<int>();
-
-                  for (int i = 1; i < limit; i += 2)
+            public static IList<int> AddOddNumbers( this IList<int> list, int limit )
+            { 
+                for (int i = 1; i < limit; i += 2)
                   {
-                        lst_OddNumbers.Add(i);
+                        list.Add(i);
                   }
-                  return lst_OddNumbers;
+                  return list;
             }
 
             
 
-            /// <summary>
-            /// Print the targets intestines on your favourite console and splits them with a comma
-            /// </summary>
-            /// <param name="values"></param>
-            /// <returns>1, 2, 3, 4, 5</returns>
-            public static string SplitSpill( IEnumerable values )
-            {
-                  string output = string.Empty;
-                  foreach (object value in values)
-                  {
-                        output += value + ", ";
-                  }
-                  xyLog.Log(output);
-                  return output;
-            }
-        /// <summary>
-        /// Print the targets intestines on your favourite console
-        /// </summary>
-        /// <param name="values"></param>
-        /// <returns>12345</returns>
-        public static string Spill( IEnumerable values )
-            {
-                  string output = string.Empty;
-                  foreach (object value in values)
-                  {
-                        output += value;
-                  }
-                  xyLog.Log(output);
-                  return output;
-            }
-
-
-            /// <summary>
-            /// Print the targets intestines on your favourite console BUT ASYNC
-            /// </summary>
-            /// <param name="values"></param>
-            /// <returns></returns>
-            public static async Task<string> AsxSpill( IEnumerable values )
-            {
-                  string output = string.Empty;
-                  await Task.Run
-                  (
-                      () =>
-                      {
-                            foreach (object value in values)
-                            {
-                                  output += value + ", ";
-                            }
-                      }
-                  );
-
-                  await xyLog.AsxLog(output);
-                  return output;
-            }
-
-            /// <summary>
-            /// Print the targets intestines on your favourite console with comma and CARRIAGE RETURNS after every value
-            /// </summary>
-            /// <param name="values"></param>
-            /// <returns></returns>
-            public static async Task<string> AsxSpillDown( IEnumerable values )
-            {
-                  string output = string.Empty;
-                  await Task.Run
-                  (
-                      async () =>
-                      {
-                            foreach (object value in values)
-                            {
-                                  output += value + ", ";
-                                  await xyLog.AsxLog(value + "");
-                            }
-                      }
-                  );
-
-                  return output;
-            }
-
-
-            /// <summary>
-            /// Print the targets intestines on your favourite console with comma and CARRIAGE RETURNS after every value
-            /// </summary>
-            /// <param name="values"></param>
-            /// <returns></returns>
-            public static string SpillDown( IEnumerable values )
-            {
-                  string output = string.Empty;
-                  foreach (object value in values)
-                  {
-                        output += value + ", ";
-                        xyLog.Log(value + "");
-                  }
-                  return output;
-            }
 
             /// <summary>
             /// Returns a list filled with all the quarters of an hour in the day

@@ -15,7 +15,7 @@ namespace xyToolz.QOL
     /// <see cref="MethodImplOptions.AggressiveInlining"/> to eliminate call overhead in hot paths.
     /// A step-by-step debug variant (<c>JoinDebug</c>) is available for diagnostic purposes.
     /// </remarks>
-    public class xySpiller
+    public static class xySpiller
     {
         /// <summary>
         /// Converts an <see cref="IEnumerable{T}"/> to a formatted, delimiter-separated string.

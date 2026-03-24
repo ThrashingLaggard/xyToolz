@@ -447,8 +447,7 @@ namespace xyToolz.Maths
         /// Example: -1 (0b11111111) → 8
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SumOfBinary(sbyte value)
-            => SumOfBinary((byte)value);
+        public static int SumOfBinary(sbyte value)=> SumOfBinary((byte)value);
 
         /// <summary>
         /// Calculates the sum of all binary digits (count of set bits) in a short value.
