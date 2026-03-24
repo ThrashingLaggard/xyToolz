@@ -32,7 +32,7 @@ namespace xyToolz.Extensions
         //}
 
         /// <summary>
-        /// Very efficient extention method
+        /// Very efficient extension method
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>

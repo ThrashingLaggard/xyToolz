@@ -4,13 +4,7 @@ using xyToolz.Helper.Logging;
 
 namespace xyToolz.Extensions
 {
-        #region Encoding – String and Byte Conversion
-
-
-
-        #endregion
-
-        public static class xyByteExtensions
+       public static class xyByteExtensions
         {
 
             /// <summary>
@@ -18,7 +12,7 @@ namespace xyToolz.Extensions
             /// </summary>
             /// <param name="bytes">The input byte array.</param>
             /// <returns>A UTF-8 string representation of the byte array.</returns>
-            public static string BytesToString( this byte[] bytes)
+            public static string ToString( this byte[] bytes)
             {
                 try
                 {
@@ -36,7 +30,7 @@ namespace xyToolz.Extensions
             /// </summary>
             /// <param name="bytes">The input byte array.</param>
             /// <returns>A Base64 string representation of the byte array.</returns>
-            public static string BytesToBase(this byte[] bytes)
+            public static string ToBase(this byte[] bytes)
             {
                 try
                 {

@@ -64,7 +64,7 @@ namespace xyToolz.Extensions
             /// </summary>
             /// <param name="input">The UTF-8 string to convert.</param>
             /// <returns>A byte array representation of the input string.</returns>
-            public static byte[] StringToBytes(string input)
+            public static byte[] ToBytes(this string input)
             {
                 try
                 {
@@ -82,7 +82,7 @@ namespace xyToolz.Extensions
             /// </summary>
             /// <param name="base64">The Base64-encoded input string.</param>
             /// <returns>The decoded byte array.</returns>
-            public static byte[] BaseToBytes(string base64)
+            public static byte[] BaseToBytes(this string base64)
             {
                 try
                 {
