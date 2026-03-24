@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
+using xyToolz.Helper.Logging;
 using xyToolz.Logging.Helper;
 using xyToolz.Logging.Loggers;
 
@@ -22,24 +23,9 @@ namespace xyToolz.QOL
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "...")]
     public class xyQol
     {
-        private readonly xyLoggerManager _log;
-        private readonly xyMessageFactory _fac;
+        
+        private static readonly xyMessageFactory _fac = new xyMessageFactory();
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="xyQol"/> with the provided logger manager and message factory.
-        /// </summary>
-        /// <param name="log_">Logger manager used to record informational messages and exceptions.</param>
-        /// <param name="fac_">Factory used to create standardized log messages.</param>
-        /// <remarks>
-        /// The constructor also registers basic console loggers for <see cref="string"/> and <see cref="System.Exception"/> messages.
-        /// </remarks>
-        public xyQol(xyLoggerManager log_, xyMessageFactory fac_)
-        {
-            _log = log_;
-            _fac = fac_;
-
-            _log.RegisterLogger(new xyConsoleLogger<string>(), new xyConsoleLogger<Exception>());
-        }
 
         /// <summary>
         /// Returns an array of <see cref="PropertyInfo"/> objects that describe the public properties
@@ -56,13 +42,13 @@ namespace xyToolz.QOL
         /// <paramref name="obj"/>. If you pass a base type variable that actually holds a derived type,
         /// only the base type's properties are returned.
         /// </remarks>
-        public PropertyInfo[] GetPropertyInfosForTarget<T>(T obj)
+        public static PropertyInfo[] GetPropertyInfosForTarget<T>(T obj)
         {
             try
             {
                 if (obj is null)
                 {
-                    _log.Log(_fac.ParameterNull(nameof(obj)));
+                    xyLog.Log(_fac.ParameterNull(nameof(obj)));
                     return [];
                 }
                 else
@@ -70,14 +56,14 @@ namespace xyToolz.QOL
                     Type type = typeof(T);
                     if (type.GetProperties() is PropertyInfo[] propertyInfos && propertyInfos.Length > 0)
                     {
-                        _log.Log($"Successfully read the property infos for {type}");
+                        xyLog.Log($"Successfully read the property infos for {type}");
                         return propertyInfos;
                     }
                 }
             }
             catch (Exception ex)
             {
-                _log.ExLog(ex);
+                xyLog.ExLog(ex);
             }
             return [];
         }
@@ -106,7 +92,7 @@ namespace xyToolz.QOL
         /// <typeparamref name="TValue"/>, the exception is logged and the property is skipped.
         /// </para>
         /// </remarks>
-        public Dictionary<TKey, TValue> GetPropertyValuesForTarget<TKey, TValue, T>(T obj) where T : class where TKey : class
+        public static Dictionary<TKey, TValue> GetPropertyValuesForTarget<TKey, TValue, T>(T obj) where T : class where TKey : class
         {
             PropertyInfo[] propertyInfos = GetPropertyInfosForTarget(obj);
 
@@ -126,7 +112,7 @@ namespace xyToolz.QOL
                 }
                 catch (Exception ex)
                 {
-                    _log.ExLog(ex);
+                    xyLog.ExLog(ex);
                 }
             }
 
@@ -156,7 +142,7 @@ namespace xyToolz.QOL
         /// conversions but does not handle complex types or custom parsers. For those, consider custom converters.
         /// </para>
         /// </remarks>
-        public T GetEntityFromDictionary<T, TKey, TValue>(Dictionary<TKey, TValue> keyValuePairs) where T : class where TKey :class
+        public static T GetEntityFromDictionary<T, TKey, TValue>(Dictionary<TKey, TValue> keyValuePairs) where T : class where TKey :class
         {
             T target = Activator.CreateInstance<T>();// CSI Gnarzraha, das habe ich gebraucht, lol!!1!!!!!!!!!!!1!!!!!111!!!!!!!  
 
@@ -192,7 +178,7 @@ namespace xyToolz.QOL
                     }
                     catch (Exception ex)
                     {
-                        _log.ExLog(ex);
+                        xyLog.ExLog(ex);
                     }
                 }
             }
