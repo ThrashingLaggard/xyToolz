@@ -4,8 +4,6 @@ using xyToolz.Helper.Logging;
 
 namespace xyToolz.Extensions
 {
-
-    {
         #region Encoding – String and Byte Conversion
 
 
@@ -50,8 +48,5 @@ namespace xyToolz.Extensions
                     return null!;
                 }
             }
-
-        }
-
-    
+        }    
 }
