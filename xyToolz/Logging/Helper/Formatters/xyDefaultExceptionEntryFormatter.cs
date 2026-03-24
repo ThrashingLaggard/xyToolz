@@ -26,8 +26,8 @@ namespace xyToolz.Logging.Helper.Formatters
         {
             if (entry_ is xyExceptionEntry entry)
             {
-                xyQol qol = new(new(),new());
-                Dictionary<TKey,TValue> dictionary = qol.GetPropertyValuesForTarget<TKey, TValue, T>(entry_);
+                
+                Dictionary<TKey,TValue> dictionary = xyQol.GetPropertyValuesForTarget<TKey, TValue, T>(entry_);
                 string properties = xyQol.PropertiesToString<TKey,TValue,T>(dictionary);
                 return properties;
             }

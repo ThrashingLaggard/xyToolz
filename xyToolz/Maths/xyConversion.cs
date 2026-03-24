@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using xyToolz.Extensions;
 using static xyToolz.QOL.xy;
 
 namespace xyToolz.Maths
@@ -74,22 +75,22 @@ namespace xyToolz.Maths
                   {
                         case 10:
                               {
-                                    Console.WriteLine(Reverse(endergebnis) + " DEC");
+                                    Console.WriteLine(endergebnis.Reverse() + " DEC");
                                     break;
                               }
                         case 16:
                               {
-                                    Console.WriteLine(Reverse(endergebnis) + " 0xF");
+                                    Console.WriteLine(endergebnis.Reverse() + " 0xF");
                                     break;
                               }
                         case 2:
                               {
-                                    Console.WriteLine(Reverse(endergebnis) + " BIN");
+                                    Console.WriteLine(endergebnis.Reverse() + " BIN");
                                     break;
                               }
                         case 8:
                               {
-                                    Console.WriteLine(Reverse(endergebnis) + " OKT");
+                                    Console.WriteLine(endergebnis.Reverse() + " OKT");
                                     break;
                               }
                   }
@@ -222,27 +223,27 @@ namespace xyToolz.Maths
                         {
                               case 2:
                                     {
-                                          Console.WriteLine(Reverse(endergebnis) + " Bin");
+                                          Console.WriteLine(endergebnis.Reverse() + " Bin");
                                           break;
                                     }
                               case 8:
                                     {
-                                          Console.WriteLine(Reverse(endergebnis) + " Okt");
+                                          Console.WriteLine(endergebnis.Reverse() + " Okt");
                                           break;
                                     }
                               case 12:
                                     {
-                                          Console.WriteLine(Reverse(endergebnis) + " DuoDez");
+                                          Console.WriteLine(endergebnis.Reverse() + " DuoDez");
                                           break;
                                     }
                               case 16:
                                     {
-                                          Console.WriteLine(Reverse(endergebnis) + " 0xF");
+                                          Console.WriteLine(endergebnis.Reverse() + " 0xF");
                                           break;
                                     }
                               default:
                                     {
-                                          Console.WriteLine(Reverse(endergebnis));
+                                          Console.WriteLine(endergebnis.Reverse());
                                           break;
                                     }
                         }

@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Security.Cryptography;
+using xyToolz.Extensions;
 using xyToolz.Helper.Logging;
 using xyToolz.QOL;
 
@@ -124,7 +125,7 @@ namespace xyToolz.Security
 
             xyLog.Log(salt is null || salt.Length == 0 ? errorSalt : string.IsNullOrWhiteSpace(password) ? errorPassword : ok);
 
-            using Rfc2898DeriveBytes pbkdf2 = new(xy.StringToBytes(password), salt!, Iterations, HashAlgorithmName.SHA256);
+            using Rfc2898DeriveBytes pbkdf2 = new(password.ToBytes(), salt!, Iterations, HashAlgorithmName.SHA256);
 
             return pbkdf2.GetBytes(KeyLength256);
         }
@@ -149,7 +150,7 @@ namespace xyToolz.Security
             {
                 if (bytes.Length > 0)
                 {
-                    result = xy.BytesToBase(bytes);
+                    result = bytes.ToBase();
                 }
             }
             return result;
@@ -288,8 +289,8 @@ namespace xyToolz.Security
                 isFormat = input.Length == 2;
                 if (isFormat)
                 {
-                    salt = xy.BaseToBytes(input[0]);
-                    hash = xy.BaseToBytes(input[1]);
+                    salt = input[0].BaseToBytes();
+                    hash = input[1].BaseToBytes();
                     isSaltValid = salt is not null && salt.Length > 0;
                     if (isSaltValid)
                     {

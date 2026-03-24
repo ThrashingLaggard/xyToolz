@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text.Json;
+using xyToolz.Extensions;
 using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
@@ -89,7 +90,7 @@ namespace xyToolz.Security
             try
             {
                 string json = JsonSerializer.Serialize(obj);
-                byte[] raw = xy.StringToBytes(json);
+                byte[] raw = json.ToBytes();
                 byte[] protectedData = ProtectedData.Protect(raw, null, DataProtectionScope.CurrentUser);
 
                 await xyLog.AsxLog(logSuccess);
@@ -129,7 +130,7 @@ namespace xyToolz.Security
             try
             {
                 byte[] raw = ProtectedData.Unprotect(encrypted, null, DataProtectionScope.CurrentUser);
-                string json = xy.BytesToString(raw);
+                string json = raw.ToUtf8();
                 T? result = JsonSerializer.Deserialize<T>(json);
 
                 await xyLog.AsxLog(success);
@@ -173,7 +174,7 @@ namespace xyToolz.Security
                 if (encBytes.Length == 0) return false;
                 else
                 {
-                    string encString = xy.BytesToBase(encBytes);
+                    string encString = encBytes.ToBase();
                     await xyFiles.SaveToFile(encString, filename);
                     await xyLog.AsxLog(success);
                     return true;
@@ -262,7 +263,7 @@ namespace xyToolz.Security
             IEnumerable<string> lines= await xyFiles.ReadLinesAsync(filePath);
             if (lines.Any())
             {
-                string content = xyColQol.Spill(lines);
+                string content = lines.Spill();
                 byte[] data =  await ProtectString(content);
                 return await xyFiles.SaveBytesToFileAsync(data, filePath);
             }

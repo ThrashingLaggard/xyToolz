@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using xyToolz.Extensions;
 using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
@@ -282,7 +283,7 @@ namespace xyToolz.Serialization
             string errorMessage = $"Key '{key}' could not be decoded to bytes from '{filePath}'.";
             if (await TryDeserializeKey<string>(filePath, key) is string base64)
             {
-                byte[]? decoded = xy.BaseToBytes(base64);
+                byte[]? decoded = base64.BaseToBytes();
                 if (decoded == null)
                 {
                     await xyLog.AsxLog(errorMessage);
@@ -406,7 +407,7 @@ namespace xyToolz.Serialization
 
             if (!string.IsNullOrEmpty(b64))
             {
-                if( xy.BaseToBytes(b64) is byte[] decoded)
+                if( b64.BaseToBytes() is byte[] decoded)
                 {
                     return decoded;
                 }

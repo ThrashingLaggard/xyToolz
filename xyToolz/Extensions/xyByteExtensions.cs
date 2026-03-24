@@ -12,7 +12,7 @@ namespace xyToolz.Extensions
             /// </summary>
             /// <param name="bytes">The input byte array.</param>
             /// <returns>A UTF-8 string representation of the byte array.</returns>
-            public static string ToString( this byte[] bytes)
+            public static string ToUtf8( this byte[] bytes)
             {
                 try
                 {

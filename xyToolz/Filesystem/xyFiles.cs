@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using xyToolz.Extensions;
 using xyToolz.Helper.Interfaces;
 using xyToolz.Helper.Logging;
 using xyToolz.Logging.Helper;
@@ -527,7 +528,7 @@ namespace xyToolz.Filesystem
         /// <returns>True if the content was successfully saved; otherwise, false.</returns>
         public static async Task<bool> SaveBytesToFileAsync(byte[] data, string filePath = "config.json")
         {
-            string content = xy.BytesToString(data);
+            string content = data.ToUtf8();
             return await SaveToFile(content, filePath);
         }
         /// <summary>
@@ -743,7 +744,7 @@ namespace xyToolz.Filesystem
 
             if (await LoadFileAsync(fullPath) is string content)
             {
-                bytes = xy.StringToBytes(content);
+                bytes = content.ToBytes();
                 if (bytes.Length == 0)
                 {
                     await xyLog.AsxLog(noBytes);
