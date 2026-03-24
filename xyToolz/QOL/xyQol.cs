@@ -199,10 +199,7 @@ namespace xyToolz.QOL
         /// <remarks>
         /// This method is <see langword="static"/> and purely formatting-oriented; it does not perform logging.
         /// </remarks>
-        public static string PropertiesToString< TKey, TValue,T>(Dictionary<TKey, TValue>  keyValuePairs) where T : class where TKey :class
-        {
-            return keyValuePairs.Spill();
-        }
+        public static string PropertiesToString< TKey, TValue,T>(Dictionary<TKey, TValue>  keyValuePairs) where T : class where TKey :class => keyValuePairs.Spill();
 
     }
 }
