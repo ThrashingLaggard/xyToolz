@@ -1,6 +1,8 @@
 ﻿# Changelog 
 
-### 
+### 24.03.2026
+- xyString-/ -ByteExtensions -> Exporting methods from xy and making them extension methods!!!
+- xyDictionaryExtensions		-> Implementation
 
 ### 16.03.2026
 - xyLog and helpers		-> Performance optimizations and comments
