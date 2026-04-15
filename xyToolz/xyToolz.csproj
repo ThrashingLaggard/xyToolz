@@ -39,12 +39,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Database\**" />
 	  <Compile Remove="Outsourcing\**" />
 	  <Compile Remove="READMEs\**" />
 	  <Compile Remove="Renderer\**" />
+	  <EmbeddedResource Remove="Database\**" />
 	  <EmbeddedResource Remove="Outsourcing\**" />
 	  <EmbeddedResource Remove="READMEs\**" />
 	  <EmbeddedResource Remove="Renderer\**" />
+	  <None Remove="Database\**" />
 	  <None Remove="Outsourcing\**" />
 	  <None Remove="READMEs\**" />
 	  <None Remove="Renderer\**" />
@@ -53,7 +56,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="10.0.5" />
