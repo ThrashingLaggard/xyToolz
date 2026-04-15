@@ -22,15 +22,7 @@ namespace xyToolz.Serialization
     /// <item><description>Access individual keys and nested subkeys as objects, dictionaries, or byte arrays.</description></item>
     /// <item><description>Automatic root-tag wrapping and file structure validation for JSON content.</description></item>
     /// <item><description>Supports both System.Text.Json and Newtonsoft.Json querying models (JObject/JToken).</description></item>
-    /// <item><description>Built-in structured logging via xyLog for errors and operations.</description></item>
     /// </list>
-    ///
-    /// <para><b>Example Usage:</b></para>
-    /// <code>
-    /// string value = await xyJson.GetStringFromJsonFile("settings.json", "jwtPublicKey");
-    /// var settings = await xyJson.DeserializeFromFile("appconfig.json");
-    /// await xyJson.AddOrUpdateEntry("userprefs.json", "theme", "dark");
-    /// </code>
     /// </summary>
     public class xyJson
     {
@@ -235,8 +227,8 @@ namespace xyToolz.Serialization
         /// var alarms = await xyJson.DeserializeFromFile<Dictionary<string, AlarmDefinition>>(path);
         /// </remarks>
         /// <param name="filePath">Path to the JSON file.</param>
-        /// <param name="outputFormat">Choose datatype for output</param>
-        /// <returns>Deserialized dictionary or null if reading fails.</returns>
+        
+        /// <returns>Deserialized data or null if reading fails.</returns>
         public static async Task<T?> DeserializeFromFile<T>(string filePath)
         {
             try
