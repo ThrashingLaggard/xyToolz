@@ -272,11 +272,11 @@ namespace xyToolz.Security
             string logInvalidFormat = "Invalid format in saltNhash.";
             string logSaltNull = "Salt is null or empty.";
             string logPasswordNull = "Password is null or empty.";
-            string[] input = [];
+            string[] input;
 
-            byte[] hashToCheck = default!;
-            byte[] hash = default!;
-            byte[] salt = default!;
+            byte[] hashToCheck;
+            byte[] hash;
+            byte[] salt;
             bool isValid = false;
             bool isFormat = false;
             bool isSaltValid = false;
@@ -306,11 +306,10 @@ namespace xyToolz.Security
         /// <summary>
         /// Compares two hash byte arrays using a fixed-time comparison to prevent timing attacks.
         /// </summary>
-        /// <param name="hashAlgorithm">The hash algorithm used (not actively used in comparison).</param>
         /// <param name="hash1">First byte array representing the computed hash.</param>
         /// <param name="hash2">Second byte array representing the stored hash.</param>
         /// <returns>True if the hashes are identical; otherwise, false.</returns>
-        public static bool VerifyPassword(HashAlgorithmName hashAlgorithm, byte[] hash1, byte[] hash2)
+        public static bool VerifyPassword(byte[] hash1, byte[] hash2)
         {
             string nullHash1 = "First array is null or empty.";
             string nullHash2 = "Second hash is null or empty.";
