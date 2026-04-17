@@ -1,9 +1,17 @@
 ﻿# Changelog 
 
+### 17.04.2026
+- Updated the Nuget from SixSharp to avoid their vulnerability
+- small fixes and optimizations mostly for comments
+- removed some useless snippets to streamline their methods
+
+### 15.04.2026
+- removed database stuff
+
 ### 24.03.2026
-- xyString-/ -ByteExtensions	-> Exporting methods from xy and making them extension methods!!!
+- xyString-/ -ByteExtensions		-> Exporting methods from xy and making them extension methods!!!
 - xyDictionaryExtensions			-> Implementation
-- Other									-> Fixed references, slimmed calls, added remarks
+- Other										-> Fixed references, slimmed calls, added remarks
 
 ### 16.03.2026
 - xyLog and helpers		-> Performance optimizations and comments
