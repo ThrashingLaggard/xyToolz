@@ -55,7 +55,7 @@ namespace xyToolz.Extensions
             /// Returns a list filled with all the quarters of an hour in the day
             /// </summary>
             /// <returns></returns>
-            private static IEnumerable<string> GetQuarterHours()
+            private static List<string> GetQuarterHours()
             {
                   var presets = new List<string>();
                   for (int i = 0; i < 24; i++)
@@ -76,9 +76,8 @@ namespace xyToolz.Extensions
                               // Mit führenden Nullen formatieren
                               string str_Time = $"{hour:D2}:{minutes:D2}";
 
-                              // Zur Liste hinzufügen und dann verwerfen
-                              presets.Add(str_Time);
-                              str_Time = string.Empty;
+                    // Zur Liste hinzufügen und dann verwerfen
+                    presets.Add(str_Time);
                         }
                   }
                   return presets;
