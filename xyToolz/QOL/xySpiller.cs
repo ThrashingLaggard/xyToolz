@@ -85,8 +85,7 @@ namespace xyToolz.QOL
             => Join(targetValues, hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
-        /// Converts a <see cref="Dictionary{TKey, TValue}"/> to a formatted string where each entry
-        /// is rendered as <c>key:value</c> and entries are separated by the configured delimiter.
+        /// Converts a <see cref="Dictionary{TKey, TValue}"/> to a formatted string where each entry is rendered as <c>key:value</c> and entries are separated by the configured delimiter.
         /// </summary>
         /// <typeparam name="TKey">The type of the dictionary keys.</typeparam>
         /// <typeparam name="TValue">The type of the dictionary values.</typeparam>
@@ -107,7 +106,7 @@ namespace xyToolz.QOL
         /// separated by the configured delimiter.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Spill<TKey, TValue>(this Dictionary<TKey, TValue> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
+        public static string Spill<TKey, TValue>(this Dictionary<TKey, TValue> targetValues, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")    where TKey : notnull
             => Join(targetValues.Select(kvp => $"{kvp.Key}:{kvp.Value}"), hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
@@ -128,12 +127,13 @@ namespace xyToolz.QOL
         /// </param>
         /// <returns>A single string of all elements joined by the resolved delimiter.</returns>
         private static string Join<T>(IEnumerable<T> values, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
-            => string.Join((hasSeperator ??true? seperator : string.Empty) + (((bool)hasWhitespace) ? " " : string.Empty), values);
+            => string.Join((hasSeperator ??true? seperator : string.Empty) + (((bool)hasWhitespace!) ? " " : string.Empty), values);
 
+
+#pragma warning disable CS0419 // Zweideutige Referenz im cref-Attribut
         /// <summary>
         /// Joins the elements of a sequence into a single string using the specified delimiter and spacing options.
-        /// Intended for diagnostic use; implements the same logic as <see cref="Spill{IEnumerable}"/> with
-        /// explicit intermediate steps to aid debugging.
+        /// Intended for diagnostic use; implements the same logic as the basic method<see cref="Spill{IEnumerable}"/>  with/// extra steps to aid debugging.
         /// </summary>
         /// <typeparam name="T">The element type of the sequence.</typeparam>
         /// <param name="values">The sequence of values to join.</param>
@@ -150,6 +150,7 @@ namespace xyToolz.QOL
         /// </param>
         /// <returns>A single string of all elements joined by the resolved delimiter.</returns>
         [MethodImpl(MethodImplOptions.NoInlining)]
+#pragma warning restore CS0419 // Zweideutige Referenz im cref-Attribut
         public static string JoinDebug<T>(this IEnumerable<T> values, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
         {
             string empty = string.Empty;
