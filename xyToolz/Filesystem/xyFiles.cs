@@ -30,7 +30,7 @@ namespace xyToolz.Filesystem
     /// </list>
     ///
     /// <para><b>Thread Safety:</b></para>
-    /// All methods are static and stateless, making them inherently thread-safe.
+    /// All methods are static and stateless, thus thread-safe.
     ///
     /// <para><b>Platform Compatibility:</b></para>
     /// Special handling for Android via conditional compilation (#if ANDROID).
@@ -62,17 +62,11 @@ namespace xyToolz.Filesystem
     ///     Console.WriteLine($"Renamed to {newPath}");
     /// }
     ///
-    /// // Read lines from a file
-    /// var lines = await xyFiles.ReadLinesAsync("data.txt");
-    ///
-    /// // Delete a file
-    /// bool deleted = xyFiles.DeleteFile("AppData", "config.json");
     /// </code>
     ///
     /// <para><b>See Also:</b></para>
     /// <see cref="File"/>, <see cref="Directory"/>, <see cref="xyPath"/>
     /// </remarks>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Muy importante!!! Siiii, mucho!")]
     public static class xyFiles
     {
         private static readonly JsonSerializerOptions DefaultJsonOptions = xyJson.defaultJsonOptions;
@@ -519,9 +513,6 @@ namespace xyToolz.Filesystem
         /// byte[] data = Encoding.UTF8.GetBytes("Sample");
         /// await xyFiles.SaveBytesToFileAsync(data, "sample.txt");
         /// </code>
-        ///
-        /// <para><b>See Also:</b></para>
-        /// <see cref="xy.BytesToString(byte[])"/>, <see cref="SaveToFile(string, string)"/>
         /// </remarks>
         /// <param name="data">The byte array to be converted and saved.</param>
         /// <param name="filePath">The full path of the file. Defaults to "config.json".</param>
@@ -731,9 +722,6 @@ namespace xyToolz.Filesystem
         /// <code>
         /// byte[] bytes = await xyFiles.LoadBytes("file.txt");
         /// </code>
-        ///
-        /// <para><b>See Also:</b></para>
-        /// <see cref="xy.StringToBytes(string)"/>, <see cref="TestLoadFileAsync(string)"/>
         /// </remarks>
         /// <param name="fullPath">The full path of the file to load.</param>
         /// <returns>A byte array derived from the file content, or an empty array.</returns>
