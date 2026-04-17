@@ -26,7 +26,7 @@ namespace xyToolz.Serialization
     /// </summary>
     public class xyJson
     {
-        private static xyMessageFactory _fac=new ();
+        private static readonly xyMessageFactory _fac=new ();
 
         #region Json Configuration
 
@@ -58,7 +58,7 @@ namespace xyToolz.Serialization
         /// <param name="ct"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", CancellationToken ct = default,JsonSerializerOptions ? options = null)
+        public static async Task<bool> SaveDataToJsonAsync<T>(T data, string fileName = "config.json", JsonSerializerOptions ? options = null, CancellationToken ct = default)
         {
             string errorMessage = $"Failed to serialize data to JSON file: '{fileName}'.";
 
@@ -88,11 +88,11 @@ namespace xyToolz.Serialization
         /// <param name="options"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static async Task<bool> SaveDataToJsonAsync(bool isVerbose, string fileName = "config.json", CancellationToken ct = default, JsonSerializerOptions? options = null, params object[] data)
+        public static async Task<bool> SaveDataToJsonAsync(bool isVerbose, string fileName = "config.json", JsonSerializerOptions? options = null, CancellationToken ct = default, params object[] data)
         {
             string name = "target";
 
-            if(data.Count() == 0) 
+            if(data.Length == 0) 
             {
                 await xyLog.AsxLog(_fac.EmptyArray());
             }
@@ -169,7 +169,7 @@ namespace xyToolz.Serialization
             }
             try
             {
-                Dictionary<string, object> data = await DeserializeFromFile(path) ?? new();
+                Dictionary<string, object> data = await DeserializeFromFile(path) ?? [];
 
                 if (data.ContainsKey(key))
                 {
@@ -219,15 +219,7 @@ namespace xyToolz.Serialization
         /// <summary>
         /// Reads the entire JSON file and deserializes it into an Enumerable like a Dictionary, a List or an Array!.
         /// </summary>
-        /// <remarks>
-        /// var alarms = await xyJson.DeserializeFromFile<List<AlarmDefinition>>(path);
-        ///
-        /// var alarms = await xyJson.DeserializeFromFile<AlarmDefinition[]>(path);
-        /// 
-        /// var alarms = await xyJson.DeserializeFromFile<Dictionary<string, AlarmDefinition>>(path);
-        /// </remarks>
         /// <param name="filePath">Path to the JSON file.</param>
-        
         /// <returns>Deserialized data or null if reading fails.</returns>
         public static async Task<T?> DeserializeFromFile<T>(string filePath)
         {
@@ -262,7 +254,7 @@ namespace xyToolz.Serialization
         /// <param name="filePath">Path to the JSON file.</param>
         /// <param name="key">Top-level key pointing to an object.</param>
         /// <returns>Dictionary at the key or empty dictionary if missing.</returns>
-        public static async Task<Dictionary<string, object>> DeserializeKeyIntoDictionary(string filePath, string key)  => await TryDeserializeKey<Dictionary<string, object>>(filePath, key) ?? new();
+        public static async Task<Dictionary<string, object>> DeserializeKeyIntoDictionary(string filePath, string key)  => await TryDeserializeKey<Dictionary<string, object>>(filePath, key) ?? [];
 
         /// <summary>
         /// Retrieves a base64-encoded value from the given key and decodes it into a byte array.
