@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
-using OpenQA.Selenium;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using xyToolz.Helper.Logging;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -663,33 +661,33 @@ namespace xyToolz.Logging.Helper
 
         #endregion
 
-        #region "Clicking"
-        public string ClickSuccess(string textOrTag) => $"Clicked on the element: {textOrTag}.";
+        //#region "Clicking"
+        //public string ClickSuccess(string textOrTag) => $"Clicked on the element: {textOrTag}.";
 
-        public string ClickTimeout(By by, int seconds) => $"Timeout: Element '{by}' was not clickable within {seconds} seconds...";
+        //public string ClickTimeout(By by, int seconds) => $"Timeout: Element '{by}' was not clickable within {seconds} seconds...";
 
-        public string ClickStale(By by) => $"Stale reference: Element '{by}' is no longer attached to the DOM.";
+        //public string ClickStale(By by) => $"Stale reference: Element '{by}' is no longer attached to the DOM.";
 
-        public string ClickUnexpected(By by) => $"Unexpected error while trying to click on element '{by}'!";
+        //public string ClickUnexpected(By by) => $"Unexpected error while trying to click on element '{by}'!";
 
-        public string ClickFail(By by) => $"Failed to click element '{by}'.";
-        #endregion
+        //public string ClickFail(By by) => $"Failed to click element '{by}'.";
+        //#endregion
 
-        #region "Enter Stuff"
-        public string EnterPassword(By by, string tag, string type) => $"Entering password into element '{by}' ({tag}, type={type}).";
+        //#region "Enter Stuff"
+        //public string EnterPassword(By by, string tag, string type) => $"Entering password into element '{by}' ({tag}, type={type}).";
 
-        public string EnterText(By by, string input, string tag, string type) => $"Entering text '{input}' into element '{by}' ({tag}, type={type}).";
+        //public string EnterText(By by, string input, string tag, string type) => $"Entering text '{input}' into element '{by}' ({tag}, type={type}).";
 
-        public string EnterSkipButton(By by, string type) => $"Skipped: Element '{by}' is a button or submit input (type={type}).";
+        //public string EnterSkipButton(By by, string type) => $"Skipped: Element '{by}' is a button or submit input (type={type}).";
 
-        public string EnterTimeout(By by, int seconds) => $"Timeout: Element '{by}' was not visible within {seconds} seconds.";
+        //public string EnterTimeout(By by, int seconds) => $"Timeout: Element '{by}' was not visible within {seconds} seconds.";
 
-        public string EnterStale(By by) => $"Stale reference: Element '{by}' is no longer attached to the DOM.";
+        //public string EnterStale(By by) => $"Stale reference: Element '{by}' is no longer attached to the DOM.";
 
-        public string EnterUnexpected(By by) => $"Unexpected error while trying to enter text into element '{by}'.";
+        //public string EnterUnexpected(By by) => $"Unexpected error while trying to enter text into element '{by}'.";
 
-        public string EnterFail(By by) => $"Failed to enter text into element '{by}'.";
-        #endregion
+        //public string EnterFail(By by) => $"Failed to enter text into element '{by}'.";
+        //#endregion
 
         #region "Screenshots"
 
@@ -719,42 +717,42 @@ namespace xyToolz.Logging.Helper
 
         public string UploadFail(string filePath) => $"Failed to upload file: {filePath}.";
 
-        public string UploadElementNotFound(By by) => $"Upload element not found: {by}.";
+        //public string UploadElementNotFound(By by) => $"Upload element not found: {by}.";
 
         #endregion
 
         #region "Submitting FORMs"
 
-        public string FormSubmitStart(By by) => $"Submitting form using element: {by}.";
+        //public string FormSubmitStart(By by) => $"Submitting form using element: {by}.";
 
-        public string FormSubmitSuccess(By by) => $"Form submitted successfully using element: {by}.";
+        //public string FormSubmitSuccess(By by) => $"Form submitted successfully using element: {by}.";
 
-        public string FormSubmitFail(By by) => $"Form submission failed using element: {by}.";
+        //public string FormSubmitFail(By by) => $"Form submission failed using element: {by}.";
 
-        public string FormSubmitTimeout(By by, int seconds) => $"Timeout during form submission with element '{by}' after {seconds} seconds.";
+        //public string FormSubmitTimeout(By by, int seconds) => $"Timeout during form submission with element '{by}' after {seconds} seconds.";
 
-        #endregion
+        //#endregion
 
-        #region "Element lookup & validation"
-        public string ElementVisible(By by) => $"Element '{by}' is visible.";
+        //#region "Element lookup & validation"
+        //public string ElementVisible(By by) => $"Element '{by}' is visible.";
 
-        public string ElementInvisible(By by) => $"Element '{by}' is not visible.";
+        //public string ElementInvisible(By by) => $"Element '{by}' is not visible.";
 
-        public string ElementClickable(By by) => $"Element '{by}' is clickable.";
+        //public string ElementClickable(By by) => $"Element '{by}' is clickable.";
 
-        public string ElementNotClickable(By by) => $"Element '{by}' is not clickable.";
+        //public string ElementNotClickable(By by) => $"Element '{by}' is not clickable.";
 
-        public string ElementNotFound(By by) => $"Element '{by}' not found.";
+        //public string ElementNotFound(By by) => $"Element '{by}' not found.";
 
-        public string ElementFound(By by) => $"Element found: {by}.";
+        //public string ElementFound(By by) => $"Element found: {by}.";
 
-        public string ElementMissing(By by) => $"Element not found: {by}.";
+        //public string ElementMissing(By by) => $"Element not found: {by}.";
 
-        public string ElementValidationPass(By by) => $"Element '{by}' passed validation.";
+        //public string ElementValidationPass(By by) => $"Element '{by}' passed validation.";
 
-        public string ElementValidationFail(By by) => $"Element '{by}' failed validation.";
+        //public string ElementValidationFail(By by) => $"Element '{by}' failed validation.";
 
-        public string ElementAttributeMismatch(By by, string attr, string expected, string actual) => $"Validation failed: Attribute '{attr}' of element '{by}' expected '{expected}', but found '{actual}'.";
+        //public string ElementAttributeMismatch(By by, string attr, string expected, string actual) => $"Validation failed: Attribute '{attr}' of element '{by}' expected '{expected}', but found '{actual}'.";
 
         #endregion
 
@@ -822,53 +820,53 @@ namespace xyToolz.Logging.Helper
 
         #region "Drag and Drop"
 
-        public string DragAndDropSuccess(By source, By target) => $"Dragged element '{source}' and dropped onto '{target}'.";
+        //public string DragAndDropSuccess(By source, By target) => $"Dragged element '{source}' and dropped onto '{target}'.";
 
-        public string DragAndDropFail(By source, By target) => $"Failed to drag element '{source}' onto '{target}'.";
+        //public string DragAndDropFail(By source, By target) => $"Failed to drag element '{source}' onto '{target}'.";
 
-        #endregion
+        //#endregion
 
-        #region "Scrolling"
+        //#region "Scrolling"
 
-        public string ScrolledToElement(By by) => $"Scrolled to element '{by}'.";
+        //public string ScrolledToElement(By by) => $"Scrolled to element '{by}'.";
 
-        public string ScrollToElementFailed(By by) => $"Failed to scroll to element '{by}'.";
+        //public string ScrollToElementFailed(By by) => $"Failed to scroll to element '{by}'.";
 
-        public string ScrolledByOffset(int x, int y) => $"Scrolled page by offset (x={x}, y={y}).";
+        //public string ScrolledByOffset(int x, int y) => $"Scrolled page by offset (x={x}, y={y}).";
 
-        #endregion
+        //#endregion
 
-        #region "Wait conditions"
+        //#region "Wait conditions"
 
-        public string WaitUntilVisible(By by, int seconds) => $"Waiting until element '{by}' is visible (timeout: {seconds} seconds).";
+        //public string WaitUntilVisible(By by, int seconds) => $"Waiting until element '{by}' is visible (timeout: {seconds} seconds).";
 
-        public string WaitUntilClickable(By by, int seconds) => $"Waiting until element '{by}' is clickable (timeout: {seconds} seconds).";
+        //public string WaitUntilClickable(By by, int seconds) => $"Waiting until element '{by}' is clickable (timeout: {seconds} seconds).";
 
-        public string WaitConditionFail(By by, string condition) => $"Wait failed: Element '{by}' did not meet condition: {condition}.";
+        //public string WaitConditionFail(By by, string condition) => $"Wait failed: Element '{by}' did not meet condition: {condition}.";
 
-        #endregion
+        //#endregion
 
-        #region "Modal Dialogs"
+        //#region "Modal Dialogs"
 
-        public string ModalDetected(By by) => $"Modal dialog detected: '{by}'";
+        //public string ModalDetected(By by) => $"Modal dialog detected: '{by}'";
 
-        public string ModalHandled(By by) => $"Modal dialog handled successfully: '{by}'";
+        //public string ModalHandled(By by) => $"Modal dialog handled successfully: '{by}'";
 
-        public string ModalNotFound(By by) => $"Modal dialog not found: '{by}'";
+        //public string ModalNotFound(By by) => $"Modal dialog not found: '{by}'";
 
-        public string ModalHandlingFailed(By by) => $"Failed to handle modal dialog: '{by}'";
+        //public string ModalHandlingFailed(By by) => $"Failed to handle modal dialog: '{by}'";
 
-        #endregion
+        //#endregion
 
-        #region "Frame Switching"
+        //#region "Frame Switching"
 
-        public string FrameSwitch(By by) => $"Switched to frame: '{by}'";
+        //public string FrameSwitch(By by) => $"Switched to frame: '{by}'";
 
-        public string SwitchedToDefaultContent() => $"Switched back to default content from frame.";
+        //public string SwitchedToDefaultContent() => $"Switched back to default content from frame.";
 
-        public string FrameNotFound(By by) => $"Frame not found: '{by}'";
+        //public string FrameNotFound(By by) => $"Frame not found: '{by}'";
 
-        public string FrameSwitchFailed(By by) => $"Failed to switch to frame: '{by}'";
+        //public string FrameSwitchFailed(By by) => $"Failed to switch to frame: '{by}'";
 
         #endregion
 
