@@ -4,21 +4,21 @@
 MSG_FILE="$1"
 SOURCE="${2:-}"
 
-# Nur bei Merge-Commits eingreifen
+# Only intervene at merge-commits
 if [ "$SOURCE" = "merge" ]; then
-  # 1) Commit tip bestimmen, der NUR lokal ist (nicht in MERGE_HEAD enthalten):
-  #    Das ist genau der Commit, den du "mitbringst".
+
+  # 1) Get the LOCAL-ONLY Commit tip  (not in MERGE_HEAD):
   LOCAL_TIP="$(git rev-list --max-count=1 --left-only HEAD...MERGE_HEAD 2>/dev/null || true)"
 
-  # Fallback: wenn das aus irgendeinem Grund leer ist, nimm HEAD (aktueller lokaler Tip)
+  # Fallback: for when its empty
   if [ -z "$LOCAL_TIP" ]; then
     LOCAL_TIP="$(git rev-parse HEAD 2>/dev/null || true)"
   fi
 
-  # 2) Dessen Commit-Message (multiline) holen
+  # 2) Get Commit-Message (multiline) 
   CURRENT_MSG="$(git log -1 --pretty=%B "$LOCAL_TIP" 2>/dev/null || printf "")"
 
-  # 3) Nur ersetzen, wenn nicht leer
+  # 3) Replace if not empty
   if [ -n "$(printf "%s" "$CURRENT_MSG" | tr -d '[:space:]')" ]; then
     printf "%s\n" "$CURRENT_MSG" > "$MSG_FILE"
   fi
