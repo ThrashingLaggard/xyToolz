@@ -1,5 +1,10 @@
 ﻿# Changelog 
 
+###17.05.2026
+- Removed the logging components and uploaded those seperately
+- xyStringExtensions		->	Added new methods capsuling string.IsNullOrWhiteSpace/empty
+
+
 ### 17.04.2026
 - Updated the Nuget from SixSharp to avoid their vulnerability
 - small fixes and optimizations mostly for comments
