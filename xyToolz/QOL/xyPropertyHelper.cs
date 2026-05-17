@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
-using xyToolz.Helper.Logging;
-using xyToolz.Logging.Helper;
+using xyLogger.Loggers;
+using xyMessageFactory.Factories;
 
 namespace xyToolz.QOL
 {
@@ -15,14 +15,14 @@ namespace xyToolz.QOL
     ///   <item><description>Create and populate an instance of a type from a dictionary.</description></item>
     ///   <item><description>Render a dictionary as a multi-line string.</description></item>
     /// </list>
-    /// Logging is performed via <see cref="xyLoggerManager"/>. All exceptions are caught and logged;
+    /// All exceptions are caught and logged;
     /// methods generally return empty results instead of throwing.
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "...")]
     public class xyPropertyHelper
     {
         
-        private static readonly xyMessageFactory _fac = new xyMessageFactory();
+        private static readonly xyBaseMessageFactory _fac = new ();
 
 
         /// <summary>

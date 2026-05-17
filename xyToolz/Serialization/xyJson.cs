@@ -6,9 +6,9 @@ using System.Text.Json.Serialization;
 using xyToolz.Extensions;
 using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
-using xyToolz.Helper.Logging;
-using xyToolz.Logging.Helper;
+using xyLogger.Loggers;
 using xyToolz.QOL;
+using xyMessageFactory.Factories;
 
 namespace xyToolz.Serialization
 {
@@ -26,7 +26,7 @@ namespace xyToolz.Serialization
     /// </summary>
     public class xyJson
     {
-        private static readonly xyMessageFactory _fac=new ();
+        private static readonly xyBaseMessageFactory _fac=new ();
 
         #region Json Configuration
 

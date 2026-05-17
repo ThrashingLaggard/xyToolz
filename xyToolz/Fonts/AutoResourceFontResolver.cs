@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using PdfSharpCore.Fonts;
-using xyToolz.Helper.Logging;
+using xyLogger.Loggers;
 
 /// <summary>
 /// PdfSharpCore font resolver that auto-detects embedded font resources (EmbeddedResource).

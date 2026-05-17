@@ -1,10 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using xyMessageFactory.Factories;
 using xyToolz.Extensions;
 using xyToolz.Helper.Interfaces;
-using xyToolz.Helper.Logging;
-using xyToolz.Logging.Helper;
+using xyLogger.Loggers;
 using xyToolz.QOL;
 using xyToolz.Serialization;
 
@@ -70,7 +70,7 @@ namespace xyToolz.Filesystem
     public static class xyFiles
     {
         private static readonly JsonSerializerOptions DefaultJsonOptions = xyJson.defaultJsonOptions;
-        private static readonly xyMessageFactory _msg = new();
+        private static readonly xyBaseMessageFactory _msg = new();
 
 
         #region Directory Management and  File Path Validation

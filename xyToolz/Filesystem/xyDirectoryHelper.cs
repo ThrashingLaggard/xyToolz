@@ -1,5 +1,5 @@
 ﻿using System.IO.Compression;
-using xyToolz.Helper.Logging;
+using xyLogger.Loggers;
 
 namespace xyToolz.Filesystem
 {

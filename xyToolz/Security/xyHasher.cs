@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Security.Cryptography;
 using xyToolz.Extensions;
-using xyToolz.Helper.Logging;
+using xyLogger.Loggers;
 using xyToolz.QOL;
 
 namespace xyToolz.Security

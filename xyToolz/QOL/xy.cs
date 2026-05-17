@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using xyToolz.Helper.Logging;
+using xyLogger.Loggers;
 
 
 namespace xyToolz.QOL

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Linq.Expressions;
 using System.Text;
-using xyToolz.Helper.Logging;
+using xyLogger.Loggers;
 
 namespace xyToolz.Extensions
 {

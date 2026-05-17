@@ -2,7 +2,7 @@
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using xyToolz.Helper.Logging;
+using xyLogger.Loggers;
 
 namespace xyToolz.Pdf
 {

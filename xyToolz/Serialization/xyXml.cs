@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using System.Xml.Serialization;
-using xyToolz.Helper.Logging;
+using xyLogger.Loggers;
 
 
 namespace xyToolz.Serialization
