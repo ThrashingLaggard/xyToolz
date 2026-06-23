@@ -69,7 +69,7 @@
 		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.10" />
 		<PackageReference Include="System.Text.Json" Version="9.0.10" />
-		<PackageReference Include="xyLogger" Version="1.0.1" />
+		<PackageReference Include="xyLogger" Version="1.0.4" />
 		<PackageReference Include="xyMessageFactory" Version="1.0.0" />
 	</ItemGroup>
 
