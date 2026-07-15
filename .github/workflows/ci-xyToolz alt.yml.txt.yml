@@ -12,9 +12,8 @@ on:
 
 # ==================================================================================
 # 1) PERMISSIONS
-#    - We need write access to repository contents in order to push a release tag
-#      back to the repo (only after the success criteria have been met). No commit
-#      is ever made to the branch itself anymore - see B.11.
+#    - We need write access to repository contents in order to commit the updated
+#      version back to the repo (only after the success criteria have been met).
 # ==================================================================================
 permissions:
   contents: write
@@ -109,29 +108,24 @@ jobs:
   # JOB B) BUILD-AND-PUBLISH  (runs only if precheck.should_run == 'true')
   #
   # High-level flow:
-  #   B.1  Checkout full repository (incl. tags - needed to compute the version)
+  #   B.1  Checkout full repository
   #   B.2  Guard for duplicate commit messages (diagnostic only)
   #   B.3  Setup .NET SDK
   #   B.4  Restore dependencies
-  #   B.5  Compute *planned* next version from the latest vX.Y.Z git tag
+  #   B.5  Compute *planned* next version (do not persist yet)
   #   B.6  Build (Release)
   #   B.7  Test (no-build)
   #   B.8  Pack into ./out using the planned version
   #   B.9  Check whether this planned version already exists on NuGet
   #   B.10 Publish to NuGet (only when not existing)
-  #   B.11 Tag the commit that was actually pushed (only on success) - NO commit,
-  #        NO push-back to master, ever.
+  #   B.11 Persist the version into the .csproj and commit (only on success)
   #   B.12 Create a GitHub Release (only if we actually published)
   #
-  # Tagging policy (B.11):
-  #   - Only tag if Build + Test + Pack succeeded AND publish just succeeded (a
-  #     version that already existed needs no new tag - it was tagged the run it
-  #     was first published).
-  #   - Deliberately does NOT write the version into the .csproj or commit it:
-  #     doing so creates a bot commit on master that your local clone doesn't have,
-  #     which rejects your *next* push as non-fast-forward until you pull. Reading
-  #     the version from tags each run means master never diverges from what you
-  #     have locally - nothing to pull, ever.
+  # Persistence policy (B.11):
+  #   - Only persist (commit) the new version if Build + Test + Pack succeeded AND
+  #     (the version already existed -> publish skipped) OR (publish succeeded now).
+  #   - This ensures the repo’s version matches a buildable/testable package that
+  #     is either already available on NuGet or has just been published.
   # ================================================================================
   build-and-changed:
     needs: precheck
@@ -147,15 +141,11 @@ jobs:
 
     steps:
       # ----------------------------------------------------------------------------
-      # B.1) CHECKOUT REPOSITORY (FULL, WITH TAGS)
-      #   - fetch-depth: 0 + fetch-tags: true so `git tag --list` below sees every
-      #     existing release tag, not just the ones reachable from a shallow clone.
+      # B.1) CHECKOUT REPOSITORY (FULL)
+      #   - Required for building, testing, packing, and later committing the bump.
       # ----------------------------------------------------------------------------
       - name: B.1) Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
 
       # ----------------------------------------------------------------------------
       # B.2) DUPLICATE COMMIT MESSAGE GUARD (DIAGNOSTIC)
@@ -168,6 +158,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git fetch --depth=2 origin ${{ github.ref }}
           m1="$(git log -1 --pretty=%B)"
           m2="$(git log -2 --pretty=%B | sed -n '2p')"
           if [ "$m1" = "$m2" ]; then
@@ -195,26 +186,19 @@ jobs:
         run: dotnet restore xyToolz/xyToolz.csproj
 
       # ----------------------------------------------------------------------------
-      # B.5) COMPUTE NEXT SEMVER FROM THE LATEST GIT TAG (PLAN ONLY)
-      #   - The .csproj's <PackageVersion> is NEVER read as the source of truth
-      #     here (it's just a placeholder, e.g. "0.0.0-local", for local dev
-      #     builds - see xyToolz/xyToolz.csproj). The real "current version" is
-      #     whatever the highest existing vX.Y.Z tag says.
+      # B.5) COMPUTE NEXT SEMVER (PLAN ONLY, DO NOT PERSIST)
+      #   - Reads current <PackageVersion> from the .csproj.
       #   - Applies bump_kind from PRECHECK (with a defensive rescan fallback).
       #   - Exports the *planned* version to $GITHUB_ENV as "version".
-      #   - Nothing is written to disk here - the .csproj is never touched.
+      #   - We intentionally DO NOT modify .csproj yet (only after success).
       # ----------------------------------------------------------------------------
-      - name: B.5) Compute next semantic version from latest tag (plan only)
+      - name: B.5) Compute next semantic version (plan only)
         id: versioning
         shell: bash
         run: |
           set -euo pipefail
-          current_version=$(git tag --list 'v*' --sort=-v:refname | head -1 | sed 's/^v//')
-          if [ -z "$current_version" ]; then
-            echo "No existing vX.Y.Z tag found - this is the first release."
-            current_version="0.0.0"
-          fi
-          echo "Latest tagged version: $current_version"
+          current_version=$(grep -oPm1 "(?<=<PackageVersion>)[^<]+" xyToolz/xyToolz.csproj)
+          echo "Current version: $current_version"
 
           major=$(echo "$current_version" | cut -d. -f1)
           minor=$(echo "$current_version" | cut -d. -f2)
@@ -275,9 +259,7 @@ jobs:
       # ----------------------------------------------------------------------------
       # B.8) PACK
       #   - Produces a .nupkg in ./out using the *planned* version (env.version).
-      #   - -p:PackageVersion overrides whatever <PackageVersion> is in the .csproj
-      #     (MSBuild command-line properties always win over the project file), so
-      #     the placeholder left in the file is never what actually ships.
+      #   - The .csproj remains unchanged until B.11.
       # ----------------------------------------------------------------------------
       - name: B.8) Pack (.nupkg to ./out)
         id: pack
@@ -286,8 +268,8 @@ jobs:
       # ----------------------------------------------------------------------------
       # B.9) CHECK IF VERSION EXISTS ON NUGET
       #   - HEAD request to the NuGet flat container for this exact version.
-      #   - If found, we skip publishing (idempotency) and skip tagging too - see
-      #     B.11.
+      #   - If found, we skip publishing (idempotency). Persisting is still allowed
+      #     because the package is buildable/testable and already public.
       # ----------------------------------------------------------------------------
       - name: B.9) Check package version on nuget.org
         id: check_version
@@ -323,37 +305,39 @@ jobs:
           --skip-duplicate
 
       # ----------------------------------------------------------------------------
-      # B.11) TAG THE PUSHED COMMIT (NO VERSION-BUMP COMMIT, EVER)
-      #   - Make the version *real* via a git tag on the commit that was actually
-      #     pushed - not via a bot commit back to master.
-      #   - Strict success criteria (same as before, applied to a tag instead of a
-      #     file+commit):
+      # B.11) PERSIST VERSION INTO .CSPROJ AND COMMIT
+      #   - Make the version bump *real* in version control.
+      #   - Strict success criteria:
       #       * build.outcome == success
       #       * test.outcome  == success
       #       * pack.outcome  == success
-      #       * AND publish.outcome == success (skip_publish == 'true' means it was
-      #         already tagged by whichever run first published it - nothing new
-      #         to tag here)
+      #       * AND (skip_publish == 'true'  OR  publish.outcome == 'success')
       #   - Rationale:
-      #       The old approach (sed the .csproj, commit, push) creates a commit on
-      #       master your local clone doesn't have, so your *next* `git push` gets
-      #       rejected as non-fast-forward until you pull. Tagging the commit you
-      #       already pushed means master never diverges from your local history -
-      #       nothing to pull, ever.
+      #       Only advance the repo version if it represents a buildable/tested
+      #       package that is already public or has just been published.
       # ----------------------------------------------------------------------------
-      - name: B.11) Tag the release
-        if: ${{ steps.build.outcome == 'success'
+      - name: B.11) Persist version to .csproj and commit
+        if: ${{ steps.build.outcome == 'success' 
              && steps.test.outcome == 'success'
              && steps.pack.outcome == 'success'
-             && steps.check_version.outputs.skip_publish == 'false'
-             && steps.publish.outcome == 'success' }}
+             && (steps.check_version.outputs.skip_publish == 'true' || steps.publish.outcome == 'success') }}
         shell: bash
         run: |
           set -euo pipefail
+          sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/" xyToolz/xyToolz.csproj
+
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "v${{ env.version }}" -m "Release ${{ env.version }} (bump: ${{ env.BUMP_KIND }}, keyword: ${{ env.MATCH_KEYWORD }})"
-          git push origin "v${{ env.version }}"
+
+          git pull --ff-only origin master
+          git add xyToolz/xyToolz.csproj
+
+          if git diff --cached --quiet; then
+            echo "No version change to commit."
+          else
+            git commit -m "chore: bump version to ${{ env.version }}"
+            git push origin master
+          fi
 
       # ----------------------------------------------------------------------------
       # B.12) CREATE GITHUB RELEASE
