@@ -214,14 +214,30 @@ jobs:
             echo "No existing vX.Y.Z tag found - this is the first release."
             current_version="0.0.0"
           fi
-          echo "Latest tagged version: $current_version"
-
+                  echo "Latest tagged version (from git): $current_version"
+ 
+          # Safety net: git tags can be missing or lag behind (e.g. a version was
+          # published to NuGet without ever tagging the repo). Never let the bump
+          # be computed from a baseline lower than what's already live, or we'd
+          # try to publish a version *older* than what users already have.
+          nuget_latest=$(curl -s "https://api.nuget.org/v3-flatcontainer/extendedcrud/index.json" \
+            | jq -r '.versions[]?' 2>/dev/null \
+            | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
+            | sort -V | tail -1 || true)
+          if [ -z "$nuget_latest" ]; then
+            nuget_latest="0.0.0"
+          fi
+          echo "Latest stable version (from NuGet): $nuget_latest"
+ 
+          current_version=$(printf '%s\n%s\n' "$current_version" "$nuget_latest" | sort -V | tail -1)
+          echo "Effective baseline version: $current_version"
+ 
           major=$(echo "$current_version" | cut -d. -f1)
           minor=$(echo "$current_version" | cut -d. -f2)
           patch=$(echo "$current_version" | cut -d. -f3)
-
+ 
           bump="${BUMP_KIND:-}"
-
+ 
           if [ -z "$bump" ] || [ "$bump" = "none" ]; then
             echo "BUMP_KIND missing/none – performing a defensive one-time rescan."
             commits="$(git log -1 --pretty=%B)"
@@ -244,17 +260,18 @@ jobs:
               fi
             fi
           fi
-
+ 
           case "$bump" in
             major) major=$((major + 1)); minor=0; patch=0; echo "Applying MAJOR bump." ;;
             minor) minor=$((minor + 1)); patch=0;              echo "Applying MINOR bump." ;;
             patch) patch=$((patch + 1));                       echo "Applying PATCH bump." ;;
             *)     echo "No bump requested – keeping current version." ;;
           esac
-
+ 
           new_version="$major.$minor.$patch"
           echo "Planned version: $new_version"
           echo "version=$new_version" >> "$GITHUB_ENV"
+ 
 
       # ----------------------------------------------------------------------------
       # B.6) BUILD (RELEASE)
