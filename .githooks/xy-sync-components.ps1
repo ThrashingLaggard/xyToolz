@@ -1,3 +1,8 @@
+param(
+    [ValidateSet("commit", "push")]
+    [string]$Mode = "commit"
+)
+
 $ErrorActionPreference = "Stop"
 
 # Module -> package name. Code stays under $BasePrefix/<Module>; the standalone
@@ -22,10 +27,32 @@ $ComponentsDir = Join-Path $RepoRoot "xyComponents"
 $BareDir       = Join-Path $RepoRoot "VersionControl"
 $StagingDir    = Join-Path $BareDir ".staging"
 
-$Changed = git diff --name-only HEAD~1 HEAD 2>$null
-if (-not $Changed) { $Changed = git ls-files }
+# Distinguish "the ref range doesn't resolve" (no @{u}, no HEAD~1 yet - fall back to
+# treating everything as changed) from "the range resolved fine but is empty" (a genuine
+# no-op push/commit - must NOT be treated as "everything changed", or every module gets
+# needlessly re-synced and, worse, re-evaluated for a version bump against a stale commit
+# message).
+$RangeResolved = $true
+if ($Mode -eq "push") {
+    # pre-push: cover every commit that's about to go out, not just the last one -
+    # otherwise commits made before the most recent one get silently skipped.
+    $Changed = git diff --name-only '@{u}..HEAD' 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        $Changed = git diff --name-only HEAD~1 HEAD 2>$null
+        if ($LASTEXITCODE -ne 0) { $RangeResolved = $false }
+    }
+    $CommitBodies = git log '@{u}..HEAD' --pretty=%B 2>$null
+    if ($LASTEXITCODE -ne 0) { $CommitBodies = git log -1 --pretty=%B }
+} else {
+    $Changed = git diff --name-only HEAD~1 HEAD 2>$null
+    if ($LASTEXITCODE -ne 0) { $RangeResolved = $false }
+    $CommitBodies = git log -1 --pretty=%B
+}
+if (-not $RangeResolved) { $Changed = git ls-files }
+$CommitBodies = $CommitBodies -join "`n"
 
 foreach ($folder in $Modules.Keys) {
+  try {
     $pkg = $Modules[$folder]
 
     $codePath   = Join-Path $BasePrefix $folder
@@ -77,6 +104,14 @@ foreach ($folder in $Modules.Keys) {
     # tracked source csproj under xyComponents/. The starting point is the latest "v*" tag
     # on this module's own bare repo (fallback: current PackageVersion in the source csproj,
     # i.e. first-ever release).
+    #
+    # Bump/tag only happens in "push" mode, using every commit since the last push
+    # (@{u}..HEAD, computed above) - that's the point where work actually goes out, and it
+    # naturally covers multiple fix/feat commits made since the last push in one go.
+    # "commit" mode fires on every local commit, often several times before you ever push -
+    # cutting a release/tag there would be premature and would double-count once pre-push
+    # runs the same range again. Commit mode still mirrors content into the bare repo (local
+    # backup of the split-out source) but leaves the version exactly where it is.
     $ownLastTag = git -C $barePath tag -l "v*" --sort=-v:refname | Select-Object -First 1
     if ($ownLastTag) {
         $baseVersion = $ownLastTag.TrimStart("v")
@@ -85,22 +120,24 @@ foreach ($folder in $Modules.Keys) {
         $baseVersion = if ($baseVersionMatch.Success) { $baseVersionMatch.Groups[1].Value } else { "1.0.0" }
     }
 
-    $verParts = $baseVersion -split '\.'
-    $major = [int]$verParts[0]; $minor = [int]$verParts[1]; $patch = [int]$verParts[2]
+    $ownVersion = $baseVersion
+    if ($Mode -eq "push") {
+        $verParts = $baseVersion -split '\.'
+        $major = [int]$verParts[0]; $minor = [int]$verParts[1]; $patch = [int]$verParts[2]
 
-    $commitBody = git -C $RepoRoot log -1 --pretty=%B
-    if ($commitBody -match "(?im)BREAKING CHANGE") {
-        $major++; $minor = 0; $patch = 0
-    } elseif ($commitBody -match "(?im)^feat") {
-        $minor++; $patch = 0
-    } elseif ($commitBody -match "(?im)^fix") {
-        $patch++
-    } else {
-        Write-Host "    kein fix/feat/BREAKING CHANGE in der Commit-Message - Version bleibt $baseVersion"
-    }
-    $ownVersion = "$major.$minor.$patch"
-    if ($ownVersion -ne $baseVersion) {
-        Write-Host "    Version bump $pkg`: $baseVersion -> $ownVersion (nur im Export, xyComponents/$pkg/$pkg.csproj bleibt unveraendert)"
+        if ($CommitBodies -match "(?im)BREAKING CHANGE") {
+            $major++; $minor = 0; $patch = 0
+        } elseif ($CommitBodies -match "(?im)^feat") {
+            $minor++; $patch = 0
+        } elseif ($CommitBodies -match "(?im)^fix") {
+            $patch++
+        } else {
+            Write-Host "    kein fix/feat/BREAKING CHANGE in der Commit-Message - Version bleibt $baseVersion"
+        }
+        $ownVersion = "$major.$minor.$patch"
+        if ($ownVersion -ne $baseVersion) {
+            Write-Host "    Version bump $pkg`: $baseVersion -> $ownVersion (nur im Export, xyComponents/$pkg/$pkg.csproj bleibt unveraendert)"
+        }
     }
     $csprojContent = [regex]::Replace($csprojContent, '<PackageVersion>[^<]*</PackageVersion>', "<PackageVersion>$ownVersion</PackageVersion>")
 
@@ -146,4 +183,7 @@ foreach ($folder in $Modules.Keys) {
     } finally {
         Pop-Location
     }
+  } catch {
+    Write-Host "==> FEHLER beim Sync von $folder ($pkg): $($_.Exception.Message) - andere Module werden trotzdem weiterverarbeitet."
+  }
 }
