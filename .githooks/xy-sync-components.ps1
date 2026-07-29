@@ -71,6 +71,39 @@ foreach ($folder in $Modules.Keys) {
     $csprojContent = $csprojContent -replace '(?s)\s*<EnableDefaultCompileItems>false</EnableDefaultCompileItems>', ''
     $csprojContent = $csprojContent -replace '(?s)<ItemGroup>\s*(<Compile Include="[^"]*"\s*/>\s*)+</ItemGroup>\s*', ''
 
+    # Version bump follows the same Conventional-Commits rule as ci-template-xyProjects.yml:
+    # BREAKING CHANGE -> major, feat -> minor, fix -> patch, else unchanged. Just like that
+    # workflow's "sed" step, this only touches the throwaway export snapshot — never the
+    # tracked source csproj under xyComponents/. The starting point is the latest "v*" tag
+    # on this module's own bare repo (fallback: current PackageVersion in the source csproj,
+    # i.e. first-ever release).
+    $ownLastTag = git -C $barePath tag -l "v*" --sort=-v:refname | Select-Object -First 1
+    if ($ownLastTag) {
+        $baseVersion = $ownLastTag.TrimStart("v")
+    } else {
+        $baseVersionMatch = [regex]::Match($csprojContent, '<PackageVersion>([^<]*)</PackageVersion>')
+        $baseVersion = if ($baseVersionMatch.Success) { $baseVersionMatch.Groups[1].Value } else { "1.0.0" }
+    }
+
+    $verParts = $baseVersion -split '\.'
+    $major = [int]$verParts[0]; $minor = [int]$verParts[1]; $patch = [int]$verParts[2]
+
+    $commitBody = git -C $RepoRoot log -1 --pretty=%B
+    if ($commitBody -match "(?im)BREAKING CHANGE") {
+        $major++; $minor = 0; $patch = 0
+    } elseif ($commitBody -match "(?im)^feat") {
+        $minor++; $patch = 0
+    } elseif ($commitBody -match "(?im)^fix") {
+        $patch++
+    } else {
+        Write-Host "    kein fix/feat/BREAKING CHANGE in der Commit-Message - Version bleibt $baseVersion"
+    }
+    $ownVersion = "$major.$minor.$patch"
+    if ($ownVersion -ne $baseVersion) {
+        Write-Host "    Version bump $pkg`: $baseVersion -> $ownVersion (nur im Export, xyComponents/$pkg/$pkg.csproj bleibt unveraendert)"
+    }
+    $csprojContent = [regex]::Replace($csprojContent, '<PackageVersion>[^<]*</PackageVersion>', "<PackageVersion>$ownVersion</PackageVersion>")
+
     # Cross-module <ProjectReference Include="..\xyOther\xyOther.csproj" /> can't
     # resolve in the flat single-module export, so rewrite it to a PackageReference
     # pinned to the latest "v*" tag of that module's own bare repo (fallback 1.0.0
@@ -103,6 +136,10 @@ foreach ($folder in $Modules.Keys) {
         if ($status) {
             git commit -m "sync: $folder @ $sourceSha - $sourceMsg" | Out-Null
             git push origin master
+            if ($ownVersion -ne $baseVersion) {
+                git tag "v$ownVersion"
+                git push origin "v$ownVersion"
+            }
         } else {
             Write-Host "    keine inhaltlichen Aenderungen, ueberspringe Commit/Push"
         }
