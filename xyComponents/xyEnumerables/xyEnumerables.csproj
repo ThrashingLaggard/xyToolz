@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Source stays in xyToolz/xyToolz/Enumerables, never copied/moved. See xyExtensions.csproj for the pattern. -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>xyEnumerables</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>ThrashingLaggard</Authors>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <Copyright>Do with this, as you please. Go home to your dog   </Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>..\..\NuGets</PackageOutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\xyToolz\Enumerables\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

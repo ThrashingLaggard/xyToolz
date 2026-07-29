@@ -34,7 +34,7 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<OutputType>Library</OutputType>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<PackageReadmeFile></PackageReadmeFile>
+		<PackageOutputPath>..\NuGets</PackageOutputPath>
 		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
@@ -52,7 +52,7 @@
 	  <None Remove="READMEs\**" />
 	  <None Remove="Renderer\**" />
 
-		<None Include="readme.md" />
+		<None Include="..\readme.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 	<ItemGroup>

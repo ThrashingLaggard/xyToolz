@@ -3,6 +3,14 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Local component-split infrastructure: bare repos + staging worktrees generated
+# by .githooks/xy-sync-components.ps1. Never belongs in the monolith's own history.
+/VersionControl/
+
+# Collected .nupkg output from every project's PackageOutputPath. Local build
+# artifacts, not source.
+/NuGets/
+
 # User-specific files
 *.rsuser
 *.suo
