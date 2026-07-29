@@ -7,7 +7,7 @@ namespace xyToolz.Extensions
     /// <summary>
     /// Providing little helpers for QOL  and readability
     /// </summary>
-       public static class xyByteExtensions
+    public static class xyByteExtensions
         {
 
             /// <summary>
