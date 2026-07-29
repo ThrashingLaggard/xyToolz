@@ -18,8 +18,6 @@
     <NeutralLanguage>en-GB</NeutralLanguage>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <Copyright>Do with this, as you please. Go home to your dog   </Copyright>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageOutputPath>..\..\NuGets</PackageOutputPath>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
@@ -29,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="xyLogger" Version="1.0.4" />
+    <PackageReference Include="xyLogger" />
   </ItemGroup>
 
   <ItemGroup>
