@@ -1,12 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json;
 using xyMessageFactory.Factories;
 using xyToolz.Extensions;
 using xyToolz.Helper.Interfaces;
 using xyLogger.Loggers;
-using xyToolz.QOL;
-using xyToolz.Serialization;
+
 
 
 #if ANDROID
@@ -40,7 +38,6 @@ namespace xyToolz.Filesystem
     /// Performance may vary depending on file size and underlying storage.
     ///
     /// <para><b>Configuration:</b></para>
-    /// - JSON serialization via <c>xyJson.defaultJsonOptions</c>
     /// - Path resolution via <c>xyPathHelper</c>
     ///
     /// <para><b>Logging:</b></para>
@@ -69,7 +66,6 @@ namespace xyToolz.Filesystem
     /// </remarks>
     public static class xyFiles
     {
-        private static readonly JsonSerializerOptions DefaultJsonOptions = xyJson.defaultJsonOptions;
         private static readonly xyBaseMessageFactory _msg = new();
 
 

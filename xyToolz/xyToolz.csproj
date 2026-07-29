@@ -82,6 +82,30 @@
 
 
 
+
+  <!-- Added by prepare-monolith-modules.ps1: exclude split-out module folders from this project's own build -->
+  <ItemGroup>
+    <Compile Remove="Extensions\**" />
+    <None Remove="Extensions\**" />
+    <Compile Remove="QOL\**" />
+    <None Remove="QOL\**" />
+    <Compile Remove="Chrono\**" />
+    <None Remove="Chrono\**" />
+    <Compile Remove="Fonts\**" />
+    <None Remove="Fonts\**" />
+    <Compile Remove="Enumerables\**" />
+    <None Remove="Enumerables\**" />
+    <Compile Remove="Maths\**" />
+    <None Remove="Maths\**" />
+    <Compile Remove="PDF\**" />
+    <None Remove="PDF\**" />
+    <Compile Remove="Filesystem\**" />
+    <None Remove="Filesystem\**" />
+    <Compile Remove="Serialization\**" />
+    <None Remove="Serialization\**" />
+    <Compile Remove="Security\**" />
+    <None Remove="Security\**" />
+  </ItemGroup>
 </Project>
 
 
@@ -120,3 +144,4 @@
 	</Target>
 
 	-->
+

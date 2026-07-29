@@ -10,11 +10,10 @@ This provides helper classes for .NET: files, hashing/RSA, JSON/XML, PDF, dates,
 This is my quick and dirty version for personal use, thus it can be a nightmare when it comes to dependency handling...
 If you prefer the components on their own, there are corresponding NuGets for each component of this toolbox.
 
----
-## Requirements
 
-- .NET 8
-- 
+For the love of compability, i still let this run in **.NET8**... Until further notice, this will continue to stay exactly that way! 
+(When i change the framework, i will change the first digit to 2, dont worry about accidentally breaking stuff, lol)
+
 ---
 
 ## Modules
@@ -77,9 +76,7 @@ await xyFiles.SaveToFile("Hello!", "output.txt");
 
 var config = xyJson.ReadFromFile<MyConfig>("settings.json");
 ```
-
 ---
-
 ## Dependencies
 
 Haters will say its not dependency-free. Notable NuGet packages: `Newtonsoft.Json`, `PDFsharp`, `PdfSharpCore`, `SixLabors.ImageSharp`, `Microsoft.IdentityModel.Tokens`, `System.IdentityModel.Tokens.Jwt`, `xyLogger`, `xyMessageFactory`.

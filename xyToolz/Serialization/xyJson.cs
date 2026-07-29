@@ -4,10 +4,8 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using xyToolz.Extensions;
-using xyToolz.Filesystem;
 using xyToolz.Helper.Interfaces;
 using xyLogger.Loggers;
-using xyToolz.QOL;
 using xyMessageFactory.Factories;
 
 namespace xyToolz.Serialization
@@ -47,6 +45,74 @@ namespace xyToolz.Serialization
 
         #endregion
 
+
+        #region Helper
+        private static async Task<bool> EnsurePathExistsAsync(string filePath)
+        {
+            const string errorEmptyPath = "The given file path is null or empty.";
+            string createdMsg = $"{filePath} was created.";
+            string existsMsg = $"{filePath} already exists.";
+
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                await xyLog.AsxLog(errorEmptyPath);
+                return false;
+            }
+
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    using (File.Create(filePath)) { }
+                    await xyLog.AsxLog(createdMsg);
+                }
+                else
+                {
+                    await xyLog.AsxLog(existsMsg);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxExLog(ex);
+                return false;
+            }
+        }
+
+
+        private static async Task<Stream?> GetStreamFromFileAsync(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                await xyLog.AsxLog(_fac.PathNotFound(filePath));
+                return null;
+            }
+
+            if (!File.Exists(filePath))
+            {
+                await xyLog.AsxLog(_fac.FileNotFound(filePath));
+                return null; ;
+            }
+
+            byte[] buffer;
+            MemoryStream memoryStream;
+            try
+            {
+                buffer = await File.ReadAllBytesAsync(filePath);
+                memoryStream = new MemoryStream(buffer) { Position = 0 };
+
+                await xyLog.AsxLog($"{buffer.Length} bytes");
+                return memoryStream;
+            }
+            catch (Exception ex)
+            {
+                await xyLog.AsxLog(_fac.FileStreamError());
+                await xyLog.AsxExLog(ex);
+                return null;
+            }
+        }
+        #endregion
+
         #region Serialization
 
         /// <summary>
@@ -64,7 +130,7 @@ namespace xyToolz.Serialization
 
             try
             {
-                if ( await xyFiles.EnsurePathExistsAsync(fileName))
+                if ( await EnsurePathExistsAsync(fileName))
                 {
                     string jsonData = JsonSerializer.Serialize(data, options ?? defaultJsonOptions);
                     await File.WriteAllTextAsync(fileName, jsonData, cancellationToken: ct);                  
@@ -98,7 +164,7 @@ namespace xyToolz.Serialization
             }
             try
             {
-                if (await xyFiles.EnsurePathExistsAsync(fileName))
+                if (await EnsurePathExistsAsync(fileName))
                 {
                     foreach (object target in data)
                     {
@@ -204,7 +270,7 @@ namespace xyToolz.Serialization
         {
             try
             {
-                dynamic? stream = await xyFiles.GetStreamFromFileAsync(filePath);
+                dynamic? stream = await GetStreamFromFileAsync(filePath);
                 if (stream == null) return null;
 
                  return await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(stream, defaultJsonOptions);
@@ -225,7 +291,7 @@ namespace xyToolz.Serialization
         {
             try
             {
-                await using var stream = await xyFiles.GetStreamFromFileAsync(filePath);
+                await using var stream = await GetStreamFromFileAsync(filePath);
                 if (stream == null) return default;
 
                 return await JsonSerializer.DeserializeAsync<T>(stream,defaultJsonOptions);
