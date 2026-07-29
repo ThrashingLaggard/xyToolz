@@ -1,2 +1,6 @@
 #!/bin/sh
-exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(dirname "$0")/xy-sync-components.ps1" -Mode push
+# Auto-runs the component sync on every push to the monorepo, covering every commit
+# since the last push (not just the last one). A non-zero exit here blocks the push
+# itself, same as any other pre-push hook - a broken component build stops you from
+# pushing until it's fixed or you bypass with --no-verify.
+exec pwsh -NoProfile -ExecutionPolicy Bypass -File "$(dirname "$0")/xy-sync-components.ps1"
