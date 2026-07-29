@@ -34,9 +34,9 @@ namespace xyToolz.QOL
     ///### I changed all the string and byte conversion methods to be extension methods and outsourced them into xyToolz.Extension namespace!!!!! ####
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs yet.")]
-#pragma warning disable CS8981 // Der Typname enthält nur ASCII-Zeichen in Kleinbuchstaben. Solche Namen können möglicherweise für die Sprache reserviert werden.
+#pragma warning disable CS8981 
     public static partial class xy
-#pragma warning restore CS8981 // Der Typname enthält nur ASCII-Zeichen in Kleinbuchstaben. Solche Namen können möglicherweise für die Sprache reserviert werden.
+#pragma warning restore CS8981 
     {
         #region TryCatch – Error-handling helpers
 

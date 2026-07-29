@@ -22,7 +22,7 @@ $Modules = @{
 }
 
 $RepoRoot      = git rev-parse --show-toplevel
-$BasePrefix    = Join-Path $RepoRoot "xyToolz\xyToolz"
+$BasePrefix    = Join-Path $RepoRoot "xyToolz"
 $ComponentsDir = Join-Path $RepoRoot "xyComponents"
 $BareDir       = Join-Path $RepoRoot "VersionControl"
 $StagingDir    = Join-Path $BareDir ".staging"
@@ -59,7 +59,7 @@ foreach ($folder in $Modules.Keys) {
     $csprojPath = Join-Path $ComponentsDir "$pkg\$pkg.csproj"
     $barePath   = Join-Path $BareDir "$pkg.git"
 
-    $relCodePrefix = "xyToolz/xyToolz/$folder/"
+    $relCodePrefix = "xyToolz/$folder/"
     $relCsprojPath = "xyComponents/$pkg/$pkg.csproj"
     if (-not (($Changed -match [regex]::Escape($relCodePrefix)) -or ($Changed -match [regex]::Escape($relCsprojPath)))) {
         continue
