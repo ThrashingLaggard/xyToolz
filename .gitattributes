@@ -61,3 +61,31 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Line endings for anything that gets EXECUTED rather than compiled.
+#
+# The repo only had "* text=auto". On Windows that checks .sh and .yml out with
+# CRLF. Consequences that actually happened here:
+#   - generate-workflow.sh began with "#!/bin/bash\r"  -> bad interpreter: ^M
+#   - every `run: |` block in the workflow YAML carried a trailing \r, so
+#     `echo "version=$v" >> $GITHUB_ENV` wrote "version=1.2.3\r" and every
+#     later step silently used a version string with a carriage return in it.
+# These are invisible in every editor and cost entire nights.
+###############################################################################
+*.sh          text eol=lf
+*.yml         text eol=lf
+*.yaml        text eol=lf
+post-receive  text eol=lf
+pre-receive   text eol=lf
+*.conf        text eol=lf
+Dockerfile    text eol=lf
+
+# Keep Windows-native tooling happy:
+*.ps1         text eol=crlf
+*.cmd         text eol=crlf
+*.bat         text eol=crlf
+
+# Never normalise binaries.
+*.nupkg       binary
+*.snk         binary

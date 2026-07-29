@@ -11,6 +11,10 @@
 # artifacts, not source.
 /NuGets/
 
+# DPAPI-encrypted NuGet API key (see WORKFLOWS.md, option 2). Useless without the
+# same Windows account that created it, but still not something to commit.
+build/*.protected
+
 # User-specific files
 *.rsuser
 *.suo

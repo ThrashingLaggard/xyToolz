@@ -56,21 +56,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
-		<PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="10.0.5" />
-		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="PDFsharp" Version="6.2.2" />
-		<PackageReference Include="PdfSharpCore" Version="1.3.67" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
-		<PackageReference Include="System.Drawing.Common" Version="9.0.10" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
-		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.10" />
-		<PackageReference Include="System.Text.Json" Version="9.0.10" />
-		<PackageReference Include="xyLogger" Version="1.0.4" />
-		<PackageReference Include="xyMessageFactory" Version="1.0.0" />
+		<!-- Microsoft.Extensions.Localization.Abstractions removed: no using/API reference anywhere in the tree, was vestigial. -->
+		<!-- System.IO.FileSystem removed: legacy netstandard-compat facade, redundant on net8.0 (System.IO comes from the BCL). -->
+		<PackageReference Include="Microsoft.Extensions.Configuration" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" />
+		<PackageReference Include="Newtonsoft.Json" />
+		<PackageReference Include="PDFsharp" />
+		<PackageReference Include="PdfSharpCore" />
+		<PackageReference Include="SixLabors.ImageSharp" />
+		<PackageReference Include="System.Drawing.Common" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" />
+		<PackageReference Include="System.Text.Json" />
+		<PackageReference Include="xyLogger" />
+		<PackageReference Include="xyMessageFactory" />
 	</ItemGroup>
 
 

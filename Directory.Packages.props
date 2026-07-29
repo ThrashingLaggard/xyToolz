@@ -1,0 +1,33 @@
+<Project>
+  <!--
+    Central Package Management. Every PackageReference in the tree is version-less;
+    the version lives here, once, instead of being duplicated across 12 csproj files.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- xyLogger: pinned by user instruction, not the latest available. Do not bump. -->
+    <PackageVersion Include="xyLogger" Version="1.0.4" />
+    <!-- xyMessageFactory: pinned by user instruction, not the latest available. Do not bump. -->
+    <PackageVersion Include="xyMessageFactory" Version="1.0.1" />
+
+    <PackageVersion Include="PdfSharpCore" Version="1.3.67" />
+    <PackageVersion Include="PDFsharp" Version="6.2.2" />
+    <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="9.0.10" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <PackageVersion Include="System.Drawing.Common" Version="9.0.10" />
+
+    <!-- xUnit, test project only -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+</Project>

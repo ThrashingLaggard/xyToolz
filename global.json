@@ -1,0 +1,7 @@
+{
+  "//": "Pins the SDK band. readme.md promises .NET 8 'until further notice', but nothing enforced it - a machine with only the .NET 10 SDK would silently build against different analyzers and language defaults.",
+  "sdk": {
+    "version": "8.0.100",
+    "rollForward": "latestFeature"
+  }
+}

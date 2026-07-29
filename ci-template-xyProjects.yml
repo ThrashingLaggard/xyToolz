@@ -1,100 +1,151 @@
-name: CI/CD for <ProjectName>
+name: CI/CD for __PROJECT__
 
-# Trigger: Run this workflow on every push to the "master" branch
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+  workflow_dispatch:
+
+# The default GITHUB_TOKEN is read-only. Without this the release step fails
+# with a 403 that looks nothing like a permissions problem.
+permissions:
+  contents: write
+
+# Two pushes in quick succession used to race each other and try to publish the
+# same version twice.
+concurrency:
+  group: release-__PROJECT__
+  cancel-in-progress: false
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest  # Use GitHub-hosted Ubuntu runner
+  build-and-release:
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4  # Step 1: Clone the GitHub repository onto the runner
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Tags are the version source. A shallow clone has none of them.
+          fetch-depth: 0
 
-    - name: Setup .NET 8
-      uses: actions/setup-dotnet@v4  # Step 2: Install the .NET 8 SDK
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-    - name: Restore dependencies
-      run: dotnet restore <ProjectName>.csproj  # Step 3: Restore project dependencies from NuGet
+      - name: Determine next version
+        id: ver
+        shell: bash
+        run: |
+          set -euo pipefail
 
-    - name: Generate new version from commit message
-      id: versioning
-      run: |
-        # Step 4: Determine new version based on commit message content
+          # The old template read the current version out of the .csproj, sed'd a
+          # new one in, and never committed it. Next run read the same stale value
+          # again, so the version could never actually advance. Tags are the only
+          # thing that survives between runs, so tags are the source of truth.
+          last_tag=$(git tag -l 'v*' --sort=-v:refname | head -n1 || true)
+          current=${last_tag#v}
+          current=${current:-0.0.0}
 
-        # Read the current version from the .csproj file
-        current_version=$(grep -oPm1 "(?<=<PackageVersion>)[^<]+" <ProjectName>.csproj)
-        echo "Current version: $current_version"
+          major=$(echo "$current" | cut -d. -f1)
+          minor=$(echo "$current" | cut -d. -f2)
+          patch=$(echo "$current" | cut -d. -f3)
 
-        # Get the last commit message to decide the version bump
-        commits=$(git log -1 --pretty=%B)
-        echo "Last commit message: $commits"
+          subject=$(git log -1 --pretty=%s)
+          body=$(git log -1 --pretty=%B)
 
-        # Split the current version into major, minor, patch
-        major=$(echo $current_version | cut -d. -f1)
-        minor=$(echo $current_version | cut -d. -f2)
-        patch=$(echo $current_version | cut -d. -f3)
+          forced=$(echo "$body" | sed -n 's/.*[Rr]elease:[[:space:]]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | head -n1)
 
-        # Bump the version based on commit message keywords
-        if echo "$commits" | grep -iq "BREAKING CHANGE"; then
-          major=$((major + 1))
-          minor=0
-          patch=0
-        elif echo "$commits" | grep -iq "^feat"; then
-          minor=$((minor + 1))
-          patch=0
-        elif echo "$commits" | grep -iq "^fix"; then
-          patch=$((patch + 1))
-        else
-          echo "No version keyword found. Keeping current version."
-        fi
+          # First-ever release always wins over feat:/fix: keyword matching - otherwise a
+          # coincidental "fix:"/"feat:" in the first commit message bumps off 0.0.0 instead
+          # of starting at the intended 1.0.0. Confirmed via the equivalent bug in
+          # build/post-receive during an actual sync run.
+          if [ -n "$forced" ]; then
+            new="$forced"
+          elif [ -z "$last_tag" ]; then
+            new="1.0.0"
+          elif echo "$body" | grep -q 'BREAKING CHANGE'; then
+            new="$((major + 1)).0.0"
+          elif echo "$subject" | grep -qiE '^feat(\(.*\))?!?:'; then
+            new="$major.$((minor + 1)).0"
+          elif echo "$subject" | grep -qiE '^fix(\(.*\))?!?:'; then
+            new="$major.$minor.$((patch + 1))"
+          else
+            echo "Kein Versions-Keyword -> kein Release."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
-        # Set and export the new version for use in later steps
-        new_version="$major.$minor.$patch"
-        echo "New version: $new_version"
-        echo "version=$new_version" >> $GITHUB_ENV
+          echo "$current -> $new"
+          echo "version=$new"   >> "$GITHUB_OUTPUT"
+          echo "release=true"   >> "$GITHUB_OUTPUT"
 
-    - name: Update .csproj with new version
-      run: |
-        # Step 5: Update the <PackageVersion> inside the .csproj file with the newly determined version
-        sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ env.version }}<\/PackageVersion>/" <ProjectName>.csproj
+      - name: Restore
+        if: steps.ver.outputs.release == 'true'
+        run: dotnet restore __PROJECT__.csproj
 
-    - name: Build project
-      run: dotnet build <ProjectName>.csproj --configuration Release --no-restore  # Step 6: Build the project in Release mode
+      - name: Build
+        if: steps.ver.outputs.release == 'true'
+        run: |
+          dotnet build __PROJECT__.csproj -c Release --no-restore \
+            -p:Version=${{ steps.ver.outputs.version }} \
+            -p:PackageVersion=${{ steps.ver.outputs.version }} \
+            -p:GeneratePackageOnBuild=false
 
-    - name: Run tests
-      run: dotnet test <ProjectName>.csproj --no-build --verbosity normal  # Step 7: Run all unit tests
+      - name: Test
+        if: steps.ver.outputs.release == 'true'
+        shell: bash
+        run: |
+          # The old template ran `dotnet test` against the library project itself,
+          # which always failed with "no test project". Find a real one, or skip.
+          test_proj=$(find . \( -iname '*Tests.csproj' -o -iname '*Test.csproj' \) | head -n1)
+          if [ -n "$test_proj" ]; then
+            dotnet test "$test_proj" -c Release --verbosity minimal
+          else
+            echo "Kein Testprojekt gefunden, uebersprungen."
+          fi
 
-    - name: Pack NuGet package
-      run: dotnet pack <ProjectName>.csproj --configuration Release --no-build -o out  # Step 8: Create a NuGet package (.nupkg)
+      - name: Pack
+        if: steps.ver.outputs.release == 'true'
+        run: |
+          dotnet pack __PROJECT__.csproj -c Release --no-build -o out \
+            -p:Version=${{ steps.ver.outputs.version }} \
+            -p:PackageVersion=${{ steps.ver.outputs.version }} \
+            -p:GeneratePackageOnBuild=false
 
-    - name: Check if version already exists on NuGet
-      id: check_version
-      run: |
-        # Step 9: Check if the version already exists on NuGet.org to avoid duplicate uploads
-        version=${{ env.version }}
-        exists=$(curl -sL https://api.nuget.org/v3-flatcontainer/<nuget-id>/$version/<nuget-id>.$version.nupkg)
-        if [ -n "$exists" ]; then
-          echo "Version $version already exists. Skipping publish."
-          echo "skip_publish=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "skip_publish=false" >> "$GITHUB_OUTPUT"
-        fi
+      - name: Check NuGet for existing version
+        id: check
+        if: steps.ver.outputs.release == 'true'
+        shell: bash
+        run: |
+          # THE bug in the old template:
+          #   exists=$(curl -sL <url>); if [ -n "$exists" ]; then skip=true
+          # A 404 from the flat container still returns a non-empty body, so
+          # $exists was never empty, so skip_publish was ALWAYS true, so this
+          # workflow never published a single package. Check the status code.
+          id=$(echo "__NUGETID__" | tr '[:upper:]' '[:lower:]')
+          v="${{ steps.ver.outputs.version }}"
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 \
+            "https://api.nuget.org/v3-flatcontainer/$id/$v/$id.$v.nupkg" || echo 000)
+          echo "HTTP $code"
+          case "$code" in
+            200) echo "skip=true"  >> "$GITHUB_OUTPUT" ;;
+            404) echo "skip=false" >> "$GITHUB_OUTPUT" ;;
+            *)   echo "NuGet nicht erreichbar (HTTP $code)."; exit 1 ;;
+          esac
 
-    - name: Push to NuGet
-      if: steps.check_version.outputs.skip_publish == 'false'  # Only publish if version does not already exist
-      run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.<YOUR_SECRET_KEY> }} --skip-duplicate
+      - name: Push to NuGet
+        if: steps.ver.outputs.release == 'true' && steps.check.outputs.skip == 'false'
+        run: >
+          dotnet nuget push out/*.nupkg
+          --source https://api.nuget.org/v3/index.json
+          --api-key ${{ secrets.__SECRET__ }}
+          --skip-duplicate
 
-    - name: Create GitHub Release
-      if: steps.check_version.outputs.skip_publish == 'false'  # Only create a GitHub release if publishing was successful
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v${{ env.version }}  # Use the new version as the GitHub tag
-        name: Release ${{ env.version }}  # Name the release after the new version
-        draft: false
-        prerelease: false
+      - name: Create GitHub release
+        if: steps.ver.outputs.release == 'true' && steps.check.outputs.skip == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: Release ${{ steps.ver.outputs.version }}
+          generate_release_notes: true
+          files: out/*.nupkg
