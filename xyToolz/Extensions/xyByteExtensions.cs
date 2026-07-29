@@ -4,6 +4,9 @@ using xyLogger.Loggers;
 
 namespace xyToolz.Extensions
 {
+    /// <summary>
+    /// Providing little helpers for QOL  and readability
+    /// </summary>
        public static class xyByteExtensions
         {
 
