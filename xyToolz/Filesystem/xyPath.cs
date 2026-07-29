@@ -49,6 +49,38 @@ namespace xyToolz.Filesystem
         }
 
         /// <summary>
+        /// Resolves <paramref name="relativePath"/> against <paramref name="basePath"/> and
+        /// rejects any result that escapes <paramref name="basePath"/> (e.g. via "..").
+        /// </summary>
+        /// <param name="basePath">The directory the result must stay inside.</param>
+        /// <param name="relativePath">A path, relative or absolute, to validate.</param>
+        /// <returns>The resolved, validated full path.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the resolved path lies outside <paramref name="basePath"/>.
+        /// </exception>
+        public static string EnsureNoTraversal(string basePath, string relativePath)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(basePath);
+            ArgumentException.ThrowIfNullOrEmpty(relativePath);
+
+            string fullBase = Path.GetFullPath(basePath);
+            string fullTarget = Path.GetFullPath(Path.Combine(fullBase, relativePath));
+
+            string baseWithSeparator = fullBase.EndsWith(Path.DirectorySeparatorChar)
+                ? fullBase
+                : fullBase + Path.DirectorySeparatorChar;
+
+            if (!fullTarget.StartsWith(baseWithSeparator, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(fullTarget, fullBase, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException(
+                    $"Path '{relativePath}' escapes base directory '{basePath}'.", nameof(relativePath));
+            }
+
+            return fullTarget;
+        }
+
+        /// <summary>
         /// Make sure the directory for the target path exists
         /// </summary>
         /// <param name="filePath"></param>
