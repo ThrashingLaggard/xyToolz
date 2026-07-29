@@ -3,7 +3,7 @@ param(
     [string]$Mode = "commit"
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 # Module -> package name. Code stays under $BasePrefix/<Module>; the standalone
 # csproj lives under xyComponents/<PackageName>. Both are combined into a flat
