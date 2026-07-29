@@ -1,0 +1,31 @@
+{
+  "//": "Single source of truth for the component split. 'order' is the topological build order:",
+  "//2": "a component may only depend on components that appear EARLIER in this list.",
+  "//3": "sourceDir is relative to the monorepo root. deps are intra-family ProjectReferences that",
+  "//4": "get rewritten into PackageReferences when the component is flattened into its own repo.",
+
+  "monorepoSourceRoot": "xyToolz",
+  "componentRoot": "xyComponents",
+  "bareRepoRoot": "VersionControl",
+  "stagingRoot": "VersionControl/.staging",
+  "localFeed": "NuGets",
+
+  "components": [
+    { "id": "xyChrono",        "sourceDir": "Chrono",         "deps": [], "extraFiles": [] },
+    { "id": "xyEnumerables",   "sourceDir": "Enumerables",    "deps": [], "extraFiles": [] },
+    { "id": "xyExtensions",    "sourceDir": "Extensions",     "deps": [], "extraFiles": [] },
+    { "id": "xyFonts",         "sourceDir": "Fonts",          "deps": [], "extraFiles": [] },
+    { "id": "xyPdf",           "sourceDir": "PDF",            "deps": [], "extraFiles": [] },
+    { "id": "xyQOL",           "sourceDir": "QOL",            "deps": [], "extraFiles": [] },
+
+    { "id": "xyFilesystem",    "sourceDir": "Filesystem",     "deps": ["xyExtensions"],
+      "extraFiles": ["Interfaces/IxyFiles.cs"] },
+    { "id": "xySerialization", "sourceDir": "Serialization",  "deps": ["xyExtensions"],
+      "extraFiles": ["Interfaces/IxyJson.cs"] },
+    { "id": "xyMaths",         "sourceDir": "Maths",          "deps": ["xyExtensions", "xyQOL"],
+      "extraFiles": [] },
+
+    { "id": "xySecurity",      "sourceDir": "Security",       "deps": ["xyExtensions", "xyQOL", "xyFilesystem", "xySerialization"],
+      "extraFiles": ["Interfaces/IxyDataProtector.cs"] }
+  ]
+}

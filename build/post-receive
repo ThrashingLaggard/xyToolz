@@ -1,0 +1,275 @@
+#!/bin/sh
+# =============================================================================
+#  xy release hook  --  post-receive
+# =============================================================================
+#  Installed into every bare repo under VersionControl/ by build/install-hooks.ps1.
+#  The package id is NOT hardcoded here: it is read from xy-release.conf, which
+#  install-hooks.ps1 writes next to this file inside each bare repo.
+#
+#  Runs on push to master. Builds -> tests -> packs -> publishes -> tags.
+#  Everything is logged to <bare-repo>/xy-release.log so you can actually see
+#  what went wrong instead of squinting at push output.
+# =============================================================================
+
+# On Windows, Git's bundled MSYS shell auto-converts any argument that looks like a
+# POSIX path into a Windows path - and "https://api.nuget.org/..." qualifies, because
+# of the leading "//" after the scheme. That silently turns the nuget.org restore
+# source into a bogus local path (confirmed by an actual failing restore: NU1301
+# against "...\https:\api.nuget.org\v3\index.json"). Exclude only args containing
+# that substring - a blanket MSYS_NO_PATHCONV=1 also breaks the *wanted* conversion
+# for "tar -C $BUILD_DIR" further down (confirmed: that combination made every
+# checkout fail with "tar: Exiting with failure status").
+export MSYS2_ARG_CONV_EXCL='https://'
+
+# ---- 0. Resolve where we are BEFORE git's env vars get in the way ----------
+# In a hook, GIT_DIR is set (often to "."), and CWD is the bare repo.
+REPO_DIR=$(cd "${GIT_DIR:-.}" && pwd)
+HOOK_DIR="$REPO_DIR/hooks"
+LOG="$REPO_DIR/xy-release.log"
+LOCK="$REPO_DIR/xy-release.lock"
+
+# CRITICAL: git exports these into the hook. If they survive into `dotnet build`
+# they poison SourceLink, NBGV and every bare `git` call in the temp worktree,
+# which is exactly how you get a build that "works locally, dies on push".
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_PREFIX
+unset GIT_QUARANTINE_PATH GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES
+unset GIT_REFLOG_ACTION
+
+log() { printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" | tee -a "$LOG"; }
+die() { log "ABBRUCH: $*"; exit 1; }
+
+# ---- 1. Config -------------------------------------------------------------
+PKG_ID=""
+CSPROJ_REL=""                           # relative path to the csproj; default "<PKG_ID>.csproj"
+NUGET_SOURCE="$REPO_DIR/../../NuGets"   # local folder feed by default
+NUGET_API_KEY_ENV=""                    # e.g. XY_NUGET_KEY, only for nuget.org
+NUGET_API_KEY_PROTECTED_FILE=""         # alternative to *_ENV: path to a DPAPI-encrypted blob
+NUGET_KEY_TOOL=""                       # path to the xyToolz_Exec build that can decrypt it
+RESTORE_SOURCES=""                      # space-separated feeds used for restore
+RUN_TESTS="1"
+DOTNET="${DOTNET:-dotnet}"
+
+if [ -f "$HOOK_DIR/xy-release.conf" ]; then
+    # shellcheck disable=SC1090
+    . "$HOOK_DIR/xy-release.conf"
+fi
+
+[ -n "$PKG_ID" ] || die "PKG_ID ist nicht gesetzt. Fehlt hooks/xy-release.conf? (build/install-hooks.ps1 ausfuehren)"
+
+# ---- 2. Only one release at a time ----------------------------------------
+if ! mkdir "$LOCK" 2>/dev/null; then
+    die "Ein Release fuer $PKG_ID laeuft bereits ($LOCK). Wenn das ein Leichenrest ist: Ordner loeschen."
+fi
+cleanup_lock() { rmdir "$LOCK" 2>/dev/null; }
+trap cleanup_lock EXIT INT TERM
+
+log "=============================================================="
+log "post-receive: $PKG_ID"
+
+# ---- 3. Process each pushed ref -------------------------------------------
+ZERO="0000000000000000000000000000000000000000"
+
+while read -r oldrev newrev refname; do
+
+    case "$refname" in
+        refs/heads/master) : ;;
+        *) log "uebersprungen: $refname (nur master wird released)"; continue ;;
+    esac
+
+    # Branch deleted -> nothing to build. The old hook happily tried to build
+    # a ref that no longer exists.
+    if [ "$newrev" = "$ZERO" ]; then
+        log "master wurde geloescht, kein Release."
+        continue
+    fi
+
+    # -- 3a. Fresh worktree per ref, always cleaned up --------------------
+    # The old hook created ONE temp dir outside the loop and rm -rf'd it
+    # INSIDE the loop, so anything after the first ref ran in a directory
+    # that no longer existed.
+    BUILD_DIR=$(mktemp -d) || die "mktemp fehlgeschlagen"
+    # shellcheck disable=SC2064
+    trap "rm -rf '$BUILD_DIR'; cleanup_lock" EXIT INT TERM
+
+    log "Worktree: $BUILD_DIR  (rev $newrev)"
+
+    # git archive does not touch the bare repo's index (checkout -f did).
+    if ! git --git-dir="$REPO_DIR" archive "$newrev" | tar -x -C "$BUILD_DIR"; then
+        die "Konnte $newrev nicht auschecken."
+    fi
+
+    CSPROJ_PATH="${CSPROJ_REL:-$PKG_ID.csproj}"
+    [ -f "$BUILD_DIR/$CSPROJ_PATH" ] || die "$CSPROJ_PATH liegt nicht im Repo. Sync-Skript hat nicht sauber geflattened."
+
+    # -- 3b. Determine the next version ----------------------------------
+    last_tag=$(git --git-dir="$REPO_DIR" tag -l 'v*' --sort=-v:refname | head -n1)
+    if [ -z "$last_tag" ]; then
+        current_version="0.0.0"
+    else
+        current_version="${last_tag#v}"
+    fi
+
+    commit_msg=$(git --git-dir="$REPO_DIR" log -1 --pretty=%B "$newrev")
+    subject=$(git --git-dir="$REPO_DIR" log -1 --pretty=%s "$newrev")
+
+    major=$(echo "$current_version" | cut -d. -f1)
+    minor=$(echo "$current_version" | cut -d. -f2)
+    patch=$(echo "$current_version" | cut -d. -f3)
+
+    # Explicit override wins:  "release: 2.1.0"  anywhere in the message.
+    forced=$(echo "$commit_msg" | sed -n 's/.*[Rr]elease:[[:space:]]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | head -n1)
+
+    # First-ever release always wins over feat:/fix: keyword matching: the sync script
+    # carries the *monorepo's* subject line into the component's "sync: ..." commit, so
+    # a component's first-ever push can easily contain "fix: ..." from unrelated monorepo
+    # history and get bumped to 0.0.1 instead of the intended 1.0.0 starting version.
+    # Confirmed by an actual sync run: every never-released component came out at 0.0.1.
+    if [ -n "$forced" ]; then
+        new_version="$forced"
+        log "Version explizit gesetzt: $new_version"
+    elif [ -z "$last_tag" ]; then
+        new_version="1.0.0"
+    elif echo "$commit_msg" | grep -q 'BREAKING CHANGE'; then
+        new_version="$((major + 1)).0.0"
+    elif echo "$subject" | grep -qiE '^feat(\(.*\))?!?:'; then
+        new_version="$major.$((minor + 1)).0"
+    elif echo "$subject" | grep -qiE '^fix(\(.*\))?!?:'; then
+        new_version="$major.$minor.$((patch + 1))"
+    else
+        log "Kein feat:/fix:/BREAKING CHANGE in der Commit-Message -> kein Release."
+        rm -rf "$BUILD_DIR"; trap cleanup_lock EXIT INT TERM
+        continue
+    fi
+
+    log "Version: $current_version -> $new_version"
+
+    if git --git-dir="$REPO_DIR" rev-parse -q --verify "refs/tags/v$new_version" >/dev/null 2>&1; then
+        die "Tag v$new_version existiert bereits. Nichts gepusht. (Commit-Message anpassen oder Tag loeschen.)"
+    fi
+
+    # -- 3c. Is it already on the feed? -----------------------------------
+    # The old check treated ANY curl output as "exists" and, when curl failed
+    # outright, set -e killed the hook mid-push. Now: only a real 200 skips,
+    # and an unreachable feed is a hard error instead of a blind publish.
+    case "$NUGET_SOURCE" in
+        http*)
+            lower=$(echo "$PKG_ID" | tr '[:upper:]' '[:lower:]')
+            url="https://api.nuget.org/v3-flatcontainer/$lower/$new_version/$lower.$new_version.nupkg"
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$url" || echo "000")
+            case "$code" in
+                200) log "$PKG_ID $new_version liegt bereits auf NuGet -> kein Publish."
+                     rm -rf "$BUILD_DIR"; trap cleanup_lock EXIT INT TERM; continue ;;
+                404) log "Version noch nicht veroeffentlicht, weiter." ;;
+                *)   die "NuGet nicht erreichbar (HTTP $code). Lieber gar nichts als blind pushen." ;;
+            esac
+            ;;
+        *)
+            if [ -f "$NUGET_SOURCE/$PKG_ID.$new_version.nupkg" ]; then
+                log "$PKG_ID.$new_version.nupkg liegt bereits im lokalen Feed -> kein Publish."
+                rm -rf "$BUILD_DIR"; trap cleanup_lock EXIT INT TERM; continue
+            fi
+            ;;
+    esac
+
+    # -- 3d. Build -------------------------------------------------------
+    cd "$BUILD_DIR" || die "cd $BUILD_DIR fehlgeschlagen"
+
+    # Version, not just PackageVersion: otherwise the assembly stays at 1.0.0
+    # forever while the package number climbs, and you can never tell which
+    # dll you are actually looking at.
+    VER_PROPS="-p:Version=$new_version -p:PackageVersion=$new_version -p:AssemblyVersion=$major.0.0.0 -p:FileVersion=$new_version.0"
+    # GeneratePackageOnBuild would pack during build, into PackageOutputPath,
+    # which points outside this temp dir. We pack explicitly instead.
+    PACK_OFF="-p:GeneratePackageOnBuild=false"
+
+    # The build runs in a temp dir far away from the monorepo, so NuGet's
+    # walk-up config discovery finds nothing and intra-family dependencies
+    # (xyExtensions, xyQOL, ...) are unresolvable. Hand it the feeds explicitly.
+    RESTORE_ARGS=""
+    if [ -n "$RESTORE_SOURCES" ]; then
+        for _src in $RESTORE_SOURCES; do RESTORE_ARGS="$RESTORE_ARGS --source $_src"; done
+    else
+        RESTORE_ARGS="--source $NUGET_SOURCE --source https://api.nuget.org/v3/index.json"
+    fi
+
+    log "restore...($RESTORE_ARGS)"
+    # shellcheck disable=SC2086
+    $DOTNET restore "$CSPROJ_PATH" $RESTORE_ARGS >>"$LOG" 2>&1 || die "restore fehlgeschlagen, siehe $LOG"
+
+    log "build..."
+    # shellcheck disable=SC2086
+    $DOTNET build "$CSPROJ_PATH" -c Release --no-restore $VER_PROPS $PACK_OFF >>"$LOG" 2>&1 \
+        || die "build fehlgeschlagen, siehe $LOG"
+
+    # -- 3e. Test --------------------------------------------------------
+    if [ "$RUN_TESTS" = "1" ]; then
+        test_csproj=$(find . \( -iname '*Tests.csproj' -o -iname '*Test.csproj' \) -print 2>/dev/null | head -n1)
+        if [ -n "$test_csproj" ]; then
+            log "test: $test_csproj"
+            # The old hook passed --no-build here. The test project was never
+            # built (only $PKG_ID.csproj was), so this failed every single time
+            # a test project existed.
+            $DOTNET test "$test_csproj" -c Release --verbosity minimal >>"$LOG" 2>&1 \
+                || die "Tests fehlgeschlagen, kein Release. Siehe $LOG"
+        else
+            log "Kein Testprojekt gefunden, ueberspringe Tests."
+        fi
+    fi
+
+    # -- 3f. Pack --------------------------------------------------------
+    rm -rf "$BUILD_DIR/out"
+    log "pack..."
+    # shellcheck disable=SC2086
+    $DOTNET pack "$CSPROJ_PATH" -c Release --no-build -o "$BUILD_DIR/out" $VER_PROPS $PACK_OFF >>"$LOG" 2>&1 \
+        || die "pack fehlgeschlagen, siehe $LOG"
+
+    NUPKG="$BUILD_DIR/out/$PKG_ID.$new_version.nupkg"
+    [ -f "$NUPKG" ] || die "Erwartetes Paket $NUPKG wurde nicht erzeugt."
+
+    # -- 3g. Publish -----------------------------------------------------
+    case "$NUGET_SOURCE" in
+        *) mkdir -p "$NUGET_SOURCE" 2>/dev/null ;;
+    esac
+
+    log "push -> $NUGET_SOURCE"
+    KEY=""
+    if [ -n "$NUGET_API_KEY_PROTECTED_FILE" ]; then
+        # DPAPI-encrypted (xySecurity/xyDataProtector, CurrentUser scope): only decrypts under
+        # the same Windows account that ran "xyToolz_Exec encrypt". The tool wraps the secret
+        # in unmistakable markers on stdout so a stray log line from the library can never be
+        # mistaken for the key itself.
+        [ -n "$NUGET_KEY_TOOL" ] || die "NUGET_API_KEY_PROTECTED_FILE gesetzt, aber NUGET_KEY_TOOL fehlt."
+        decrypt_out=$($DOTNET "$NUGET_KEY_TOOL" decrypt "$NUGET_API_KEY_PROTECTED_FILE" 2>>"$LOG") \
+            || die "Entschluesseln des API-Keys fehlgeschlagen, siehe $LOG"
+        KEY=$(printf '%s\n' "$decrypt_out" | sed -n '/===XYSECRET-BEGIN===/{n;p}')
+        [ -n "$KEY" ] || die "Entschluesselter Key ist leer - falscher Windows-Account, oder Datei fehlt/beschaedigt."
+    elif [ -n "$NUGET_API_KEY_ENV" ]; then
+        eval "KEY=\${$NUGET_API_KEY_ENV}"
+        [ -n "$KEY" ] || die "Env-Variable $NUGET_API_KEY_ENV ist leer, kein API-Key."
+    fi
+
+    if [ -n "$KEY" ]; then
+        $DOTNET nuget push "$NUPKG" --source "$NUGET_SOURCE" --api-key "$KEY" --skip-duplicate >>"$LOG" 2>&1 \
+            || die "nuget push fehlgeschlagen, siehe $LOG"
+    else
+        $DOTNET nuget push "$NUPKG" --source "$NUGET_SOURCE" --skip-duplicate >>"$LOG" 2>&1 \
+            || die "nuget push fehlgeschlagen, siehe $LOG"
+    fi
+    unset KEY decrypt_out
+
+    # -- 3h. Tag LAST, only after a successful publish --------------------
+    # Explicit identity: a bare server repo usually has no user.name/user.email,
+    # and an annotated tag refuses to be created without one.
+    git -c user.name="xy release hook" -c user.email="hook@localhost" \
+        --git-dir="$REPO_DIR" tag -a "v$new_version" -m "$PKG_ID $new_version" "$newrev" \
+        || die "Publish war erfolgreich, aber Tag v$new_version konnte nicht gesetzt werden - bitte manuell nachziehen!"
+
+    log "OK: $PKG_ID $new_version veroeffentlicht und getaggt."
+
+    cd / || true
+    rm -rf "$BUILD_DIR"
+    trap cleanup_lock EXIT INT TERM
+done
+
+log "post-receive fertig."
+exit 0
