@@ -3,6 +3,7 @@
 namespace xyToolz.Filesystem
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<Because its my wish to do so!>")]
+    
     public static class xyPath
     {
 #if ANDROID
