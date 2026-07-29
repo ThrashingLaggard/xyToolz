@@ -216,14 +216,26 @@ namespace xyToolz.Security
 
             try
             {
-                byte[]? encrypted = await xyFiles.LoadBytesFromFile(filename);
-
-                if (encrypted == null || encrypted.Length == 0)
+                // SaveProtectedToFileAsync base64-encodes the ciphertext and writes it as TEXT
+                // (xyFiles.SaveToFile(encString, ...)) - reading the file's raw bytes here instead
+                // of base64-decoding it first fed ProtectedData.Unprotect the UTF-8 bytes of the
+                // base64 *text* rather than the actual DPAPI blob, so every load failed with
+                // CryptographicException even immediately after a successful save. Confirmed by
+                // an actual round-trip test.
+                if (!File.Exists(filename))
                 {
                     await xyLog.AsxLog(missing);
                     return default;
                 }
 
+                string base64 = await File.ReadAllTextAsync(filename);
+                if (string.IsNullOrWhiteSpace(base64))
+                {
+                    await xyLog.AsxLog(missing);
+                    return default;
+                }
+
+                byte[] encrypted = base64.Trim().BaseToBytes();
                 T? obj = await UnprotectAsync<T>(encrypted);
                 await xyLog.AsxLog(success);
                 return obj;
