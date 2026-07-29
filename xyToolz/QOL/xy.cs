@@ -21,7 +21,7 @@ namespace xyToolz.QOL
     /// Open Editor 
     ///         -> also with file
     ///         
-    ///         ---------------------------
+    /// -----------------
     ///         
     /// "Useless" experiments:
     /// 
