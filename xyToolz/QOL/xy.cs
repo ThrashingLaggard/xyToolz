@@ -27,7 +27,7 @@ namespace xyToolz.QOL
     /// 
     /// Biep Biep Boooop
     /// ---
-    /// Crash
+    /// Crash BOOM
     /// 
     /// </summary>
     /// <remarks>
