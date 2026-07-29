@@ -175,8 +175,9 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
         string fontStem = fontFileName_;
         string styleTokensToRemove = "(regular|bold|italic|oblique|medium|semi.?bold|black|light|thin|extra|ultra)";
         string emptyStringForReplacement="";
-       
-        IEnumerable<string> splitUpReversedFontFileName = fontFileName_.Split('.').Reverse();
+
+        IEnumerable<string> splitUpReversedFontFileName = fontFileName_.Split('.');
+        splitUpReversedFontFileName=  splitUpReversedFontFileName.Reverse();
 
         if (splitUpReversedFontFileName.Skip(1).FirstOrDefault() is string stemFromFileName)
         {
