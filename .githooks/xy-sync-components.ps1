@@ -5,6 +5,11 @@ param(
 
 $ErrorActionPreference = "Continue"
 
+# Unconditional trace so we can tell whether the hook was even invoked at all,
+# independent of anything else the script does.
+$LogPath = Join-Path (git rev-parse --show-toplevel) ".githooks\hook.log"
+"$(Get-Date -Format o) MODE=$Mode PID=$PID" | Add-Content -Path $LogPath
+
 # Module -> package name. Code stays under $BasePrefix/<Module>; the standalone
 # csproj lives under xyComponents/<PackageName>. Both are combined into a flat
 # snapshot in the staging worktree and pushed to the module's bare repo.
