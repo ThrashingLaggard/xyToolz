@@ -25,7 +25,7 @@ namespace xyToolz.QOL
     ///         
     /// "Useless" experiments:
     /// 
-    /// Biep Biep
+    /// Biep Biep Boooop
     /// ---
     /// Crash
     /// 
