@@ -18,7 +18,7 @@ public class xyXmlTests
         var original = new Sample { Name = "widget", Value = 42 };
 
         // Act
-        string xml = xyXml.ToXML(original);
+        string xml = xyXml.ToXml(original);
         Sample loaded = xyXml.FromXml<Sample>(xml);
 
         // Assert

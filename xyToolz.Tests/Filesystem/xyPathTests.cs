@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using xyToolz.Filesystem;
 using Xunit;
 

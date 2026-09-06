@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\xyToolz\Serialization\**\*.cs" />
-    <Compile Include="..\..\xyToolz\Interfaces\IxyJson.cs" />
+    <Compile Include="..\..\xyToolz\xUnit Test-Interfaces\IxyJson.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +26,7 @@
     <PackageReference Include="System.Text.Json" />
     <PackageReference Include="xyLogger" />
     <PackageReference Include="xyMessageFactory" />
-    <ProjectReference Include="..\xyExtensions\xyExtensions.csproj" />
+    <ProjectReference Include="..\..\xyToolz\xyToolz.csproj" />
   </ItemGroup>
 
   <ItemGroup>

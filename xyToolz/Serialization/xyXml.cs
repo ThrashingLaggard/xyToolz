@@ -11,7 +11,7 @@ namespace xyToolz.Serialization
     public static class xyXml
     {
         /// <summary>
-        /// Deserialize the target from xml and print it in the console if needed
+        /// Deserialize the target from XML and print it in the console if needed
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="xml"></param>
@@ -46,7 +46,7 @@ namespace xyToolz.Serialization
         }
 
         /// <summary>
-        /// Deserialize the target from xml 
+        /// Deserialize the target from XML 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="xml"></param>
@@ -54,22 +54,19 @@ namespace xyToolz.Serialization
         public static T FromXml<T>(string xml) => (T)new XmlSerializer(typeof(T)).Deserialize(new StringReader(xml?? "Error:    "))!;
         
         /// <summary>
-        /// Serialize the target into a xml string
+        /// Serialize the target into an XML string
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static string ToXML<T>(T target) 
+        public static string ToXml<T>(T target) 
         {
             try
             {
-                using (StringWriter stringWriter = new()) 
-                {
-                    
-                    XmlSerializer xmlSerializer = new(typeof(T));
-                    xmlSerializer.Serialize(stringWriter, target);
-                    return stringWriter.ToString();
-                } ;
+                using StringWriter stringWriter = new();
+                XmlSerializer xmlSerializer = new(typeof(T));
+                xmlSerializer.Serialize(stringWriter, target);
+                return stringWriter.ToString();
             }
             catch(Exception ex)
             {

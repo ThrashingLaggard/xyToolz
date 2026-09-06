@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\xyToolz\Security\**\*.cs" />
-    <Compile Include="..\..\xyToolz\Interfaces\IxyDataProtector.cs" />
+    <Compile Include="..\..\xyToolz\xUnit Test-Interfaces\IxyDataProtector.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,10 +26,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="xyLogger" />
-    <ProjectReference Include="..\xyExtensions\xyExtensions.csproj" />
-    <ProjectReference Include="..\xyQOL\xyQOL.csproj" />
-    <ProjectReference Include="..\xyFilesystem\xyFilesystem.csproj" />
-    <ProjectReference Include="..\xySerialization\xySerialization.csproj" />
+    <ProjectReference Include="..\..\xyToolz\xyToolz.csproj" />
   </ItemGroup>
 
   <ItemGroup>

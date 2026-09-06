@@ -1,5 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using xyMessageFactory.Factories;
 using xyToolz.Extensions;
 using xyToolz.Helper.Interfaces;
@@ -75,8 +80,6 @@ namespace xyToolz.Filesystem
         /// Resolves and returns a platform-correct path to a directory, ensuring compatibility.
         /// </summary>
         /// <remarks>
-        /// <para><b>Thread Safety:</b></para>
-        /// Thread-safe due to local processing and read-only resolution.
         ///
         /// <para><b>Platform Notes:</b></para>
         /// Uses <c>Application.Context.FilesDir</c> or <c>GetExternalFilesDir</c> on Android.

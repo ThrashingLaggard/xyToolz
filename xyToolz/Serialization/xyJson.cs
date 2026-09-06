@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using xyToolz.Extensions;
@@ -32,7 +30,7 @@ namespace xyToolz.Serialization
         /// JSON serialization settings for consistent formatting and behavior.
         /// Used as default across all JSON-related methods in this class.
         /// </summary>
-        internal static readonly JsonSerializerOptions defaultJsonOptions = new()
+        private static readonly JsonSerializerOptions defaultJsonOptions = new()
         {
             WriteIndented = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -63,7 +61,7 @@ namespace xyToolz.Serialization
             {
                 if (!File.Exists(filePath))
                 {
-                    using (File.Create(filePath)) { }
+                    await using (File.Create(filePath)) { }
                     await xyLog.AsxLog(createdMsg);
                 }
                 else
@@ -94,12 +92,12 @@ namespace xyToolz.Serialization
                 return null; ;
             }
 
-            byte[] buffer;
-            MemoryStream memoryStream;
+            
+            
             try
             {
-                buffer = await File.ReadAllBytesAsync(filePath);
-                memoryStream = new MemoryStream(buffer) { Position = 0 };
+                byte[] buffer = await File.ReadAllBytesAsync(filePath);
+                MemoryStream memoryStream = new MemoryStream(buffer) { Position = 0 };
 
                 await xyLog.AsxLog($"{buffer.Length} bytes");
                 return memoryStream;

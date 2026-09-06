@@ -1,7 +1,8 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Security.Cryptography;
-using xyToolz.Extensions;
 using xyLogger.Loggers;
+using xyToolz.Extensions;
 using xyToolz.QOL;
 
 namespace xyToolz.Security

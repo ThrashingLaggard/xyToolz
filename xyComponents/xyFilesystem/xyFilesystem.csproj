@@ -18,13 +18,13 @@
 
   <ItemGroup>
     <Compile Include="..\..\xyToolz\Filesystem\**\*.cs" />
-    <Compile Include="..\..\xyToolz\Interfaces\IxyFiles.cs" />
+    <Compile Include="..\..\xyToolz\xUnit Test-Interfaces\IxyFiles.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="xyLogger" />
     <PackageReference Include="xyMessageFactory" />
-    <ProjectReference Include="..\xyExtensions\xyExtensions.csproj" />
+    <ProjectReference Include="..\..\xyToolz\xyToolz.csproj" />
   </ItemGroup>
 
   <ItemGroup>
