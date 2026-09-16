@@ -26,7 +26,10 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="xyLogger" />
-    <ProjectReference Include="..\..\xyToolz\xyToolz.csproj" />
+    <ProjectReference Include="..\xyExtensions\xyExtensions.csproj" />
+    <ProjectReference Include="..\xyFilesystem\xyFilesystem.csproj" />
+    <ProjectReference Include="..\xyQOL\xyQOL.csproj" />
+    <ProjectReference Include="..\xySerialization\xySerialization.csproj" />
   </ItemGroup>
 
   <ItemGroup>

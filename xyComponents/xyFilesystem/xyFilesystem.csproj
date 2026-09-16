@@ -24,7 +24,7 @@
   <ItemGroup>
     <PackageReference Include="xyLogger" />
     <PackageReference Include="xyMessageFactory" />
-    <ProjectReference Include="..\..\xyToolz\xyToolz.csproj" />
+    <ProjectReference Include="..\xyExtensions\xyExtensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
