@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PdfSharpCore" />
+    <PackageReference Include="PdfSharp" />
     <PackageReference Include="xyLogger" />
   </ItemGroup>
 
