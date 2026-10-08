@@ -63,7 +63,6 @@
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" />
 		<PackageReference Include="Newtonsoft.Json" />
 		<PackageReference Include="PDFsharp" />
-		<PackageReference Include="SixLabors.ImageSharp" />
 		<PackageReference Include="System.Drawing.Common" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" />

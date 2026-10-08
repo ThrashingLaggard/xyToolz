@@ -4,7 +4,6 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>xyFilesystem</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
@@ -14,6 +13,7 @@
     <Copyright>Do with this, as you please. Go home to your dog   </Copyright>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
