@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <PackageReference Include="PDFsharp" />
-    <PackageReference Include="PdfSharpCore" />
     <PackageReference Include="xyLogger" />
   </ItemGroup>
 

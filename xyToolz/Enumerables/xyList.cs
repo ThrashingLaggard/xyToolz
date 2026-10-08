@@ -1,11 +1,11 @@
-﻿using System;
+﻿
 using System.Buffers;
 
 namespace xyToolz.Enumerables
 {
 
 
-    //                                                                                                                                     Disclaimer: this is just an experiment for learning purposes, please neither shout at me nor hit me 
+    //                                                                                                                             Disclaimer: this is just an experiment for learning purposes, please neither shout at me nor hit me 
 
 
 
@@ -24,34 +24,34 @@ namespace xyToolz.Enumerables
         /// Initializes a new instance of the <see cref="xyList{T}"/> class with the specified initial buffer and
         /// expansion factor.
         /// </summary>
-        /// <remarks>The <see cref="xyList{T}"/> class uses the provided <paramref name="initialBuffer_"/>
+        /// <remarks>The <see cref="xyList{T}"/> class uses the provided <paramref name="initialBuffer"/>
         /// as its initial storage. If the buffer's capacity is exceeded, a new buffer will be allocated with a size
-        /// determined by the <paramref name="expansionFactor_"/>.</remarks>
-        /// <param name="initialBuffer_">A span representing the initial buffer to be used for storing elements. The buffer must have sufficient
+        /// determined by the <paramref name="expansionFactor"/>.</remarks>
+        /// <param name="initialBuffer">A span representing the initial buffer to be used for storing elements. The buffer must have sufficient
         /// capacity to hold the initial elements.</param>
-        /// <param name="expansionFactor_">The factor by which the internal buffer will expand when additional capacity is required. Must be greater
+        /// <param name="expansionFactor">The factor by which the internal buffer will expand when additional capacity is required. Must be greater
         /// than or equal to 2. The default value is 2.</param>
-        public xyList(Span<T> initialBuffer_, uint expansionFactor_ ): this((uint) expansionFactor_)
+        public xyList(Span<T> initialBuffer, uint expansionFactor ): this( expansionFactor)
         {
-            _viewPointerSpan = initialBuffer_;
+            _viewPointerSpan = initialBuffer;
         }
         /// <summary>
         /// Initialize a new instance of xyList with predefined capacity and expansion factor
         /// </summary>
-        /// <param name="capacity_"></param>
-        /// <param name="expansionFactor_"></param>
-        public xyList(uint capacity_, uint expansionFactor_ = 2) : this((uint) expansionFactor_)
+        /// <param name="capacity"></param>
+        /// <param name="expansionFactor"></param>
+        public xyList(uint capacity, uint expansionFactor = 2) : this( expansionFactor)
         {
-            _rentedBufferArrayFromPool = ArrayPool<T>.Shared.Rent((int)capacity_);
+            _rentedBufferArrayFromPool = ArrayPool<T>.Shared.Rent((int)capacity);
             _viewPointerSpan = _rentedBufferArrayFromPool.AsSpan();
         }
         /// <summary>
         /// Initialize a new instance of xyList with expansion factor
         /// </summary>
-        /// <param name="expansionFactor_"></param>
-        public xyList(uint expansionFactor_)
+        /// <param name="expansionFactor"></param>
+        public xyList(uint expansionFactor)
         {
-            _factor = expansionFactor_;
+            _factor = expansionFactor;
             _count = 0;
         }
 
@@ -66,14 +66,14 @@ namespace xyToolz.Enumerables
         /// It is type- and memory-SAFE. 
         /// Unlike arrays, it can point to either MANAGED or NATIVE memory, or to memory allocated on the STACK. 
         /// </summary>
-        public Span<T> _viewPointerSpan;
+        private Span<T> _viewPointerSpan;
 
         /// <summary>
         /// Sitting on the heap
         /// Rented from the Array-Pool
         /// Ideal for JSON-Parsing, Network Communication or editing pictures
         /// </summary>
-        public T[]? _rentedBufferArrayFromPool;
+        private T[]? _rentedBufferArrayFromPool;
 
         /// <summary>
         /// How many elements are in the span
@@ -88,7 +88,7 @@ namespace xyToolz.Enumerables
         /// <summary>
         /// By how much do you want to multiply the size of reserved space in case of a resize
         /// </summary>
-        private uint _factor;
+        private readonly uint _factor;
         /// <summary>
         /// Gets the total number of elements that the underlying span can contain at MAX.
         /// </summary>
@@ -115,7 +115,8 @@ namespace xyToolz.Enumerables
         // TODO: Remove(target) 
         public void Remove(T target)
         {
-            if (false)
+            
+            if (!false)
             {
 
             }
@@ -226,7 +227,7 @@ namespace xyToolz.Enumerables
 
                 _viewPointerSpan = default!;
 
-                _rentedBufferArrayFromPool = default!;
+                _rentedBufferArrayFromPool = null!;
 
             }
         }
@@ -238,7 +239,7 @@ namespace xyToolz.Enumerables
         /// from the shared array pool. The contents of the current buffer are copied to the new array, and the old
         /// buffer is returned to the pool. The new size is determined by multiplying the current size by a growth
         /// factor or using a minimum size of 4, whichever is larger.</remarks>
-        public void Expand()
+        private void Expand()
         {
             // Set the bigger of the two values as new size for the array
             int newSize = Math.Max(val1: 4, val2: _viewPointerSpan.Length * (int)_factor);
@@ -271,7 +272,7 @@ namespace xyToolz.Enumerables
         /// the span.</returns>
         public T[] ToArray()
         {
-            T[]? result = new T[_count];
+            T[] result = new T[_count];
 
             _viewPointerSpan.Slice(0, _count).CopyTo(result);
 

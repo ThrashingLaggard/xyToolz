@@ -1,5 +1,5 @@
 ﻿namespace xyToolz.Fonts;
-#nullable enable
+
 
 using System;
 using System.Collections.Generic;
@@ -112,7 +112,7 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
     /// <param name="isBold"></param>
     /// <param name="isItalic"></param>
     /// <returns></returns>
-    public FontResolverInfo ResolveTypeface(string familyName, bool isBold, bool isItalic)
+    public FontResolverInfo ResolveTypeface(string? familyName, bool isBold, bool isItalic)
     {
         var fam = (familyName ?? "").Trim().ToLowerInvariant();
 
@@ -155,10 +155,10 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
     /// <exception cref="FileNotFoundException"></exception>
     public static byte[] GetBytesFromAssemblyManifest(Assembly asm, string manifestName)
     {
-        using Stream DataStreamFromManifestResource = asm.GetManifestResourceStream(manifestName)?? 
-            throw new FileNotFoundException($"Embedded font not found: {manifestName} \nCheck <EmbeddedResource> items and the project's default namespace.");
+        using Stream DataStreamFromManifestResource = asm.GetManifestResourceStream(manifestName)??  throw new FileNotFoundException($"Embedded font not found: {manifestName} \nCheck <EmbeddedResource> items and the project's default namespace.");
         
-        using MemoryStream ms_RessourceStream = new ();         DataStreamFromManifestResource.CopyTo(ms_RessourceStream);
+        using MemoryStream ms_RessourceStream = new ();
+        DataStreamFromManifestResource.CopyTo(ms_RessourceStream);
 
         byte[]  bytesFromResourceStream =ms_RessourceStream.ToArray();      
         return bytesFromResourceStream;
@@ -179,7 +179,7 @@ public sealed partial class AutoResourceFontResolver : IFontResolver
         IEnumerable<string> splitUpReversedFontFileName = fontFileName_.Split('.');
         splitUpReversedFontFileName=  splitUpReversedFontFileName.Reverse();
 
-        if (splitUpReversedFontFileName.Skip(1).FirstOrDefault() is string stemFromFileName)
+        if (splitUpReversedFontFileName.Skip(1).FirstOrDefault() is { } stemFromFileName)
         {
             fontStem = stemFromFileName;
         }

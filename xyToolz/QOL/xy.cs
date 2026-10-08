@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using xyLogger.Loggers;
 
 
@@ -37,7 +35,7 @@ namespace xyToolz.QOL
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "Because XyQol and XYQOL look like shit, and I dont have a better naming idea for my libs yet.")]
 #pragma warning disable CS8981 
-    public static partial class xy
+    public static class xy
 #pragma warning restore CS8981 
     {
         #region TryCatch – Error-handling helpers
@@ -171,7 +169,7 @@ namespace xyToolz.QOL
         {
             await TryCatch(async () =>
             {
-                if (Process.Start(processName) is Process proc)
+                if (Process.Start(processName) is { } proc)
                 {
                     return await Task.FromResult<object>(proc);
                 }

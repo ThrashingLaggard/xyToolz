@@ -59,11 +59,11 @@ namespace xyToolz.Security
         {
             if (_override is not null)
             {
-               return await  _override?.UnprotectFromFileAsync<T>(path, key)!;
+               return await  _override.UnprotectFromFileAsync<T>(path, key);
             }
             else
             {
-                if (await xyJson.DeserializeKeyToBytes(path, key) is byte[] encrypted)
+                if (await xyJson.DeserializeKeyToBytes(path, key) is { } encrypted)
                 {
                     return await UnprotectAsync<T>(encrypted);
                 }
@@ -175,7 +175,7 @@ namespace xyToolz.Security
                 else
                 {
                     string encString = encBytes.ToBase();
-                    await Filesystem.xyFiles.SaveToFile(encString, filename);
+                    await xyFiles.SaveToFile(encString, filename);
                     await xyLog.AsxLog(success);
                     return true;
                 }
@@ -198,7 +198,7 @@ namespace xyToolz.Security
         /// <returns></returns>
         public static async Task<bool> SaveProtectedToFileAsync<T>(T obj, string subfolder = "HyperSecret", string filename = "secret.md")
         {
-            if( xyPath.Combine(subfolder, filename) is string fullPath && fullPath.Length > 3)    // Mucho intelligento
+            if( xyPath.Combine(subfolder, filename) is { Length: > 3 } fullPath)    // Mucho intelligento
             {
                 return await SaveProtectedToFileAsync(obj, fullPath);
             }
@@ -236,7 +236,7 @@ namespace xyToolz.Security
                 }
 
                 byte[] encrypted = base64.Trim().BaseToBytes();
-                T? obj = await UnprotectAsync<T>(encrypted);
+                T obj = await UnprotectAsync<T>(encrypted);
                 await xyLog.AsxLog(success);
                 return obj;
             }
@@ -257,7 +257,7 @@ namespace xyToolz.Security
         /// <returns></returns>
         public static async Task<T?> LoadProtectedFromFileAsync<T>(string subfolder = "UltraSecret", string filename = "secret.bin")
         {
-                if (xyPath.Combine(subfolder, filename)  is string path)
+                if (xyPath.Combine(subfolder, filename)  is {  } path)
                 {
                     return await LoadProtectedFromFileAsync<T>(path);   
                 }
@@ -272,14 +272,27 @@ namespace xyToolz.Security
         /// <returns></returns>
         public static async Task<bool> ProtectFileAsync<T>(string filePath)
         {
-            IEnumerable<string> lines= await xyFiles.ReadLinesAsync(filePath);
-            if (lines.Any())
+            try
             {
-                string content = lines.Spill();
-                byte[] data =  await ProtectString(content);
-                return await xyFiles.SaveBytesToFileAsync(data, filePath);
+                string[] lines = (string[]) await xyFiles.ReadLinesAsync(filePath);
+            
+                if(lines.Length == 0)
+                {
+                    await xyLog.AsxLog($"File {filePath} does not contain any entries.");
+                    return false;
+                }
+                else
+                {
+                    string content = lines.Spill();
+                    byte[] data =  await ProtectString(content);
+                    return await xyFiles.SaveBytesToFileAsync(data, filePath);
+                }
             }
-            return false;
+            catch (Exception e)
+            {
+                await xyLog.AsxLog(e.Message);
+                throw;
+            }
         }
 
 

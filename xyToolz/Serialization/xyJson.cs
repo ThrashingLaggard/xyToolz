@@ -5,6 +5,12 @@ using xyToolz.Extensions;
 using xyToolz.Helper.Interfaces;
 using xyLogger.Loggers;
 using xyMessageFactory.Factories;
+// ReSharper disable ConvertTypeCheckPatternToNullCheck
+// ReSharper disable SuggestVarOrType_BuiltInTypes
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+// ReSharper disable SuggestVarOrType_SimpleTypes
+// ReSharper disable UnusedMember.Local
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace xyToolz.Serialization
 {
@@ -22,7 +28,7 @@ namespace xyToolz.Serialization
     /// </summary>
     public class xyJson
     {
-        private static readonly xyBaseMessageFactory _fac=new ();
+        private static readonly xyBaseMessageFactory Fac=new ();
 
         #region Json Configuration
 
@@ -30,7 +36,7 @@ namespace xyToolz.Serialization
         /// JSON serialization settings for consistent formatting and behavior.
         /// Used as default across all JSON-related methods in this class.
         /// </summary>
-        private static readonly JsonSerializerOptions defaultJsonOptions = new()
+        private static readonly JsonSerializerOptions DefaultJsonOptions = new()
         {
             WriteIndented = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -82,14 +88,14 @@ namespace xyToolz.Serialization
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                await xyLog.AsxLog(_fac.PathNotFound(filePath));
+                await xyLog.AsxLog(Fac.PathNotFound(filePath));
                 return null;
             }
 
             if (!File.Exists(filePath))
             {
-                await xyLog.AsxLog(_fac.FileNotFound(filePath));
-                return null; ;
+                await xyLog.AsxLog(Fac.FileNotFound(filePath));
+                return null; 
             }
 
             
@@ -104,7 +110,7 @@ namespace xyToolz.Serialization
             }
             catch (Exception ex)
             {
-                await xyLog.AsxLog(_fac.FileStreamError());
+                await xyLog.AsxLog(Fac.FileStreamError());
                 await xyLog.AsxExLog(ex);
                 return null;
             }
@@ -130,7 +136,7 @@ namespace xyToolz.Serialization
             {
                 if ( await EnsurePathExistsAsync(fileName))
                 {
-                    string jsonData = JsonSerializer.Serialize(data, options ?? defaultJsonOptions);
+                    string jsonData = JsonSerializer.Serialize(data, options ?? DefaultJsonOptions);
                     await File.WriteAllTextAsync(fileName, jsonData, cancellationToken: ct);                  
                     return true;
                 }
@@ -158,7 +164,7 @@ namespace xyToolz.Serialization
 
             if(data.Length == 0) 
             {
-                await xyLog.AsxLog(_fac.EmptyArray());
+                await xyLog.AsxLog(Fac.EmptyArray());
             }
             try
             {
@@ -168,16 +174,16 @@ namespace xyToolz.Serialization
                     {
                         if (isVerbose)
                         {
-                            name = nameof(target) +"    :    "+ target.ToString();
+                            name = nameof(target) + "    :    " + target;
                         }
 
-                        string jsonData = JsonSerializer.Serialize(target, options ?? defaultJsonOptions);
+                        string jsonData = JsonSerializer.Serialize(target, options ?? DefaultJsonOptions);
                         await File.WriteAllTextAsync(fileName, jsonData, cancellationToken: ct);
                     }
 
                     if (isVerbose)
                     {
-                        xyLog.Log(_fac.SerializationSuccess(fileName,data));
+                        xyLog.Log(Fac.SerializationSuccess(fileName,data));
                     }
 
                     return true;
@@ -188,7 +194,7 @@ namespace xyToolz.Serialization
                 await xyLog.AsxExLog(ex);
                 if (isVerbose)
                 {
-                    await xyLog.AsxLog(_fac.SerializationFail(fileName, name));
+                    await xyLog.AsxLog(Fac.SerializationFail(fileName, name));
                 }
             }
             return false;
@@ -227,7 +233,7 @@ namespace xyToolz.Serialization
 
             if(_override is not null && value is not null)
             {
-                 await _override?.AddOrUpdateEntry(path, key, value.ToString())!;
+                 await _override.AddOrUpdateEntry(path, key, value.ToString());
 
                 return;
             }
@@ -271,7 +277,7 @@ namespace xyToolz.Serialization
                 dynamic? stream = await GetStreamFromFileAsync(filePath);
                 if (stream == null) return null;
 
-                 return await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(stream, defaultJsonOptions);
+                 return await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(stream, DefaultJsonOptions);
             }
             catch (Exception ex)
             {
@@ -292,7 +298,7 @@ namespace xyToolz.Serialization
                 await using var stream = await GetStreamFromFileAsync(filePath);
                 if (stream == null) return default;
 
-                return await JsonSerializer.DeserializeAsync<T>(stream,defaultJsonOptions);
+                return await JsonSerializer.DeserializeAsync<T>(stream,DefaultJsonOptions);
                 
             }
             catch (Exception ex)
@@ -332,7 +338,7 @@ namespace xyToolz.Serialization
             if (await TryDeserializeKey<string>(filePath, key) is string base64)
             {
                 byte[]? decoded = base64.BaseToBytes();
-                if (decoded == null)
+                if (decoded == null || decoded.Length == 0)
                 {
                     await xyLog.AsxLog(errorMessage);
                 }
@@ -360,7 +366,7 @@ namespace xyToolz.Serialization
                 JObject? obj = await GetJObjectFromFile(filePath);
                 if (obj != null && obj.TryGetValue(key, out JToken? token))
                 {
-                    return token!.ToObject<T>();
+                    return token.ToObject<T>();
                 }
                 else
                 {
@@ -402,7 +408,7 @@ namespace xyToolz.Serialization
 
                 if (nested.TryGetValue(subkey, out JToken? subToken))
                 {
-                    return subToken!.ToObject<T>();
+                    return subToken.ToObject<T>();
                 }
                 else
                 {

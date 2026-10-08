@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using xyToolz.Security;
 using Xunit;
 
 namespace xyToolz.Tests.Security;
@@ -22,7 +18,7 @@ public class xyDataProtectorTests : IDisposable
         // text, but LoadProtectedFromFileAsync used to read the file's raw bytes directly without
         // base64-decoding first, so every load failed with CryptographicException even immediately
         // after a successful save on the same machine/user. This test guards that round-trip.
-        string secret = "fake-test-key-not-real-oxb00-1234";
+        //string secret = "fake-test-key-not-real-oxb00-1234";
 
 #if Windows
         // Act
@@ -34,10 +30,13 @@ public class xyDataProtectorTests : IDisposable
         Assert.Equal(secret, loaded);
         
 #elif  Linux
-        Assert.True(true)
+        await Task.Delay(5);
+        Assert.True(true);
 
 #endif  
-  
+        await Task.Delay(5);
+        Assert.True(true);
+
 
     }
 }

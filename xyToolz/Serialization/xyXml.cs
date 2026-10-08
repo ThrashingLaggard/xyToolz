@@ -21,8 +21,8 @@ namespace xyToolz.Serialization
         {
             try
             {
+                using StringReader reader = new(xml);
                 XmlSerializer deserializer = new(typeof(T));
-                using StringReader reader = new StringReader(xml);
                 if (deserializer.Deserialize(reader) is T target)
                 {
                     xyLog.Log($"{target} has been deserialized!");

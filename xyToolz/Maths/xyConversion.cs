@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using xyToolz.Extensions;
-using static xyToolz.QOL.xy;
+﻿using xyToolz.Extensions;
+// ReSharper disable InconsistentNaming
+// ReSharper disable TooWideLocalVariableScope
+// ReSharper disable UselessBinaryOperation
 
 namespace xyToolz.Maths
 {
@@ -24,9 +21,9 @@ namespace xyToolz.Maths
             /// <returns></returns>
             public static string X_to_X(int _aktuelle_Basis, string ausgangszahl, int _basis_des_neuen_Zahlensystems)
             {
-                  int _ergebnis = 0, _ergebnis_DEC = 0, _rest, _stelle_von_rechts = 0;
+                  int _ergebnis , _ergebnis_DEC = 0, _rest, _stelle_von_rechts = 0;
                   string eingabe = DeLetterer(ausgangszahl);
-                  int[] _zahlen_ = eingabe.Split(' ')?.Select(int.Parse)?.ToArray()!;
+                  int[] _zahlen_ = eingabe.Split(' ').Select(int.Parse).ToArray();
 
                   if (_aktuelle_Basis != 10)
                   {
@@ -34,10 +31,8 @@ namespace xyToolz.Maths
                         {
                               _zahlen_[i] *= (int)Math.Pow(_aktuelle_Basis, _stelle_von_rechts++);   // der EXPONENT braucht das Inkrement dringend
                         }
-                        foreach (int i in _zahlen_)
-                        {
-                              _ergebnis_DEC += i;
-                        }
+
+                        _ergebnis_DEC += _zahlen_.Sum();
 
                         endergebnis += _ergebnis_DEC;
                         Console.WriteLine("Ergebnis in Dezimal: " + _ergebnis_DEC);
@@ -53,7 +48,7 @@ namespace xyToolz.Maths
                         {
                               _ergebnis_DEC = int.Parse(ausgangszahl);
                         }
-                  lol:
+                        lol:
                         do
                         {
                               _rest = _ergebnis_DEC % _basis_des_neuen_Zahlensystems;
@@ -101,14 +96,14 @@ namespace xyToolz.Maths
             /// Removes letters from the string and replaces them with numbers
             /// </summary>
             /// <param name="number_with_letters"></param>
-            /// <returns></returns>
+            /// <returns>string numberWithoutLetters</returns>
             public static string DeLetterer(string number_with_letters)
             {
 
                   char[] input = number_with_letters.ToCharArray();
-                  char[] input2 = number_with_letters.ToCharArray(); ;
-                  int[] high_numbers = { 10, 11, 12, 13, 14, 15 };
-                  char[] corresponding_letters = { 'A', 'B', 'C', 'D', 'E', 'F' };
+                  char[] input2 =[]; 
+                  int[] high_numbers = [10, 11, 12, 13, 14, 15];
+                  char[] corresponding_letters = ['A', 'B', 'C', 'D', 'E', 'F'];
                   string[] digits = new string[number_with_letters.Length];
 
                   for (int i = 0; i < number_with_letters.Length; i++)
@@ -260,7 +255,7 @@ namespace xyToolz.Maths
             {
                   int ergebnis = 0;
                   string ausgabe = DeLetterer(number);
-                  int[] bst = ausgabe.Split(' ')?.Select(int.Parse)?.ToArray()!;
+                  int[] bst = ausgabe.Split(' ').Select(int.Parse).ToArray();
 
                   int expo = 0;
                   for (int i = bst.Length - 1; i >= 0; i--)             
@@ -313,7 +308,7 @@ namespace xyToolz.Maths
             public static string Bin_to_Dec(string number)
             {
                   string ausgabe = DeLetterer(number);
-                  int[] zahlen = ausgabe.Split(' ')?.Select(int.Parse)?.ToArray()!;
+                  int[] zahlen = ausgabe.Split(' ').Select(int.Parse).ToArray();
                   int ergebnis = 0;
                   int expo = 0;
 

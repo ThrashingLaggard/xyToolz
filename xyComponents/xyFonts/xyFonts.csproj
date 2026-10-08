@@ -29,4 +29,8 @@
     <None Include="README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageVersion Update="PdfSharp" Version="6.2.4" />
+  </ItemGroup>
+
 </Project>

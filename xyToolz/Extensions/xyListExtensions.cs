@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
-using xyLogger.Loggers;
-
+﻿// ReSharper disable UnusedMember.Local
 namespace xyToolz.Extensions
 {
     #region "filling"
@@ -75,10 +70,10 @@ namespace xyToolz.Extensions
                               }
 
                               // Mit führenden Nullen formatieren
-                              string str_Time = $"{hour:D2}:{minutes:D2}";
+                              string time = $"{hour:D2}:{minutes:D2}";
 
                     // Zur Liste hinzufügen und dann verwerfen
-                    presets.Add(str_Time);
+                    presets.Add(time);
                         }
                   }
                   return presets;

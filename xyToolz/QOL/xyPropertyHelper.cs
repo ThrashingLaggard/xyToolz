@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using xyLogger.Loggers;
 using xyMessageFactory.Factories;
 
@@ -54,7 +52,7 @@ namespace xyToolz.QOL
                 else
                 {
                     Type type = typeof(T);
-                    if (type.GetProperties() is PropertyInfo[] propertyInfos && propertyInfos.Length > 0)
+                    if (type.GetProperties() is {  } propertyInfos && propertyInfos.Length > 0)
                     {
                         xyLog.Log($"Successfully read the property infos for {type}");
                         return propertyInfos;
@@ -95,11 +93,9 @@ namespace xyToolz.QOL
         public static Dictionary<TKey, TValue> GetPropertyValuesForTarget<TKey, TValue, T>(T obj) where T : class where TKey : class
         {
             PropertyInfo[] propertyInfos = GetPropertyInfosForTarget(obj);
-
             Dictionary<TKey, TValue> propertyDictionary = [];
-            TKey key = default!;
-            object? value = default;
-
+            TKey key;
+            object? value;
 
             foreach (PropertyInfo info in propertyInfos)
             {
@@ -108,7 +104,7 @@ namespace xyToolz.QOL
                 try
                 {
                     key = (TKey)Convert.ChangeType(info.Name, typeof(TKey));
-                    propertyDictionary.Add(key, (TValue)value!);
+                    propertyDictionary.Add(key, (TValue)value);
                 }
                 catch (Exception ex)
                 {
@@ -142,14 +138,14 @@ namespace xyToolz.QOL
         /// conversions but does not handle complex types or custom parsers. For those, consider custom converters.
         /// </para>
         /// </remarks>
-        public static T GetEntityFromDictionary<T, TKey, TValue>(Dictionary<TKey, TValue> keyValuePairs) where T : class where TKey :class
+        public static T GetEntityFromDictionary<T, TKey, TValue>(Dictionary<TKey, TValue>? keyValuePairs) where T : class where TKey :class
         {
             T target = Activator.CreateInstance<T>();// CSI Gnarzraha, das habe ich gebraucht, lol!!1!!!!!!!!!!!1!!!!!111!!!!!!!  
 
             if (keyValuePairs is not null)
             {
                 // Placeholder, needed for reflection
-                string propertyName = "";
+                string propertyName;
 
                 // Getting all properties for the target type
                 PropertyInfo[] propertyInfos = GetPropertyInfosForTarget(target);
@@ -163,7 +159,7 @@ namespace xyToolz.QOL
                     try
                     {
                         // Looking for the corresponding property
-                        if (Array.Find(propertyInfos, x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)) is PropertyInfo info)
+                        if (Array.Find(propertyInfos, x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)) is {  } info)
                         {
                             // Checking for writabillity
                             if (info.CanWrite)

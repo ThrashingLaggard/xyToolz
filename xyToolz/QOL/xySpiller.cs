@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 
 namespace xyToolz.QOL
 {
@@ -131,6 +126,7 @@ namespace xyToolz.QOL
 
 
 #pragma warning disable CS0419 // Zweideutige Referenz im cref-Attribut
+#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
         /// <summary>
         /// Joins the elements of a sequence into a single string using the specified delimiter and spacing options.
         /// Intended for diagnostic use; implements the same logic as the basic method<see cref="Spill{IEnumerable}"/>  with/// extra steps to aid debugging.
@@ -151,6 +147,7 @@ namespace xyToolz.QOL
         /// <returns>A single string of all elements joined by the resolved delimiter.</returns>
         [MethodImpl(MethodImplOptions.NoInlining)]
 #pragma warning restore CS0419 // Zweideutige Referenz im cref-Attribut
+#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
         public static string JoinDebug<T>(this IEnumerable<T> values, bool? hasWhitespace = true, bool? hasSeperator = true, string? seperator = ",")
         {
             string empty = string.Empty;

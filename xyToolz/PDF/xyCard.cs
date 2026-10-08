@@ -8,26 +8,26 @@ namespace xyToolz.Pdf
     /// 
     /// Needs to be implemented fully
     /// </summary>
-    internal class xyCard
+    public class xyCard
     {
-        static PdfDocument card = new PdfDocument();
-        PdfPage frontSide = new PdfPage(card);
-        PdfPage backSide = new PdfPage(card);
+        public PdfDocument? Document;
+        public PdfPage frontSide;
+        public PdfPage backSide;
 
-        int Number;
-        PdfDocumentInformation? info;
-        PdfDocumentSettings? settings;
-        PdfDocumentOptions? options;
-        PdfPageLayout? layout;
+        public int Number;
+        public PdfDocumentInformation? info;
+        public PdfDocumentSettings? settings;
+        public PdfDocumentOptions? options;
+        public PdfPageLayout? layout;
 
-        xyCard(PdfPage frontSide, PdfPage backSide, int num)
+        public xyCard(PdfPage frontSide, PdfPage backSide, int num)
         {
             this.frontSide = frontSide;
             this.backSide = backSide;
             Number = num;
         }
 
-        xyCard(PdfPage frontSide, PdfPage backSide, PdfDocumentInformation info,int num, PdfDocumentSettings settings, PdfDocumentOptions options, PdfPageLayout layout)
+        public xyCard(PdfPage frontSide, PdfPage backSide, PdfDocumentInformation info,int num, PdfDocumentSettings settings, PdfDocumentOptions options, PdfPageLayout layout)
         {
             Number = num;
             this.frontSide = frontSide;

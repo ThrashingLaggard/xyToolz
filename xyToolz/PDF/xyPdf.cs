@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using PdfSharp;
+﻿using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
@@ -124,9 +120,6 @@ namespace xyToolz.Pdf
 
         public static PdfDocument CombineTwoPDF(PdfDocument first, PdfDocument second)
         {
-            PdfDocument firstDoc = PdfReader.Open(first.FullPath, PdfDocumentOpenMode.Import);
-            PdfDocument secondDoc = PdfReader.Open(second.FullPath, PdfDocumentOpenMode.Import);
-
             PdfDocument targetDoc = new PdfDocument();
 
             foreach (PdfPage page in first.Pages)
@@ -157,9 +150,7 @@ namespace xyToolz.Pdf
         public static PdfDocument CombineTwoPDFs(PdfDocument first, PdfDocument second)
         {
             PdfDocument targetDoc = new PdfDocument();
-            PdfDocument firstDoc = PdfReader.Open(first.FullPath, PdfDocumentOpenMode.Import);
-            PdfDocument secondDoc = PdfReader.Open(second.FullPath, PdfDocumentOpenMode.Import);
-
+            
             foreach (PdfPage page in first.Pages)
             {
                 targetDoc.AddPage(page);
@@ -317,8 +308,6 @@ namespace xyToolz.Pdf
         public static List<PdfDocument> CombineAllIntoBundles(string directory)
         {
             List<PdfDocument> lst_AllFiles = new List<PdfDocument>();
-            List<PdfDocument> lst_Questions = new List<PdfDocument>();
-            List<PdfDocument> lst_Answers = new List<PdfDocument>();
             List<PdfDocument> lst_joined = new List<PdfDocument>();
 
             string[] arr = Directory.GetFiles(directory, "*.pdf", SearchOption.TopDirectoryOnly);
@@ -338,7 +327,6 @@ namespace xyToolz.Pdf
                 {
                     if (int.Parse(pdf.Comment) == int.Parse(doc.Comment))
                     {
-                        lst_Questions.Add(pdf);
                         Console.WriteLine($"q {i} ---> {pdf.Info.Title}");
                         PdfDocument temp = CombineTwoPDFs(pdf, doc);
                         lst_joined.Add(temp);

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using xyLogger.Loggers;
 
 
@@ -18,12 +17,12 @@ namespace xyToolz.Extensions
         /// <returns>The repeated string.</returns>
         public static string Repeat(this string text, ushort count)
         {
-            StringBuilder sb_Repeater = new();
+            StringBuilder repeater = new();
             for (int i = 0; i < count; i++)
             {
-                sb_Repeater.Append(text);
+                repeater.Append(text);
             }
-            return sb_Repeater.ToString();
+            return repeater.ToString();
         }
 
         /// <summary>
@@ -36,9 +35,9 @@ namespace xyToolz.Extensions
         /// <returns>The reversed string.</returns>
         public static string Reverse(this string input)
         {
-            char[] arr_InputChars = input.ToCharArray();
-            Array.Reverse(arr_InputChars);
-            return new(arr_InputChars);
+            char[] inputChars = input.ToCharArray();
+            Array.Reverse(inputChars);
+            return new(inputChars);
         }
 
         /// <summary>
@@ -103,7 +102,7 @@ namespace xyToolz.Extensions
         /// <returns>
         /// true if the value parameter is null or an empty string (""); otherwise, false.
         /// </returns>
-        public static bool IsNullOrEmpty(this string target) => (string.IsNullOrEmpty(target)) ? true : false;
+        public static bool IsNullOrEmpty(this string target) => (string.IsNullOrEmpty(target));
 
         /// <summary>
         /// Indicates whether the specified string is null or a whitespace
@@ -112,7 +111,7 @@ namespace xyToolz.Extensions
         /// <returns>
         /// true if the value parameter is null or a whitespace; otherwise, false.
         /// </returns>
-        public static bool IsNullOrWhitespace(this string target) => (string.IsNullOrWhiteSpace(target)) ? true : false;
+        public static bool IsNullOrWhitespace(this string target) => (string.IsNullOrWhiteSpace(target));
 
     }
 }

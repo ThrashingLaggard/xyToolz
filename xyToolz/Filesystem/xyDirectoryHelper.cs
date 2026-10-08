@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
+﻿using System.IO.Compression;
 using xyLogger.Loggers;
+// ReSharper disable UnusedMember.Local
 
 namespace xyToolz.Filesystem
 {
@@ -30,9 +28,9 @@ namespace xyToolz.Filesystem
         /// <returns></returns>
         public static string GetInnerApplicationFolderDebug()
         {
-            string net8_0 = Environment.CurrentDirectory; xyLog.Log(net8_0);
+            string net8 = Environment.CurrentDirectory; xyLog.Log(net8);
 
-            string debug = Directory.GetParent(net8_0)!.FullName; xyLog.Log(debug);
+            string debug = Directory.GetParent(net8)!.FullName; xyLog.Log(debug);
 
             string bin = Directory.GetParent(debug)!.FullName; xyLog.Log(bin);
 

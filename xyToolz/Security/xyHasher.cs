@@ -1,9 +1,9 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Security.Cryptography;
 using xyLogger.Loggers;
 using xyToolz.Extensions;
-using xyToolz.QOL;
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+// ReSharper disable NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
 
 namespace xyToolz.Security
 {
@@ -147,7 +147,7 @@ namespace xyToolz.Security
         {
             string result = "";
 
-            if (HashToBytes(hashAlgorithm, password, salt) is byte[] bytes)
+            if (HashToBytes(hashAlgorithm, password, salt) is {  } bytes)
             {
                 if (bytes.Length > 0)
                 {
