@@ -147,6 +147,10 @@ _ReSharper*/
 # JetBrains Rider
 .idea/
 
+# Local Claude notes and Rider shared settings, kept out of the repo on purpose
+CLAUDE.md
+*.sln.DotSettings
+
 # TeamCity is a build add-in
 _TeamCity*
 
