@@ -1,9 +1,11 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.IO;
+using System.Security.Cryptography;
 using System.Text.Json;
+using System.Threading.Tasks;
 using xyLogger.Loggers;
 using xyToolz.Extensions;
 using xyToolz.Filesystem;
-using xyToolz.Helper.Interfaces;
 using xyToolz.QOL;
 using xyToolz.Serialization;
 
@@ -29,25 +31,6 @@ namespace xyToolz.Security
     /// </summary>
     public static class xyDataProtector
     {
-        #region "Tests"
-        private static IxyDataProtector? _override;
-      
-        /// <summary>
-        /// Replaces the default implementation with a mocked version .
-        /// </summary>
-        public static void OverrideForTests(IxyDataProtector testDouble)
-            => _override = testDouble;
-
-        /// <summary>
-        /// Resets to original implementation after testing.
-        /// </summary>
-        public static void ResetOverride()
-            => _override = null;
-
-        #endregion
-
-
-
         /// <summary>
         /// Unprotect and read the values from a key from a file
         /// </summary>
@@ -57,16 +40,9 @@ namespace xyToolz.Security
         /// <returns></returns>
         public static async Task<T?> UnprotectFromFileAsync<T>(string path, string key)
         {
-            if (_override is not null)
+            if (await xyJson.DeserializeKeyToBytes(path, key) is { } encrypted)
             {
-               return await  _override.UnprotectFromFileAsync<T>(path, key);
-            }
-            else
-            {
-                if (await xyJson.DeserializeKeyToBytes(path, key) is { } encrypted)
-                {
-                    return await UnprotectAsync<T>(encrypted);
-                }
+                return await UnprotectAsync<T>(encrypted);
             }
 
             return default;

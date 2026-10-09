@@ -1,8 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using xyToolz.Extensions;
-using xyToolz.Helper.Interfaces;
 using xyLogger.Loggers;
 using xyMessageFactory.Factories;
 // ReSharper disable ConvertTypeCheckPatternToNullCheck
@@ -231,12 +236,6 @@ namespace xyToolz.Serialization
             string addMessage = $"Added key '{key}' to '{path}'.";
             string errorMessage = $"Failed to update key '{key}' in file '{path}'.";
 
-            if(_override is not null && value is not null)
-            {
-                 await _override.AddOrUpdateEntry(path, key, value.ToString());
-
-                return;
-            }
             try
             {
                 Dictionary<string, object> data = await DeserializeFromFile(path) ?? [];
@@ -618,19 +617,6 @@ namespace xyToolz.Serialization
                 return (string.Empty, string.Empty, string.Empty);
             }
         }
-
-
-        private static IxyJson? _override;
-
-        public static void OverrideForTests(IxyJson mocked) => _override = mocked;
-        public static void ResetOverride() => _override = null;
-
-
-        public static Task<string> TestGetStringFromJsonFile(string path, string key) =>
-            _override?.GetStringFromJsonFile(path, key) ?? GetStringFromJsonFile(path, key);
-
-        public static Task TestAddOrUpdateEntry(string path, string key, string value) =>
-            _override?.AddOrUpdateEntry(path, key, value) ?? AddOrUpdateEntry(path, key, value);
 
     }
 }

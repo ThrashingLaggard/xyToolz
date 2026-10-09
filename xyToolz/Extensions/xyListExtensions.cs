@@ -1,4 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Local
+
+using System.Collections.Generic;
+
 namespace xyToolz.Extensions
 {
     #region "filling"

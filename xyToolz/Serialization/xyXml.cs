@@ -1,4 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using xyLogger.Loggers;
 

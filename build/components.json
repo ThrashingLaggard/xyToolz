@@ -19,13 +19,13 @@
     { "id": "xyQOL",           "sourceDir": "QOL",            "deps": [], "extraFiles": [] },
 
     { "id": "xyFilesystem",    "sourceDir": "Filesystem",     "deps": ["xyExtensions"],
-      "extraFiles": ["xUnit Test-Interfaces/IxyFiles.cs"] },
+      "extraFiles": [] },
     { "id": "xySerialization", "sourceDir": "Serialization",  "deps": ["xyExtensions"],
-      "extraFiles": ["xUnit Test-Interfaces/IxyJson.cs"] },
+      "extraFiles": [] },
     { "id": "xyMaths",         "sourceDir": "Maths",          "deps": ["xyExtensions", "xyQOL"],
       "extraFiles": [] },
 
     { "id": "xySecurity",      "sourceDir": "Security",       "deps": ["xyExtensions", "xyQOL", "xyFilesystem", "xySerialization"],
-      "extraFiles": ["xUnit Test-Interfaces/IxyDataProtector.cs"] }
+      "extraFiles": [] }
   ]
 }

@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Compile Include="..\..\xyToolz\Security\**\*.cs" />
-    <Compile Include="..\..\xyToolz\xUnit Test-Interfaces\IxyDataProtector.cs" />
   </ItemGroup>
 
   <ItemGroup>

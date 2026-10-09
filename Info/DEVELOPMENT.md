@@ -6,9 +6,6 @@
 xyQOL, xySecurity, xySerialization). `xyToolz_Exec` is a small CLI (used e.g. to DPAPI-encrypt
 the NuGet API key). `xyToolz.Tests` covers Filesystem, Maths, Security and Serialization.
 
-The interfaces `IxyFiles`, `IxyJson` and `IxyDataProtector` only exist for test doubles of the
-static classes; they are not public API.
-
 ## Rules
 - Stay on .NET 8. `global.json` pins the SDK band (`8.0.100`, rollForward `latestFeature`).
 - Never bypass the git hooks (`--no-verify`). `.githooks/pre-push` runs

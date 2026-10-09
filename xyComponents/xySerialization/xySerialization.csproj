@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Compile Include="..\..\xyToolz\Serialization\**\*.cs" />
-    <Compile Include="..\..\xyToolz\xUnit Test-Interfaces\IxyJson.cs" />
   </ItemGroup>
 
   <ItemGroup>
