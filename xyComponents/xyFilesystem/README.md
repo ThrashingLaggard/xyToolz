@@ -18,7 +18,6 @@ dotnet add package xyFilesystem
   - `SaveToFile`, `SaveBytesToFileAsync`, `SaveStringToFileAsync`
   - `LoadFileAsync` (path or subfolder+filename overloads), `LoadBytesFromFile`
   - `DeleteFile`
-  - `OverrideForTests` / `ResetOverride` — swap in an `IxyFiles` test double.
 
 - **`xyDirectoryHelper`** — directory operations:
   - `GetSolutionFolder`, `GetApplicationFolder`, `GetInnerApplicationFolderDebug`
@@ -30,8 +29,6 @@ dotnet add package xyFilesystem
 - **`xyPath`** — path helpers:
   - `BasePath` (Android-aware via `#if ANDROID`, falls back to `AppContext.BaseDirectory`)
   - `Combine(params string[])`, `EnsureDirectory(params string[])`, `EnsureParentDirectoryExists(string)`
-
-- **`IxyFiles`** — interface for mocking `xyFiles` in unit tests.
 
 ## Example
 

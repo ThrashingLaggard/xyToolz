@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace xyToolz.QOL
 {
@@ -80,7 +82,7 @@ namespace xyToolz.QOL
             => Join(targetValues, hasWhitespace, hasSeperator, seperator);
 
         /// <summary>
-        /// Converts a <see cref="Dictionary{TKey, TValue}"/> to a formatted string where each entry is rendered as <c>key:value</c> and entries are separated by the configured delimiter.
+        /// Converts a <see cref="Dictionary{TKey,TValue}"/> to a formatted string where each entry is rendered as <c>key:value</c> and entries are separated by the configured delimiter.
         /// </summary>
         /// <typeparam name="TKey">The type of the dictionary keys.</typeparam>
         /// <typeparam name="TValue">The type of the dictionary values.</typeparam>

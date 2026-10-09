@@ -18,12 +18,9 @@ dotnet add package xySerialization
   - `DeserializeSubKey`, `DeserializeSubKeyToDictionary`, `DeserializeSubKeyToBytes`
   - `GetJObjectFromFile`, `GetJTokenFromKey`, `GetStringFromJsonFile`, `GetFirstAndLastLinesAsync`
   - `EnsureJsonRootTag(string filePath)`
-  - `OverrideForTests` / `ResetOverride` — swap in an `IxyJson` test double.
 
 - **`xyXml`** — XML (de)serialization:
   - `FromXml<T>(string xml)` (with optional console output), `ToXML<T>(T target)`.
-
-- **`IxyJson`** — interface for mocking `xyJson` in unit tests.
 
 ## Example
 

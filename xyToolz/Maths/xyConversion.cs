@@ -1,4 +1,6 @@
-﻿using xyToolz.Extensions;
+﻿using System;
+using System.Linq;
+using xyToolz.Extensions;
 // ReSharper disable InconsistentNaming
 // ReSharper disable TooWideLocalVariableScope
 // ReSharper disable UselessBinaryOperation
@@ -10,86 +12,37 @@ namespace xyToolz.Maths
         /// </summary>
       public static class xyConversion
       {
-            private static string endergebnis = "", endausgabe = "";
-
             /// <summary>
             /// Convert any number into any system
             /// </summary>
-            /// <param name="_aktuelle_Basis"></param>
-            /// <param name="ausgangszahl"></param>
-            /// <param name="_basis_des_neuen_Zahlensystems"></param>
+            /// <param name="currentBase">Base of the current number system</param>
+            /// <param name="startNumber">The number to go from</param>
+            /// <param name="newBase">The base of the target number system</param>
             /// <returns></returns>
-            public static string X_to_X(int _aktuelle_Basis, string ausgangszahl, int _basis_des_neuen_Zahlensystems)
+            public static string X_to_X(int currentBase, string startNumber, int newBase)
             {
-                  int _ergebnis , _ergebnis_DEC = 0, _rest, _stelle_von_rechts = 0;
-                  string eingabe = DeLetterer(ausgangszahl);
-                  int[] _zahlen_ = eingabe.Split(' ').Select(int.Parse).ToArray();
+                  int _ergebnis_DEC, _stelle_von_rechts = 0;
 
-                  if (_aktuelle_Basis != 10)
+                  if (currentBase != 10)
                   {
+                        string eingabe = DeLetterer(startNumber);
+                        int[] _zahlen_ = eingabe.Split(' ').Select(int.Parse).ToArray();
+
                         for (int i = _zahlen_.Length - 1; i >= 0; i--)
                         {
-                              _zahlen_[i] *= (int)Math.Pow(_aktuelle_Basis, _stelle_von_rechts++);   // der EXPONENT braucht das Inkrement dringend
+                              _zahlen_[i] *= (int)Math.Pow(currentBase, _stelle_von_rechts++);   // der EXPONENT braucht das Inkrement dringend
                         }
 
-                        _ergebnis_DEC += _zahlen_.Sum();
-
-                        endergebnis += _ergebnis_DEC;
+                        _ergebnis_DEC = _zahlen_.Sum();
                         Console.WriteLine("Ergebnis in Dezimal: " + _ergebnis_DEC);
-                        _aktuelle_Basis = 10;
                   }
-                  if (_aktuelle_Basis == 10)
+                  else
                   {
-                        if (_ergebnis_DEC > 0)
-                        {
-                              goto lol;   // sehr praktisch
-                        }
-                        else
-                        {
-                              _ergebnis_DEC = int.Parse(ausgangszahl);
-                        }
-                        lol:
-                        do
-                        {
-                              _rest = _ergebnis_DEC % _basis_des_neuen_Zahlensystems;
-                              _ergebnis = _ergebnis_DEC / _basis_des_neuen_Zahlensystems;
-
-                              // Rechenweg ausgeben
-                              Console.Write(_ergebnis_DEC + " % " + _basis_des_neuen_Zahlensystems + " = " + _rest + "\t" + "\t");
-                              Console.WriteLine(_ergebnis_DEC + " / " + _basis_des_neuen_Zahlensystems + " = " + _ergebnis);
-
-                              // Lösungs_String formatieren
-                              endergebnis = Letterer("" + _ergebnis_DEC % _basis_des_neuen_Zahlensystems);
-
-                              _ergebnis_DEC = _ergebnis;
-                        }
-                        while (_ergebnis_DEC > 0);
+                        _ergebnis_DEC = int.Parse(startNumber);
                   }
 
-                  switch (_basis_des_neuen_Zahlensystems)
-                  {
-                        case 10:
-                              {
-                                    Console.WriteLine(endergebnis.Reverse() + " DEC");
-                                    break;
-                              }
-                        case 16:
-                              {
-                                    Console.WriteLine(endergebnis.Reverse() + " 0xF");
-                                    break;
-                              }
-                        case 2:
-                              {
-                                    Console.WriteLine(endergebnis.Reverse() + " BIN");
-                                    break;
-                              }
-                        case 8:
-                              {
-                                    Console.WriteLine(endergebnis.Reverse() + " OKT");
-                                    break;
-                              }
-                  }
-                  return endergebnis;
+                  // Rechenweg und Ergebnis gibt DEC_to_X aus
+                  return DEC_to_X(_ergebnis_DEC, newBase);
             }
 
             /// <summary>
@@ -99,9 +52,9 @@ namespace xyToolz.Maths
             /// <returns>string numberWithoutLetters</returns>
             public static string DeLetterer(string number_with_letters)
             {
-
+                  number_with_letters = number_with_letters.ToUpperInvariant();
                   char[] input = number_with_letters.ToCharArray();
-                  char[] input2 =[]; 
+                  //char[] input2 =[];
                   int[] high_numbers = [10, 11, 12, 13, 14, 15];
                   char[] corresponding_letters = ['A', 'B', 'C', 'D', 'E', 'F'];
                   string[] digits = new string[number_with_letters.Length];
@@ -122,13 +75,13 @@ namespace xyToolz.Maths
                               }
                         }
                   }
-                  for (int i = 0; i < digits.Length; i++)
-                  {
-                        if (input[i].ToString() != digits[i])
-                        {
-                              input2[i] = input[i];
-                        }
-                  }
+                  //for (int i = 0; i < digits.Length; i++)
+                  //{
+                  //      if (input[i].ToString() != digits[i])
+                  //      {
+                  //            input2[i] = input[i];
+                  //      }
+                  //}
 
                   string numbers = string.Join(" ", digits);              
 
@@ -178,8 +131,7 @@ namespace xyToolz.Maths
                               }
                   }
 
-                  endausgabe += too_big_numbers;
-                  return endausgabe;
+                  return too_big_numbers;
             }
 
 
@@ -193,14 +145,20 @@ namespace xyToolz.Maths
             public static string DEC_to_X(int Number, int baseOfTargetNumberSystem)
             {
                   int ergebnis, rest;
+                  string endergebnis = "";
+
+                  if (baseOfTargetNumberSystem < 2 || baseOfTargetNumberSystem > 16)
+                  {
+                        throw new ArgumentOutOfRangeException(nameof(baseOfTargetNumberSystem), baseOfTargetNumberSystem, "Base must be between 2 and 16.");
+                  }
 
                   if (Number == 0)
                   {
-                        endergebnis += Number % baseOfTargetNumberSystem;
                         Console.WriteLine("Ausgangszahl ist nutzlos: " + Number);
-                        return endergebnis;
+                        return "0";
                   }
-                  else
+
+                  while (Number > 0)
                   {
                         rest = Number % baseOfTargetNumberSystem;
                         ergebnis = Number / baseOfTargetNumberSystem;
@@ -208,42 +166,46 @@ namespace xyToolz.Maths
                         Console.Write(Number + " % " + baseOfTargetNumberSystem + " = " + rest + "\t" + "\t");
                         Console.WriteLine(Number + " / " + baseOfTargetNumberSystem + " = " + ergebnis);
 
-                         // Beide machen Dasselbe
-                        //endergebnis  +=  Letterer (  (ausgangszahl % basis_des_neuen_Zahlensystems).ToString()); 
-                        endergebnis = Letterer("" + Number % baseOfTargetNumberSystem);      // KEIN Leerzeichen zwischen den  -->""<-- !!!         
+                        // Neue Ziffer kommt nach vorne, die Reste fallen von rechts nach links an
+                        endergebnis = Letterer("" + rest) + endergebnis;      // KEIN Leerzeichen zwischen den  -->""<-- !!!
 
                         Number = ergebnis;
-
-                        switch (baseOfTargetNumberSystem)
-                        {
-                              case 2:
-                                    {
-                                          Console.WriteLine(endergebnis.Reverse() + " Bin");
-                                          break;
-                                    }
-                              case 8:
-                                    {
-                                          Console.WriteLine(endergebnis.Reverse() + " Okt");
-                                          break;
-                                    }
-                              case 12:
-                                    {
-                                          Console.WriteLine(endergebnis.Reverse() + " DuoDez");
-                                          break;
-                                    }
-                              case 16:
-                                    {
-                                          Console.WriteLine(endergebnis.Reverse() + " 0xF");
-                                          break;
-                                    }
-                              default:
-                                    {
-                                          Console.WriteLine(endergebnis.Reverse());
-                                          break;
-                                    }
-                        }
-                        return DEC_to_X(Number, baseOfTargetNumberSystem);
                   }
+
+                  switch (baseOfTargetNumberSystem)
+                  {
+                        case 2:
+                              {
+                                    Console.WriteLine(endergebnis + " Bin");
+                                    break;
+                              }
+                        case 8:
+                              {
+                                    Console.WriteLine(endergebnis + " Okt");
+                                    break;
+                              }
+                        case 10:
+                              {
+                                    Console.WriteLine(endergebnis + " Dez");
+                                    break;
+                              }
+                        case 12:
+                              {
+                                    Console.WriteLine(endergebnis + " DuoDez");
+                                    break;
+                              }
+                        case 16:
+                              {
+                                    Console.WriteLine(endergebnis + " 0xF");
+                                    break;
+                              }
+                        default:
+                              {
+                                    Console.WriteLine(endergebnis);
+                                    break;
+                              }
+                  }
+                  return endergebnis;
             }
 
             /// <summary>
@@ -268,10 +230,9 @@ namespace xyToolz.Maths
                         ergebnis += i;
                   }
 
-                  endergebnis += ergebnis;
-                  Console.WriteLine("Ergebnis: " + endergebnis);
+                  Console.WriteLine("Ergebnis: " + ergebnis);
 
-                  return endergebnis;
+                  return ergebnis.ToString();
 
             }
             /// <summary>
@@ -322,10 +283,9 @@ namespace xyToolz.Maths
                         ergebnis += i;
                   }
 
-                  endergebnis += ergebnis;
-                  Console.WriteLine("Ergebnis: " + endergebnis);
+                  Console.WriteLine("Ergebnis: " + ergebnis);
 
-                  return endergebnis;
+                  return ergebnis.ToString();
 
             }
             /// <summary>

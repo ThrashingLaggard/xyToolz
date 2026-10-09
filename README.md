@@ -60,9 +60,6 @@ Simple EF Core wrapper: https://www.nuget.org/packages/ExtendedCRUD/
 ### Driver (WIP)
 **xyWebDriver** — Selenium-based browser automation. Currently disabled.
 
-### Interfaces - Ignore these!!!	Only relevant for internal Unit Tests (due to tomfoolery they cant be internal but need to be visible)
-`IxyFiles`, `IxyJson`, `IxyDataProtector` — abstractions used for test-double overrides in the corresponding static classes.
-
 ---
 
 ## Example

@@ -1,10 +1,15 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
+using xyLogger.Loggers;
 using xyMessageFactory.Factories;
 using xyToolz.Extensions;
-using xyToolz.Helper.Interfaces;
-using xyLogger.Loggers;
+
 #pragma warning disable CS1574, CS1584, CS1581, CS1580
 #pragma warning disable CS1571 // XML comment has a duplicate param tag
 #pragma warning disable CS1572 // XML comment has a param tag, but there is no parameter by that name
@@ -103,7 +108,7 @@ namespace xyToolz.Filesystem
         /// </summary>
         /// <remarks>
         /// <para><b>Behavior:</b></para>
-        /// Guarantees the existence of the target file path. If its nonexistent, attempts to create it.
+        /// Guarantees the existence of the target file path. If it's nonexistent, attempts to create it.
         ///
         /// <para><b>Performance:</b></para>
         /// Uses asynchronous file I/O; suitable for runtime checks and quick creation.
@@ -181,7 +186,7 @@ namespace xyToolz.Filesystem
         ///
         /// <para><b>Exceptions:</b></para>
         /// May throw exceptions if the path is invalid or access is denied. 
-        /// Provides internal exception handling by trycatch and exception logging!
+        /// Provides internal exception handling by try-catch and exception logging!
         ///
         /// <para><b>Example:</b></para>
         /// <code>
@@ -633,8 +638,7 @@ namespace xyToolz.Filesystem
             {
                 try
                 {
-                    string content = await File.ReadAllTextAsync(fileName);
-                    return content;
+                    return await File.ReadAllTextAsync(fileName);
                 }
                 catch (Exception ex)
                 {
@@ -800,16 +804,6 @@ namespace xyToolz.Filesystem
             }
         }
 
-        #endregion
-
-        #region Tests
-        private static IxyFiles? _override;
-        public static void OverrideForTests(IxyFiles mocked) => _override = mocked;
-        public static void ResetOverride() => _override = null;
-
-        //public static Task<string?> TestLoadFileAsync(string subfolder = "AppData", string fileName = "config.json")   =>  _override?.LoadFileAsync( fileName)?? LoadFileAsync(subfolder, fileName);
-
-        public static Task<string?> TestLoadFileAsync(string fullPath)   =>  _override?.LoadFileAsync(fullPath) ?? LoadFileAsync(fullPath);
         #endregion
 
     }

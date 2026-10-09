@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Compile Include="..\..\xyToolz\Filesystem\**\*.cs" />
-    <Compile Include="..\..\xyToolz\xUnit Test-Interfaces\IxyFiles.cs" />
   </ItemGroup>
 
   <ItemGroup>

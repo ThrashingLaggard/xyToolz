@@ -26,9 +26,6 @@ dotnet add package xySecurity
 - **`xyDataProtector`** — encrypt/decrypt objects, strings, bytes, and files:
   - `ProtectAsync<T>` / `UnprotectAsync<T>`, `ProtectString` / `UnprotectStringAsync`, `ProtectBytes` / `UnprotectBytesAsync`
   - `SaveProtectedToFileAsync<T>` / `LoadProtectedFromFileAsync<T>`, `ProtectFileAsync<T>`
-  - `OverrideForTests` / `ResetOverride` — swap in an `IxyDataProtector` test double.
-
-- **`IxyDataProtector`** — interface for mocking `xyDataProtector` in unit tests.
 
 ## Example
 
