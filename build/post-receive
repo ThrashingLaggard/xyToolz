@@ -42,6 +42,7 @@ die() { log "ABBRUCH: $*"; exit 1; }
 PKG_ID=""
 CSPROJ_REL=""                           # relative path to the csproj; default "<PKG_ID>.csproj"
 NUGET_SOURCE="$REPO_DIR/../../NuGets"   # local folder feed by default
+LOCAL_FEED="$REPO_DIR/../../NuGets"     # every published nupkg is also copied here, see 3g
 NUGET_API_KEY_ENV=""                    # e.g. XY_NUGET_KEY, only for nuget.org
 NUGET_API_KEY_PROTECTED_FILE=""         # alternative to *_ENV: path to a DPAPI-encrypted blob
 NUGET_KEY_TOOL=""                       # path to the xyToolz_Exec build that can decrypt it
@@ -193,8 +194,11 @@ while read -r oldrev newrev refname; do
     fi
 
     log "restore...($RESTORE_ARGS)"
+    # --no-http-cache: NuGet caches the version list of nuget.org for ~30 min. Without
+    # it, a dependency published minutes ago stays "not found" (NU1102) even after
+    # nuget.org has indexed it.
     # shellcheck disable=SC2086
-    $DOTNET restore "$CSPROJ_PATH" $RESTORE_ARGS >>"$LOG" 2>&1 || die "restore fehlgeschlagen, siehe $LOG"
+    $DOTNET restore "$CSPROJ_PATH" $RESTORE_ARGS --no-http-cache >>"$LOG" 2>&1 || die "restore fehlgeschlagen, siehe $LOG"
 
     log "build..."
     # shellcheck disable=SC2086
@@ -256,6 +260,19 @@ while read -r oldrev newrev refname; do
             || die "nuget push fehlgeschlagen, siehe $LOG"
     fi
     unset KEY decrypt_out
+
+    # nuget.org needs several minutes to validate and index a new package. Components
+    # released later in the SAME push (xyFilesystem after xyExtensions, ...) would then
+    # fail their restore with NU1102 (confirmed 2026-10-09: 4 of 10 components aborted).
+    # The local feed is the first restore source, so a copy there makes the new version
+    # available immediately. Not fatal: the publish itself has already succeeded.
+    if [ "$NUGET_SOURCE" != "$LOCAL_FEED" ]; then
+        if mkdir -p "$LOCAL_FEED" 2>/dev/null && cp "$NUPKG" "$LOCAL_FEED/"; then
+            log "Kopie im lokalen Feed: $LOCAL_FEED/$PKG_ID.$new_version.nupkg"
+        else
+            log "WARNUNG: Kopie in den lokalen Feed $LOCAL_FEED fehlgeschlagen. Abhaengige Komponenten im selben Push koennen am restore scheitern."
+        fi
+    fi
 
     # -- 3h. Tag LAST, only after a successful publish --------------------
     # Explicit identity: a bare server repo usually has no user.name/user.email,
