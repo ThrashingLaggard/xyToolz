@@ -151,6 +151,10 @@ _ReSharper*/
 CLAUDE.md
 *.sln.DotSettings
 
+# Local-only sources, deliberately not part of the repo
+/xyToolz/Logging/
+/xyToolz/xUnit Test-Interfaces/
+
 # TeamCity is a build add-in
 _TeamCity*
 
