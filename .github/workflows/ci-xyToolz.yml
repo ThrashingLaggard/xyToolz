@@ -220,7 +220,7 @@ jobs:
           # published to NuGet without ever tagging the repo). Never let the bump
           # be computed from a baseline lower than what's already live, or we'd
           # try to publish a version *older* than what users already have.
-          nuget_latest=$(curl -s "https://api.nuget.org/v3-flatcontainer/extendedcrud/index.json" \
+          nuget_latest=$(curl -s "https://api.nuget.org/v3-flatcontainer/xytoolz/index.json" \
             | jq -r '.versions[]?' 2>/dev/null \
             | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
             | sort -V | tail -1 || true)
