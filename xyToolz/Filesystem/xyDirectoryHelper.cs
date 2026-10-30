@@ -8,6 +8,7 @@ namespace xyToolz.Filesystem
     /// Directory helpers
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Benennungsstile", Justification = "<I want it that way>")]
+    // ReSharper disable once InconsistentNaming
     public static class xyDirectoryHelper
     {
         /// <summary>
@@ -23,7 +24,7 @@ namespace xyToolz.Filesystem
         public static string GetApplicationFolder() => Environment.CurrentDirectory;
 
         /// <summary>
-        /// While debugging in C# use this to get the app directory
+        /// While debugging in C# use this to get the app directory with logging (4 steps)
         /// </summary>
         /// <returns></returns>
         public static string GetInnerApplicationFolderDebug()
@@ -38,6 +39,14 @@ namespace xyToolz.Filesystem
 
             return appFolder;
         }
+        /// <summary>
+        /// While debugging in C# use this to get the app directory without logging
+        /// </summary>
+        /// <returns></returns>
+        public static string GetInnerApplicationFolder() =>  Directory.GetParent(Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory)!.FullName)! .FullName)!.FullName;
+     
+ 
+
 
         /// <summary>
         /// Deleting the target folder and its contents (recursive).
@@ -73,7 +82,7 @@ namespace xyToolz.Filesystem
         {
             if (Directory.Exists(folderPath))
             {
-                var option = includeSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+                SearchOption option = includeSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
                 return Directory.GetFiles(folderPath, searchPattern, option);
             }
             return Array.Empty<string>();
