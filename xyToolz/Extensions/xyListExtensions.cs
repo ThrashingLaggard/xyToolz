@@ -13,7 +13,7 @@ namespace xyToolz.Extensions
     /// Print whole thingy
     ///         --> also with Carriage return
     /// 
-    /// Fill with a time for every quarter hour of the day 
+    /// Fill with a time for every quarter-hour of the day 
     ///     
     /// </summary>
     public static class xyListExtensions

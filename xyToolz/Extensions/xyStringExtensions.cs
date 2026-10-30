@@ -44,7 +44,7 @@ namespace xyToolz.Extensions
         /// Reverses the characters in a given string.
         /// </summary>
         /// <remarks>
-        /// This variant is appearently safe for usage with unicode
+        /// This variant is appearently safe for usage with Unicode
         /// </remarks>
         /// <param name="input">The string to reverse.</param>
         /// <returns>The reversed string.</returns>
