@@ -6,7 +6,7 @@ using xyLogger.Loggers;
 namespace xyToolz.Extensions
 {
     /// <summary>
-    /// Providing little helpers for QOL  and readability
+    /// Get Bytes from (Base64)String and vice versa
     /// </summary>
     public static class xyByteExtensions
         {
