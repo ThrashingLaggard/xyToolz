@@ -10,7 +10,6 @@
     <!-- xyLogger: pinned by user instruction, not the latest available. Do not bump. -->
     <PackageVersion Include="xyLogger" Version="1.0.4" />
     <!-- xyMessageFactory: pinned by user instruction, not the latest available. Do not bump. -->
-    <PackageVersion Include="xyMessageFactory" Version="1.0.1" />
     <PackageVersion Include="PDFsharp" Version="6.2.4" />
     <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.23.0" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
@@ -24,5 +23,6 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
+    <PackageVersion Include="xyMessageFactory" Version="1.0.2" />
   </ItemGroup>
 </Project>
