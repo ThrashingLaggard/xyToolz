@@ -25,8 +25,5 @@ git merge target-branch
 
 --------------------------------------------
 
-
-### Merge Branches into master
-git checkout master
-git pull origin master
-git merge target-branch
+### Pushing the component repos to NuGet per post-receive
+cd ~/work/Repos/ThrashingLaggard/xyToolz/VersionControl && for id in xyChrono xyEnumerables xyExtensions xyPdf xyQOL xySerialization xyMaths xySecurity xyFonts xyFilesystem; do (cd "$id.git" && echo "$(git rev-parse master^) $(git rev-parse master) refs/heads/master" | ./hooks/post-receive) || { echo "STOP bei $id"; break; }; done
