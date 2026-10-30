@@ -194,11 +194,12 @@ while read -r oldrev newrev refname; do
     fi
 
     log "restore...($RESTORE_ARGS)"
-    # --no-http-cache: NuGet caches the version list of nuget.org for ~30 min. Without
+    # --no-cache: NuGet caches the version list of nuget.org for ~30 min. Without
     # it, a dependency published minutes ago stays "not found" (NU1102) even after
-    # nuget.org has indexed it.
+    # nuget.org has indexed it. Not --no-http-cache: the repos ship a global.json that
+    # pins SDK 8.0.x, and that SDK rejects it (MSB1001); only the 10.x CLI knows it.
     # shellcheck disable=SC2086
-    $DOTNET restore "$CSPROJ_PATH" $RESTORE_ARGS --no-http-cache >>"$LOG" 2>&1 || die "restore fehlgeschlagen, siehe $LOG"
+    $DOTNET restore "$CSPROJ_PATH" $RESTORE_ARGS --no-cache >>"$LOG" 2>&1 || die "restore fehlgeschlagen, siehe $LOG"
 
     log "build..."
     # shellcheck disable=SC2086
