@@ -1,6 +1,6 @@
+using Xunit;
 using xyToolz.Filesystem;
 using xyToolz.Serialization;
-using Xunit;
 
 namespace xyToolz.Tests.Filesystem;
 

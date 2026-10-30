@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace xyToolz.Chrono
+﻿namespace xyToolz.Chrono
 {
     /// <summary>
     /// Helper class for date operations

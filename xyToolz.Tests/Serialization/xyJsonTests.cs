@@ -1,5 +1,5 @@
-using xyToolz.Serialization;
 using Xunit;
+using xyToolz.Serialization;
 
 namespace xyToolz.Tests.Serialization;
 

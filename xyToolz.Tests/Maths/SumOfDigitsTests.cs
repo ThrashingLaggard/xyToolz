@@ -1,5 +1,5 @@
-using xyToolz.Maths;
 using Xunit;
+using xyToolz.Maths;
 
 namespace xyToolz.Tests.Maths;
 

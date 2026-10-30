@@ -1,5 +1,5 @@
-using xyToolz.Filesystem;
 using Xunit;
+using xyToolz.Filesystem;
 
 namespace xyToolz.Tests.Filesystem;
 

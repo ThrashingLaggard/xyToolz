@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using xyLogger.Loggers;
+﻿using xyLogger.Loggers;
 
 namespace xyToolz.Filesystem
 {

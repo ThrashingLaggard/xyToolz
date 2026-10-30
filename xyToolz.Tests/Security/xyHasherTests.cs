@@ -1,5 +1,5 @@
-using xyToolz.Security;
 using Xunit;
+using xyToolz.Security;
 
 namespace xyToolz.Tests.Security;
 
