@@ -9,8 +9,6 @@ using xyToolz.Extensions;
 #pragma warning disable CS1571 // XML comment has a duplicate param tag
 #pragma warning disable CS1572 // XML comment has a param tag, but there is no parameter by that name
 
-
-
 #if ANDROID
 using Android.Content;
 using Android.App;
