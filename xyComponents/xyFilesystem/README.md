@@ -43,7 +43,7 @@ string safePath = xyPath.Combine("AppData", "config.json");
 ## Dependencies
 
 - `xyLogger`
-- `xyMessageFactory`
+- `xyMessageFactory` (with selenium)
 - `xyExtensions` (project reference)
 
 ## Target Framework
